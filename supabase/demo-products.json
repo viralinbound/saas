@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Organic Royal Kashmiri Apples (1kg)",
+    "description": "Fresh organic apples from Kashmir valley",
+    "price": 18000,
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500&auto=format&fit=crop",
+    "category": "fruits"
+  },
+  {
+    "name": "Cold-Pressed Olive Oil (1L)",
+    "description": "Premium extra virgin olive oil",
+    "price": 89000,
+    "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&auto=format&fit=crop",
+    "category": "oils"
+  },
+  {
+    "name": "Farm Fresh Eggs (12 pcs)",
+    "description": "Free-range brown eggs",
+    "price": 13000,
+    "image": "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=500&auto=format&fit=crop",
+    "category": "dairy"
+  }
+]

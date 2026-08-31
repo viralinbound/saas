@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>SuperShowroom — Websites Designed, Built & Run For You</title>
+  <meta name="description" content="SuperShowroom by Viral Inbound. Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% sales fee." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sticky WhatsApp Button -->
+  <a href="https://wa.me/918968430834" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <span style="font-size:1.35rem;">💬</span>
+    <span>Chat on WhatsApp</span>
+  </a>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-content">
+      <span class="announcement-badge">✦ 2026 EDITION</span>
+      <span>SuperShowroom: Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% of sales!</span>
+      <a href="pricing.html" class="announcement-link">Compare Plans →</a>
+    </div>
+  </div>
+
+  <!-- Navigation Bar (Exact Header Matching Reference) -->
+  <header class="navbar-container">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo-brochure">
+        <div class="brand-logo-main">supershowroom<span class="sparkle-star">✦</span></div>
+        <div class="brand-logo-sub">BY VIRAL INBOUND</div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="domain-search.html">Domain Search</a>
+        <a href="templates.html">Store Templates</a>
+        <a href="features.html">What You Get</a>
+        <a href="pricing.html">Plans & Pricing</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openConsultationModal()">Build Store</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <span class="hero-badge-pill">✦ COMPLETE E-COMMERCE OPERATING SYSTEM</span>
+          <h1 class="hero-title">ecommerce websites designed, built & <span class="highlight-lime">run for you.</span></h1>
+          <p class="hero-subtitle">supershowroom is the hands-off ecommerce service for ambitious brands. we design your store, manage catalogs, handle hosting & domains, run ads, and recover abandoned carts — for a flat yearly fee + 2% of sales.</p>
+          
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+            <button class="btn btn-primary btn-lg" onclick="openConsultationModal('Pro Showroom (₹25,000/yr)')">Start Your Store Setup →</button>
+            <a href="templates.html" class="btn btn-outline btn-lg">Browse Live Store Themes</a>
+          </div>
+
+          <div style="display:flex; gap:16px; font-size:0.84rem; font-weight:700; color:var(--slate-500); flex-wrap:wrap;">
+            <span>✓ ₹15,000/yr starting</span>
+            <span>✓ 2% sales fee</span>
+            <span>✓ 350+ stores launched</span>
+          </div>
+        </div>
+
+        <div class="stats-banner-grid">
+          <div class="stat-box-modern">
+            <div class="stat-num font-mono">350+</div>
+            <div class="stat-text">STORES LIVE & RUNNING</div>
+          </div>
+          <div class="stat-box-modern">
+            <div class="stat-num font-mono">₹4.8Cr+</div>
+            <div class="stat-text">MERCHANT SALES PROCESSED</div>
+          </div>
+          <div class="stat-box-modern">
+            <div class="stat-num font-mono">99.9%</div>
+            <div class="stat-text">UPTIME WITH CLOUDFLARE</div>
+          </div>
+          <div class="stat-box-modern">
+            <div class="stat-num font-mono">&lt; 7 Days</div>
+            <div class="stat-text">AVERAGE TIME TO LAUNCH</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Merchant Logos Strip -->
+  <div style="background:#FFFFFF; border-bottom:1px solid var(--slate-200); padding:16px 0;">
+    <div class="container">
+      <div class="social-proof-bar">
+        <span class="social-logo-item">✦ THE CAFE CLUB</span>
+        <span class="social-logo-item">✦ RAW ORGANICS</span>
+        <span class="social-logo-item">✦ VELVET BOUTIQUE</span>
+        <span class="social-logo-item">✦ SPARK ELECTRONICS</span>
+        <span class="social-logo-item">✦ HERBAL ESSENCE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERVIEW SECTION 01: DOMAIN SEARCH OVERVIEW -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">01 / BRAND IDENTITY & DOMAINS</span>
+        <h2 class="section-title">Claim Your Free Custom Domain</h2>
+        <p class="section-sub">Search available brand domains. Every yearly SuperShowroom plan includes a free .com or .in domain with instant setup.</p>
+      </div>
+
+      <div class="feature-split-banner">
+        <div>
+          <div class="domain-search-box" style="margin-bottom:0;">
+            <label style="font-size:0.86rem; font-weight:800; color:var(--primary-navy); margin-bottom:8px; display:block;">Check Your Brand Domain Availability:</label>
+            <form onsubmit="handleHomeDomainRedirect(event)">
+              <div class="domain-input-group">
+                <input type="text" id="homeDomainInput" placeholder="e.g. yourbrandname" required />
+                <button type="submit" class="btn btn-primary">Check Availability →</button>
+              </div>
+            </form>
+            <div style="display:flex; gap:10px; margin-top:10px; font-size:0.78rem; color:var(--slate-500); flex-wrap:wrap;">
+              <span>🔥 <strong>.com</strong> (₹899 Free)</span>
+              <span>⚡ <strong>.in</strong> (₹499 Free)</span>
+              <span>🛍️ <strong>.store</strong> (₹299 Free)</span>
+              <span>✨ <strong>.shop</strong> (₹199 Free)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-dark-box">
+          <h3 style="color:var(--accent-cyan); font-size:1.25rem; margin-bottom:12px;">Domain Features Included:</h3>
+          <ul style="list-style:none; line-height:2.0; font-size:0.92rem; color:#FFFFFF; margin-bottom:14px;">
+            <li>✓ Automated SSL Certificate & HTTPS Binding</li>
+            <li>✓ Free DNS Record Management</li>
+            <li>✓ 1-Click Connection to SuperShowroom Store</li>
+            <li>✓ Zero Hidden Renewal Charges</li>
+          </ul>
+          <a href="domain-search.html" class="btn btn-sm btn-outline" style="background:rgba(255,255,255,0.12); color:#FFF; border-color:rgba(255,255,255,0.25);">Explore Full Domain Matrix →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW SECTION 02: STORE TEMPLATES & THEMES OVERVIEW -->
+  <section class="section-padding" style="background:var(--slate-50);">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">02 / STORE TEMPLATES & THEMES</span>
+        <h2 class="section-title">Ready-to-Launch Store Layouts</h2>
+        <p class="section-sub">Choose from 6+ mobile-first industry themes styled with custom color palettes, live search, cart drawers, and product photography.</p>
+      </div>
+
+      <!-- Responsive Fluid Grid -->
+      <div class="templates-grid" style="margin-bottom:28px;">
+        
+        <!-- 1. Luxe Apparel -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop" alt="Luxe Apparel" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.2rem;">Luxe Apparel & Fashion</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#EFF6FF; color:#0052FF; padding:2px 8px; border-radius:4px;">FASHION</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Color/size variants (S/M/L/XL), lookbook showcase & instant slide-out cart drawer.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <a href="templates.html#demo=fashion" class="btn btn-outline btn-full btn-sm">👁️ Live Demo</a>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('1. Luxe Apparel & Fashion')">Select Theme →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Artisan Bakery -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop" alt="Artisan Bakery" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.2rem;">Artisan Bakery & Café</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#FEF3C7; color:#D97706; padding:2px 8px; border-radius:4px;">BAKERY</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Daily fresh menu, eggless tags, delivery slot selector & gourmet cake booking.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <a href="templates.html#demo=bakery" class="btn btn-outline btn-full btn-sm">👁️ Live Demo</a>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('2. Artisan Bakery & Café')">Select Theme →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Fresh Mart Kirana -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop" alt="Fresh Mart Kirana" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.2rem;">Fresh Mart & Kirana</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#F1F5F9; color:#475569; padding:2px 8px; border-radius:4px;">GROCERY</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">High-density catalog, weight selector (500g, 1kg, 5kg) & 1-click fast cart add.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <a href="templates.html#demo=kirana" class="btn btn-outline btn-full btn-sm">👁️ Live Demo</a>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('4. Fresh Mart & Kirana')">Select Theme →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;">
+        <a href="templates.html" class="btn btn-primary btn-lg">Browse All 6 Store Themes & Live Demos →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW SECTION 03: WHAT YOU GET (3 PILLARS) -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">03 / WHAT YOU GET</span>
+        <h2 class="section-title">Complete 3-Pillar E-Commerce System</h2>
+        <p class="section-sub">Website design, catalog management, GST invoicing & automated growth suite.</p>
+      </div>
+
+      <div class="pillars-grid-3" style="margin-bottom:28px;">
+        <div style="background:var(--slate-50); border:1px solid var(--slate-200); padding:clamp(16px, 2.8vw, 26px); border-radius:var(--radius-md);">
+          <h3 style="font-size:1.22rem; margin-bottom:8px;">01. YOUR WEBSITE</h3>
+          <p style="color:var(--slate-600); font-size:0.9rem; line-height:1.55;">Custom brand styling, mobile-first design, high-speed hosting, custom domain & free SSL certificates.</p>
+        </div>
+        <div style="background:var(--slate-50); border:1px solid var(--slate-200); padding:clamp(16px, 2.8vw, 26px); border-radius:var(--radius-md);">
+          <h3 style="font-size:1.22rem; margin-bottom:8px;">02. YOUR STORE</h3>
+          <p style="color:var(--slate-600); font-size:0.9rem; line-height:1.55;">Full product catalog, stock alerts, order notifications & multi-member team logins.</p>
+        </div>
+        <div style="background:var(--slate-50); border:1px solid var(--slate-200); padding:clamp(16px, 2.8vw, 26px); border-radius:var(--radius-md);">
+          <h3 style="font-size:1.22rem; margin-bottom:8px;">03. YOUR GROWTH</h3>
+          <p style="color:var(--slate-600); font-size:0.9rem; line-height:1.55;">Sitewide SEO, Google Ads kit, WhatsApp CRM & automated repeat buyer recovery.</p>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <a href="features.html" class="btn btn-primary btn-lg">See Complete Feature Breakdown →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW SECTION 04: PRICING -->
+  <section class="section-padding" style="background:var(--slate-50);">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">04 / PLANS & PRICING</span>
+        <h2 class="section-title">pick the one that fits <span class="highlight-lime">today.</span></h2>
+        <p class="section-sub">Transparent yearly plans starting from ₹15,000/yr + 2% sales fee.</p>
+      </div>
+
+      <div class="pricing-cards-grid" style="margin-bottom:28px;">
+        <div class="pricing-card-modern">
+          <h3 class="plan-title">ESSENTIAL</h3>
+          <div class="plan-price-wrap"><span class="price-currency">₹</span><span class="price-amount">15,000</span><span class="price-period">/yr</span></div>
+          <p class="plan-desc">For small catalogs & first online stores</p>
+          <button class="btn btn-outline btn-full" onclick="selectPlan('Essential (₹15,000/yr)', this)">Pick Essential Plan →</button>
+        </div>
+
+        <div class="pricing-card-modern">
+          <h3 class="plan-title">PRO SHOWROOM</h3>
+          <div class="plan-price-wrap"><span class="price-currency">₹</span><span class="price-amount">25,000</span><span class="price-period">/yr</span></div>
+          <p class="plan-desc">For growing brands ready to scale</p>
+          <button class="btn btn-outline btn-full" onclick="selectPlan('Pro (₹25,000/yr)', this)">Pick Pro Plan →</button>
+        </div>
+
+        <div class="pricing-card-modern">
+          <h3 class="plan-title">ELITE</h3>
+          <div class="plan-price-wrap"><span class="price-currency">₹</span><span class="price-amount">35,000</span><span class="price-period">/yr</span></div>
+          <p class="plan-desc">For established high volume sellers</p>
+          <button class="btn btn-outline btn-full" onclick="selectPlan('Elite (₹35,000/yr)', this)">Pick Elite Plan →</button>
+        </div>
+
+        <div class="pricing-card-modern">
+          <h3 class="plan-title">PLUS</h3>
+          <div class="plan-price-wrap"><span class="price-currency">₹</span><span class="price-amount">50,000+</span><span class="price-period">/yr</span></div>
+          <p class="plan-desc">Fully custom build & dedicated manager</p>
+          <button class="btn btn-outline btn-full" onclick="selectPlan('Plus (₹50,000+/yr)', this)">Pick Plus Plan →</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <a href="pricing.html" class="btn btn-primary btn-lg">Compare All Plans & Calculate ROI →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW SECTION 05: SLEEK APPOINTMENT SCHEDULER WIDGET -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">05 / SCHEDULE ONBOARDING</span>
+        <h2 class="section-title">Book a 15-Minute Strategy Consultation</h2>
+        <p class="section-sub">Pick today's date or select any upcoming date & time slot for a live 1:1 strategy call on WhatsApp or Google Meet.</p>
+      </div>
+
+      <!-- Sleek Appointment Scheduler Card Matching Screenshot -->
+      <div class="appointment-scheduler-box" style="max-width:620px; margin:0 auto; padding:clamp(16px, 3vw, 24px);">
+        <div class="scheduler-header-host">
+          <div class="host-avatar-badge">K</div>
+          <div>
+            <div style="font-size:0.84rem; font-weight:800; color:var(--slate-500);">Kevin Singh</div>
+            <div class="host-info-title">15-Min Live Strategy Call</div>
+          </div>
+        </div>
+
+        <div class="scheduler-meta-tags" style="margin-bottom:14px;">
+          <span>⏱ 15 min strategy call</span>
+          <span>💬 WhatsApp Call or Google Meet Video Invite</span>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap" style="background:#F8FAFC; padding:14px; border-radius:12px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:0.95rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="sectionNativeDatePicker" onchange="handleSectionNativeDateChange(this)" style="font-size:0.84rem; padding:4px 8px; border:1px solid var(--slate-300); border-radius:6px; outline:none; background:#FFF; cursor:pointer; font-weight:600;" />
+          </div>
+          
+          <div class="modal-dates-row" id="sectionQuickDatesRow" style="margin-bottom:12px;">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid" id="sectionTimesGrid" style="grid-template-columns: repeat(4, 1fr); gap:6px;">
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectSectionTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="font-size:0.86rem; font-weight:800; color:var(--brand-blue);" id="sectionSelectedSlotDisplay">Selected: Today at 10:00am</div>
+          <button class="btn btn-primary btn-lg" onclick="openConsultationModal('Pro Showroom (₹25,000/yr)')">Book This Appointment Slot →</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- OVERVIEW SECTION 06: INTERACTIVE FAQ ACCORDION -->
+  <section class="section-padding" style="background:var(--slate-50);">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">06 / FREQUENTLY ASKED QUESTIONS</span>
+        <h2 class="section-title">Everything You Need To Know</h2>
+        <p class="section-sub">Clear answers about pricing, GST invoicing, domains, and store setup.</p>
+      </div>
+
+      <div class="faq-accordion-container">
+        <div class="faq-item active">
+          <div class="faq-question">How does the 2% fee on sales work? <span>▼</span></div>
+          <div class="faq-answer">The 2% sales fee applies only to completed orders processed on your store (ex GST). It is billed monthly with transparent reporting.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Is custom domain & SSL included for free? <span>▼</span></div>
+          <div class="faq-answer">Yes! Every SuperShowroom plan includes a free custom domain (.com or .in), SSL certificate, and automated HTTPS security.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">How long does it take to launch my online store? <span>▼</span></div>
+          <div class="faq-answer">Our standard setup takes 3 to 7 business days from catalog handover. We handle design, build, and delivery partner integration.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Can I use my existing GST and bank account? <span>▼</span></div>
+          <div class="faq-answer">Yes! We configure your automated GST invoices, razorpay/UPI payment gateways, and direct payout bank accounts during onboarding.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-logo-brochure">
+            <div class="brand-logo-main" style="color:#FFFFFF;">supershowroom<span class="sparkle-star">✦</span></div>
+            <div class="brand-logo-sub" style="color:var(--accent-cyan);">BY VIRAL INBOUND</div>
+          </div>
+          <p>SuperShowroom by Viral Inbound. Ecommerce websites designed, built & run for you. 350+ projects shipped.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Pages Overview</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home Overview</a></li>
+            <li><a href="domain-search.html">Domain Search Portal</a></li>
+            <li><a href="templates.html">Store Templates Gallery</a></li>
+            <li><a href="features.html">Features & Operations</a></li>
+            <li><a href="pricing.html">Plans & Pricing Table</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact Us</h4>
+          <ul class="footer-links">
+            <li><a href="mailto:kevin@viralinbound.com">kevin@viralinbound.com</a></li>
+            <li><a href="https://wa.me/918968430834">+91 89684 30834</a></li>
+            <li><a href="#">Bengaluru, India</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 SuperShowroom by Viral Inbound. All rights reserved.</span>
+        <span>Built for High-Growth Brands & Merchants across India.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SMART CONSULTATION MODAL (WITH DIRECT DATE/CALENDAR PICKER) -->
+  <div class="modal-overlay" id="consultationModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+      
+      <div style="margin-bottom: 14px;">
+        <span class="section-tag-pill">SCHEDULE ONBOARDING</span>
+        <h3 style="font-size: 1.35rem; margin-top: 6px;">Schedule Store Consultation</h3>
+        <div id="modalContextBadge" style="display:inline-block; background:var(--brand-blue-light); color:var(--brand-blue); font-weight:800; font-size:0.82rem; padding:4px 12px; border-radius:20px; margin-top:6px;">Plan: Pro Showroom</div>
+      </div>
+
+      <!-- Channel Selector: Email vs WhatsApp -->
+      <div class="channel-selector-grid">
+        <div class="channel-choice-card whatsapp-active active" id="channelCardWhatsapp" onclick="setConsultChannel('whatsapp')">
+          <div class="channel-icon-badge">💬</div>
+          <div>
+            <div class="channel-title">WhatsApp Call</div>
+            <div class="channel-sub">Direct Call & WhatsApp Chat</div>
+          </div>
+        </div>
+
+        <div class="channel-choice-card" id="channelCardEmail" onclick="setConsultChannel('email')">
+          <div class="channel-icon-badge">📧</div>
+          <div>
+            <div class="channel-title">Email & Meet</div>
+            <div class="channel-sub">Google Meet Video Invite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="storeCreateForm" onsubmit="handleStoreCreateSubmit(event)">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalFullName">Your Name</label>
+            <input type="text" id="modalFullName" placeholder="e.g. Kevin Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="modalBrandName">Store / Brand Name</label>
+            <input type="text" id="modalBrandName" placeholder="e.g. Kevin Boutique" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalPhone">Phone / WhatsApp Number</label>
+            <input type="tel" id="modalPhone" placeholder="+91 98765 43210" required />
+          </div>
+          <div class="form-group" id="modalEmailGroup">
+            <label for="modalEmail">Your Email Address</label>
+            <input type="email" id="modalEmail" placeholder="kevin@example.com" required />
+          </div>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="modalNativeDatePicker" onchange="handleModalNativeDateChange(this)" style="font-size:0.75rem; padding:3px 6px; border:1px solid var(--slate-200); border-radius:4px; outline:none; background:#FFF; cursor:pointer;" />
+          </div>
+          
+          <div class="modal-dates-row" id="modalQuickDatesRow">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid">
+            <div class="modal-time-chip" onclick="selectModalTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectModalTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <!-- Custom Requirements Message Textarea -->
+        <div class="form-group">
+          <label for="modalCustomMessage">Custom Requirements / Notes (Optional)</label>
+          <textarea id="modalCustomMessage" rows="2" placeholder="e.g. Need delivery partner integration, product variants, and GST invoicing setup..."></textarea>
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-whatsapp btn-full btn-lg">💬 Schedule WhatsApp Call & Details →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

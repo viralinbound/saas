@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  supabaseId String?  @unique
+  name       String
+  email      String   @unique
+  phone      String?
+  password   String?
+  createdAt  DateTime @default(now())
+  stores     Store[]
+}
+
+model Store {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  industry     String    @default("fashion")
+  theme        String    @default("fashion")
+  plan         String    @default("free")
+  status       String    @default("draft")
+  accentColor  String    @default("#24457A")
+  customDomain String?
+  ownerId      String
+  owner        User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products     Product[]
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       Int
+  mrp         Int?
+  image       String?
+  category    String   @default("all")
+  stock       Int      @default(100)
+  sku         String?
+  variants    String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  storeId       String
+  store         Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderNumber   String
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  address       String
+  city          String?
+  pincode       String?
+  paymentMethod String      @default("cod")
+  status        String      @default("placed")
+  subtotal      Int
+  platformFee   Int         @default(0)
+  total         Int
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  name      String
+  price     Int
+  quantity  Int     @default(1)
+  variant   String?
+}

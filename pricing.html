@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plans & Pricing — SuperShowroom</title>
+  <meta name="description" content="SuperShowroom managed e-commerce plans: Essential ₹15,000, Pro ₹25,000, Elite ₹35,000, Plus ₹50,000+. 2% sales fee, zero lock-in contracts." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sticky WhatsApp Button -->
+  <a href="https://wa.me/918968430834" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <span style="font-size:1.35rem;">💬</span>
+    <span>Chat on WhatsApp</span>
+  </a>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-content">
+      <span class="announcement-badge">✦ 2026 EDITION</span>
+      <span>SuperShowroom: Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% of sales!</span>
+      <a href="pricing.html" class="announcement-link">Compare Plans →</a>
+    </div>
+  </div>
+
+  <!-- Navigation Bar (Exact Header Matching Reference) -->
+  <header class="navbar-container">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo-brochure">
+        <div class="brand-logo-main">supershowroom<span class="sparkle-star">✦</span></div>
+        <div class="brand-logo-sub">BY VIRAL INBOUND</div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="domain-search.html">Domain Search</a>
+        <a href="templates.html">Store Templates</a>
+        <a href="features.html">What You Get</a>
+        <a href="pricing.html" class="active">Plans & Pricing</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openConsultationModal()">Build Store</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-section" style="padding: 64px 0 80px 0;">
+    <div class="container text-center">
+      <span class="hero-badge-pill">COMPARE THE PLANS</span>
+      <h1 class="hero-title">pick the one that fits <span class="highlight-lime">today.</span></h1>
+      <p class="hero-subtitle" style="margin: 0 auto;">upgrade any time — we move you up without rebuilding your site. from ₹15,000 a year plus 2% of what you sell.</p>
+    </div>
+  </section>
+
+  <!-- Pricing Cards Grid -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+
+      <div class="pricing-cards-grid" style="margin-bottom:60px;">
+        
+        <!-- Tier 1: Essential -->
+        <div class="pricing-card-modern" data-plan="Essential (₹15,000/yr)">
+          <h3 class="plan-title">ESSENTIAL</h3>
+          <p class="plan-desc">For small catalogs & first online stores</p>
+          <div class="plan-price-wrap">
+            <span class="price-currency">₹</span>
+            <span class="price-amount">15,000</span>
+            <span class="price-period">/yr</span>
+          </div>
+          <ul style="list-style:none; margin-bottom:24px; font-size:0.9rem; color:var(--slate-600); line-height:2.2;">
+            <li>✓ Free Custom Domain (.in)</li>
+            <li>✓ Up to 100 Products</li>
+            <li>✓ Advance to start: ₹5,000</li>
+            <li>✓ 2% Sales Fee (ex GST)</li>
+          </ul>
+          <button class="btn btn-outline" onclick="selectPlan('Essential (₹15,000/yr)', this)">Pick Essential Plan →</button>
+        </div>
+
+        <!-- Tier 2: Pro -->
+        <div class="pricing-card-modern" data-plan="Pro (₹25,000/yr)">
+          <h3 class="plan-title">PRO SHOWROOM</h3>
+          <p class="plan-desc">For growing brands ready to scale</p>
+          <div class="plan-price-wrap">
+            <span class="price-currency">₹</span>
+            <span class="price-amount">25,000</span>
+            <span class="price-period">/yr</span>
+          </div>
+          <ul style="list-style:none; margin-bottom:24px; font-size:0.9rem; color:var(--slate-600); line-height:2.2;">
+            <li>✓ Free Domain (.com / .in)</li>
+            <li>✓ Unlimited Products & Video</li>
+            <li>✓ Advance to start: ₹8,000</li>
+            <li>✓ 2% Sales Fee (ex GST)</li>
+          </ul>
+          <button class="btn btn-outline" onclick="selectPlan('Pro (₹25,000/yr)', this)">Pick Pro Plan →</button>
+        </div>
+
+        <!-- Tier 3: Elite -->
+        <div class="pricing-card-modern" data-plan="Elite (₹35,000/yr)">
+          <h3 class="plan-title">ELITE</h3>
+          <p class="plan-desc">For established high volume sellers</p>
+          <div class="plan-price-wrap">
+            <span class="price-currency">₹</span>
+            <span class="price-amount">35,000</span>
+            <span class="price-period">/yr</span>
+          </div>
+          <ul style="list-style:none; margin-bottom:24px; font-size:0.9rem; color:var(--slate-600); line-height:2.2;">
+            <li>✓ Remove SuperShowroom Branding</li>
+            <li>✓ Full Sitewide SEO & Reviews</li>
+            <li>✓ Advance to start: ₹12,000</li>
+            <li>✓ 2% Sales Fee (ex GST)</li>
+          </ul>
+          <button class="btn btn-outline" onclick="selectPlan('Elite (₹35,000/yr)', this)">Pick Elite Plan →</button>
+        </div>
+
+        <!-- Tier 4: Plus -->
+        <div class="pricing-card-modern" data-plan="Plus (₹50,000+/yr)">
+          <h3 class="plan-title">PLUS</h3>
+          <p class="plan-desc">Fully custom build & dedicated manager</p>
+          <div class="plan-price-wrap">
+            <span class="price-currency">₹</span>
+            <span class="price-amount">50,000+</span>
+            <span class="price-period">/yr</span>
+          </div>
+          <ul style="list-style:none; margin-bottom:24px; font-size:0.9rem; color:var(--slate-600); line-height:2.2;">
+            <li>✓ Fully Custom Theme Design</li>
+            <li>✓ Reduced 1% Sales Fee</li>
+            <li>✓ Advance to start: ₹20,000</li>
+            <li>✓ Admin + 15 Logins</li>
+          </ul>
+          <button class="btn btn-outline" onclick="selectPlan('Plus (₹50,000+/yr)', this)">Pick Plus Plan →</button>
+        </div>
+
+      </div>
+
+      <!-- FULL DETAILED BROCHURE COMPARISON MATRIX (Page 5 of Brochure) -->
+      <div style="margin-bottom:60px;">
+        <div class="section-header-center" style="margin-bottom:32px;">
+          <span class="section-tag-pill">COMPLETE FEATURE MATRIX</span>
+          <h2 class="section-title">Full Detailed Feature Breakdown</h2>
+          <p class="section-sub">Line-by-line feature comparison across all four SuperShowroom plans.</p>
+        </div>
+
+        <div class="pricing-matrix-scroll">
+          <table class="pricing-table-brochure">
+            <thead>
+              <tr>
+                <th style="width: 28%;">FEATURE</th>
+                <th style="width: 18%;">
+                  <div class="plan-header-title">ESSENTIAL</div>
+                  <div class="plan-header-price">₹15,000</div>
+                  <div style="font-size:0.75rem; color:var(--slate-500); margin-top:2px;">/year + 2% sales</div>
+                </th>
+                <th style="width: 18%;">
+                  <div class="plan-header-title">PRO</div>
+                  <div class="plan-header-price">₹25,000</div>
+                  <div style="font-size:0.75rem; color:var(--slate-500); margin-top:2px;">/year + 2% sales</div>
+                </th>
+                <th style="width: 18%;">
+                  <div class="plan-header-title">ELITE</div>
+                  <div class="plan-header-price">₹35,000</div>
+                  <div style="font-size:0.75rem; color:var(--slate-500); margin-top:2px;">/year + 2% sales</div>
+                </th>
+                <th style="width: 18%;">
+                  <div class="plan-header-title">PLUS</div>
+                  <div class="plan-header-price">₹50,000+</div>
+                  <div style="font-size:0.75rem; color:var(--slate-500); margin-top:2px;">/year + 1% sales</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- BEST SUITED TO -->
+              <tr class="row-group-title"><td colspan="5">BEST SUITED TO</td></tr>
+              <tr>
+                <td><strong>Who it's for</strong></td>
+                <td>first store, small catalog</td>
+                <td>growing brand, ready to scale</td>
+                <td>established, high volume</td>
+                <td>fully custom build</td>
+              </tr>
+              <tr>
+                <td><strong>Advance to start</strong></td>
+                <td>₹5,000</td>
+                <td>₹8,000</td>
+                <td>₹12,000</td>
+                <td>₹20,000</td>
+              </tr>
+              <tr>
+                <td><strong>Platform fee on sales</strong></td>
+                <td>2%</td>
+                <td>2%</td>
+                <td>2%</td>
+                <td>1%</td>
+              </tr>
+
+              <!-- WEBSITE & HOSTING -->
+              <tr class="row-group-title"><td colspan="5">WEBSITE & HOSTING</td></tr>
+              <tr>
+                <td><strong>Domain, hosting & SSL</strong></td>
+                <td style="color:var(--success-green); font-weight:700;">Free</td>
+                <td style="color:var(--success-green); font-weight:700;">Free</td>
+                <td style="color:var(--success-green); font-weight:700;">Free</td>
+                <td style="color:var(--success-green); font-weight:700;">Free</td>
+              </tr>
+              <tr>
+                <td><strong>Design layouts</strong></td>
+                <td>Premium</td>
+                <td>Premium</td>
+                <td>Premium</td>
+                <td>Fully custom</td>
+              </tr>
+              <tr>
+                <td><strong>Extra pages (blog, FAQ, testimonials)</strong></td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td>Custom</td>
+              </tr>
+              <tr>
+                <td><strong>Remove SuperShowroom branding</strong></td>
+                <td>—</td>
+                <td>—</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+
+              <!-- YOUR CATALOG -->
+              <tr class="row-group-title"><td colspan="5">YOUR CATALOG</td></tr>
+              <tr>
+                <td><strong>Products you can list</strong></td>
+                <td>100</td>
+                <td style="color:var(--success-green); font-weight:700;">Unlimited</td>
+                <td style="color:var(--success-green); font-weight:700;">Unlimited</td>
+                <td style="color:var(--success-green); font-weight:700;">Unlimited</td>
+              </tr>
+              <tr>
+                <td><strong>Images per product</strong></td>
+                <td>4 + 1/variant</td>
+                <td>4 + 4/variant + video</td>
+                <td>4 + 8/variant + video</td>
+                <td>4 + 8/variant + video</td>
+              </tr>
+              <tr>
+                <td><strong>Variants (size, colour...)</strong></td>
+                <td>Basic</td>
+                <td style="color:var(--success-green); font-weight:700;">Advanced</td>
+                <td style="color:var(--success-green); font-weight:700;">Advanced</td>
+                <td style="color:var(--success-green); font-weight:700;">Advanced</td>
+              </tr>
+              <tr>
+                <td><strong>Collections, filters & product tags</strong></td>
+                <td>—</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Customer reviews & ratings</strong></td>
+                <td>—</td>
+                <td>—</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+
+              <!-- RUNNING THE STORE -->
+              <tr class="row-group-title"><td colspan="5">RUNNING THE STORE</td></tr>
+              <tr>
+                <td><strong>Order management & notifications</strong></td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Stock alerts & auto out-of-stock</strong></td>
+                <td>Manual</td>
+                <td style="color:var(--success-green); font-weight:700;">Automatic</td>
+                <td style="color:var(--success-green); font-weight:700;">Automatic</td>
+                <td style="color:var(--success-green); font-weight:700;">Automatic</td>
+              </tr>
+              <tr>
+                <td><strong>Order cancellation & reports</strong></td>
+                <td>—</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Team logins</strong></td>
+                <td>Admin only</td>
+                <td>Admin + 3</td>
+                <td>Admin + 15</td>
+                <td>Admin + 15</td>
+              </tr>
+
+              <!-- GETTING CUSTOMERS -->
+              <tr class="row-group-title"><td colspan="5">GETTING CUSTOMERS & MARKETING</td></tr>
+              <tr>
+                <td><strong>SEO setup</strong></td>
+                <td>Homepage</td>
+                <td>Homepage</td>
+                <td style="color:var(--success-green); font-weight:700;">Full sitewide</td>
+                <td style="color:var(--success-green); font-weight:700;">Full sitewide</td>
+              </tr>
+              <tr>
+                <td><strong>Google Ads, Shopping & social kit</strong></td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+              <tr>
+                <td><strong>CRM — repeat buyers & cart recovery</strong></td>
+                <td>—</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Coupons & vouchers</strong></td>
+                <td>Store / cart</td>
+                <td>+ categories</td>
+                <td>+ products</td>
+                <td>+ products</td>
+              </tr>
+              <tr>
+                <td><strong>WhatsApp marketing credits</strong></td>
+                <td>Add-on</td>
+                <td style="color:var(--success-green); font-weight:700;">Free credits</td>
+                <td style="color:var(--success-green); font-weight:700;">Free credits</td>
+                <td style="color:var(--success-green); font-weight:700;">Free credits</td>
+              </tr>
+
+              <!-- SUPPORT -->
+              <tr class="row-group-title"><td colspan="5">SUPPORT & ONBOARDING</td></tr>
+              <tr>
+                <td><strong>WhatsApp chat & callback support</strong></td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+                <td style="color:var(--success-green); font-weight:700;">Yes</td>
+              </tr>
+
+              <!-- ACTION ROW -->
+              <tr class="row-cta">
+                <td><strong>CHOOSE TIER</strong></td>
+                <td><button class="btn btn-sm btn-outline" onclick="selectPlan('Essential (₹15,000/yr)', this)">Select Essential</button></td>
+                <td><button class="btn btn-sm btn-outline" onclick="selectPlan('Pro (₹25,000/yr)', this)">Select Pro</button></td>
+                <td><button class="btn btn-sm btn-outline" onclick="selectPlan('Elite (₹35,000/yr)', this)">Select Elite</button></td>
+                <td><button class="btn btn-sm btn-outline" onclick="selectPlan('Plus (₹50,000+/yr)', this)">Select Plus</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:0.85rem; color:var(--slate-500); font-family:var(--font-mono); margin-top:14px;">* Prices exclude 18% GST. Plans step up 10% each year on renewal — written down from day one. The 2% fee on sales never changes.</p>
+      </div>
+
+      <!-- ROI Calculator Card -->
+      <div class="roi-card-box">
+        <div class="section-tag-pill">THE MATHS</div>
+        <h3 style="font-size:1.8rem; margin-bottom:8px;">Interactive 2% Sales ROI Calculator (Pro Plan)</h3>
+        <p style="color:var(--slate-600); font-size:0.95rem;">Drag the slider to see your exact total investment based on your monthly revenue:</p>
+
+        <div class="slider-group">
+          <label for="monthlySalesSlider">Estimated Monthly Store Sales: <span id="salesDisplay" style="color:var(--brand-blue); font-weight:900;">₹1,00,000</span></label>
+          <input type="range" id="monthlySalesSlider" min="25000" max="500000" step="25000" value="100000" />
+        </div>
+
+        <div class="roi-stats-3">
+          <div class="roi-stat-box">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--slate-500);">MONTHLY SALES</div>
+            <div class="roi-stat-val" id="resMonthlySales">₹1,00,000</div>
+          </div>
+          <div class="roi-stat-box">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--slate-500);">2% PLATFORM FEE</div>
+            <div class="roi-stat-val" id="resPlatformFee">₹2,000 / mo</div>
+          </div>
+          <div class="roi-stat-box">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--slate-500);">TOTAL YEAR ONE COST</div>
+            <div class="roi-stat-val" id="resTotalYear" style="color:var(--success-green);">₹49,000</div>
+            <div style="font-size:0.75rem; color:var(--slate-500); margin-top:3px;">(₹25k Plan + ₹24k Sales Fee)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>© 2026 SuperShowroom by Viral Inbound. All rights reserved.</span>
+        <span>Transparent Managed Ecommerce Store Pricing.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SMART CONSULTATION MODAL (CLEAN CONTEXTUAL BADGE WITHOUT DROPDOWNS) -->
+  <div class="modal-overlay" id="consultationModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+      
+      <div style="margin-bottom: 14px;">
+        <span class="section-tag-pill">CONFIRM SELECTION</span>
+        <h3 style="font-size: 1.35rem; margin-top: 6px;">Schedule Plan Consultation</h3>
+        <div id="modalContextBadge" style="display:inline-block; background:var(--brand-blue-light); color:var(--brand-blue); font-weight:800; font-size:0.82rem; padding:4px 12px; border-radius:20px; margin-top:6px;">Plan: Pro Showroom (₹25,000/yr)</div>
+      </div>
+
+      <!-- Channel Selector: Email vs WhatsApp -->
+      <div class="channel-selector-grid">
+        <div class="channel-choice-card whatsapp-active active" id="channelCardWhatsapp" onclick="setConsultChannel('whatsapp')">
+          <div class="channel-icon-badge">💬</div>
+          <div>
+            <div class="channel-title">WhatsApp Call</div>
+            <div class="channel-sub">Direct Call & WhatsApp Chat</div>
+          </div>
+        </div>
+
+        <div class="channel-choice-card" id="channelCardEmail" onclick="setConsultChannel('email')">
+          <div class="channel-icon-badge">📧</div>
+          <div>
+            <div class="channel-title">Email & Meet</div>
+            <div class="channel-sub">Google Meet Video Invite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="storeCreateForm" onsubmit="handleStoreCreateSubmit(event)">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label for="modalFullName">Your Name</label>
+            <input type="text" id="modalFullName" placeholder="e.g. Kevin Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="modalBrandName">Store / Brand Name</label>
+            <input type="text" id="modalBrandName" placeholder="e.g. Kevin Boutique" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label for="modalPhone">Phone / WhatsApp Number</label>
+            <input type="tel" id="modalPhone" placeholder="+91 98765 43210" required />
+          </div>
+          <div class="form-group" id="modalEmailGroup">
+            <label for="modalEmail">Your Email Address</label>
+            <input type="email" id="modalEmail" placeholder="kevin@example.com" required />
+          </div>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="modalNativeDatePicker" onchange="handleModalNativeDateChange(this)" style="font-size:0.75rem; padding:3px 6px; border:1px solid var(--slate-200); border-radius:4px; outline:none; background:#FFF; cursor:pointer;" />
+          </div>
+          
+          <div class="modal-dates-row" id="modalQuickDatesRow">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid">
+            <div class="modal-time-chip" onclick="selectModalTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectModalTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <!-- Custom Requirements Message Textarea -->
+        <div class="form-group">
+          <label for="modalCustomMessage">Custom Requirements / Notes (Optional)</label>
+          <textarea id="modalCustomMessage" rows="2" placeholder="e.g. Need help setting up Razorpay, custom domain, and catalog upload..."></textarea>
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-whatsapp btn-full btn-lg">💬 Schedule WhatsApp Call & Details →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

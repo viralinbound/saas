@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Store Templates & Color Palettes — SuperShowroom</title>
+  <meta name="description" content="Browse 6 high-converting industry themes with custom color palettes and real product imagery. Live demo website preview." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sticky WhatsApp Button -->
+  <a href="https://wa.me/918968430834" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <span style="font-size:1.35rem;">💬</span>
+    <span>Chat on WhatsApp</span>
+  </a>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-content">
+      <span class="announcement-badge">✦ 2026 EDITION</span>
+      <span>SuperShowroom: Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% of sales!</span>
+      <a href="pricing.html" class="announcement-link">Compare Plans →</a>
+    </div>
+  </div>
+
+  <!-- Navigation Bar (Exact Header Matching Reference) -->
+  <header class="navbar-container">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo-brochure">
+        <div class="brand-logo-main">supershowroom<span class="sparkle-star">✦</span></div>
+        <div class="brand-logo-sub">BY VIRAL INBOUND</div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="domain-search.html">Domain Search</a>
+        <a href="templates.html" class="active">Store Templates</a>
+        <a href="features.html">What You Get</a>
+        <a href="pricing.html">Plans & Pricing</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openConsultationModal()">Build Store</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header (Compact Responsive Padding) -->
+  <section class="hero-section">
+    <div class="container text-center">
+      <span class="hero-badge-pill">6 INDUSTRY THEMES</span>
+      <h1 class="hero-title">store templates & <span class="highlight-lime">color palettes.</span></h1>
+      <p class="hero-subtitle" style="margin: 0 auto;">explore authentic interactive demo storefronts with real photography, hero sliders, cart drawer, and checkout. click "launch live demo" to preview any theme!</p>
+    </div>
+  </section>
+
+  <!-- Templates Gallery Section -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+      
+      <div class="templates-grid">
+        
+        <!-- 1. Luxe Apparel -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop" alt="Luxe Apparel" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">1. Luxe Apparel & Fashion</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#EFF6FF; color:#0052FF; padding:2px 8px; border-radius:4px;">POPULAR</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Color & size swatches (S/M/L/XL), Instagram lookbook reel, and one-click cart drawer.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('fashion')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('1. Luxe Apparel & Fashion')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Artisan Bakery -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop" alt="Artisan Bakery" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">2. Artisan Bakery & Café</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#FEF3C7; color:#D97706; padding:2px 8px; border-radius:4px;">HOT</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Daily baked menu, eggless badges, delivery slot selector & fresh cake order booking.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('bakery')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('2. Artisan Bakery & Café')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Glow Skincare -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop" alt="Glow Skincare" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">3. Glow Organic Skincare</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#ECFDF5; color:#059669; padding:2px 8px; border-radius:4px;">ORGANIC</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Clean beauty design, dermatologist verified badges, customer reviews & before-after slider.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('skincare')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('3. Glow Organic Skincare')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Fresh Mart Kirana -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop" alt="Fresh Mart Kirana" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">4. Fresh Mart & Kirana</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#F1F5F9; color:#475569; padding:2px 8px; border-radius:4px;">GROCERY</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">High-density catalog layout, weight selector (500g, 1kg, 5kg), and fast 1-click cart addition.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('kirana')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('4. Fresh Mart & Kirana')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Cyber Tech & Electronics -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop" alt="Cyber Tech" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">5. Cyber Tech & Gadgets</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#EFF6FF; color:#0052FF; padding:2px 8px; border-radius:4px;">TECH</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">Technical specs comparison table, warranty registration badges, and EMI calculator integration.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('tech')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('5. Cyber Tech & Gadgets')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Royal Gold & Gems -->
+        <div class="template-card">
+          <div class="template-img-wrap">
+            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&auto=format&fit=crop" alt="Royal Gems" />
+          </div>
+          <div class="template-content-body">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h3 style="font-size:1.22rem;">6. Royal Gold & Jewellery</h3>
+                <span style="font-size:0.72rem; font-weight:800; background:#FEF3C7; color:#B45309; padding:2px 8px; border-radius:4px;">LUXURY</span>
+              </div>
+              <p style="color:var(--slate-600); font-size:0.88rem; margin-bottom:14px;">BIS Hallmark certified tags, high-resolution zoom magnifier, and VIP consultation booking.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="launchLiveDemo('jewels')">👁️ Live Demo</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="selectTemplate('6. Royal Gold & Jewellery')">Select & Schedule →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       REAL PRODUCTION-GRADE LIVE DEMO STOREFRONT CANVAS MODAL
+       ========================================================================== -->
+  <div class="modal-overlay" id="fullStoreCanvasModal">
+    <div class="demo-canvas-modal-card" id="demoCanvasContainer">
+      
+      <!-- Top Control Toolbar (Device Preview Switcher & Actions) -->
+      <div class="demo-control-toolbar">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button onclick="closeFullStoreCanvas()" style="background:rgba(255,255,255,0.15); color:#FFF; border:none; padding:4px 10px; border-radius:6px; font-weight:700; font-size:0.78rem; cursor:pointer;">← Exit Demo</button>
+          
+          <div class="demo-view-tabs">
+            <button class="demo-view-btn active" id="viewBtnDesktop" onclick="setDemoViewMode('desktop')">🖥️ Desktop</button>
+            <button class="demo-view-btn" id="viewBtnMobile" onclick="setDemoViewMode('mobile')">📱 Mobile</button>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-sm btn-primary" style="padding:5px 14px; font-size:0.78rem;" onclick="closeFullStoreCanvas(); selectTemplate(currentStoreData.name);">Launch This Theme →</button>
+        </div>
+      </div>
+
+      <!-- Real Storefront Scrollable Webpage Content -->
+      <div style="flex:1; overflow-y:auto; background:#FFFFFF;" id="storefrontScrollArea">
+        
+        <!-- 1. Storefront Announcement Bar -->
+        <div class="real-store-announcement" id="storeAnnouncementBar">
+          ✨ SPECIAL LAUNCH OFFER: GET FLAT 15% OFF WITH CODE: <strong>LAUNCH15</strong> • FREE SHIPPING OVER ₹999
+        </div>
+
+        <!-- 2. Storefront Navigation Bar -->
+        <div class="real-store-nav">
+          <div class="real-store-logo" id="storefrontLogo">LUXE APPAREL</div>
+
+          <ul class="real-store-menu-links">
+            <li><a href="#" onclick="filterDemoCategory('all', null); return false;">Home</a></li>
+            <li><a href="#" onclick="filterDemoCategory('all', null); return false;">Shop All</a></li>
+            <li><a href="#" onclick="filterDemoCategory('bestsellers', null); return false;">Bestsellers</a></li>
+            <li><a href="#" onclick="filterDemoCategory('new', null); return false;">New Arrivals</a></li>
+            <li><a href="#storeReviewsSection">Reviews</a></li>
+          </ul>
+
+          <div class="real-store-nav-icons">
+            <div style="background:#F1F5F9; border-radius:20px; padding:4px 10px; display:flex; align-items:center; gap:6px;">
+              <input type="text" id="demoLiveSearchInput" placeholder="Search products..." oninput="handleDemoLiveSearch()" style="border:none; background:transparent; font-size:0.8rem; outline:none; width:110px;" />
+            </div>
+            <div style="background:#F1F5F9; padding:6px 12px; border-radius:20px; font-size:0.82rem; font-weight:800; cursor:pointer; user-select:none;" onclick="openCartDrawer()">
+              🛒 Cart (<span id="storeCartCount" style="color:#0052FF;">0</span>)
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Storefront Hero Banner -->
+        <div class="real-store-hero" id="storeHeroBanner">
+          <div style="max-width:540px;">
+            <span style="background:var(--accent-lime); color:#000; font-size:0.75rem; font-weight:900; padding:3px 8px; border-radius:4px; margin-bottom:10px; display:inline-block;" id="storeHeroBadge">NEW SEASON DROP</span>
+            <h2 style="color:#FFFFFF; font-size:clamp(1.6rem, 4vw, 2.5rem); margin-bottom:8px; line-height:1.15;" id="storeHeroTitle">Designer Festive Elegance</h2>
+            <p style="color:#E2E8F0; font-size:0.95rem; margin-bottom:16px;" id="storeHeroSub">Handcrafted premium collections designed for modern lifestyle & comfort.</p>
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('storeCatalogSection').scrollIntoView({behavior:'smooth'})">Explore Catalog ↓</button>
+          </div>
+        </div>
+
+        <!-- 4. Real Trust Strip -->
+        <div class="real-store-trust-strip">
+          <span>⚡ Same-Day Express Dispatch</span>
+          <span>🛡️ 100% Secure Razorpay & UPI</span>
+          <span>🔄 7-Day Hassle-Free Returns</span>
+          <span>⭐ 4.9/5 Rating (1,400+ Verified Buyers)</span>
+        </div>
+
+        <!-- 5. Storefront Catalog Section -->
+        <div style="padding:clamp(12px, 3vw, 24px);" id="storeCatalogSection">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h3 style="font-size:1.35rem; color:#0F172A;">Featured Catalog</h3>
+              <p style="font-size:0.84rem; color:#64748B;">Showing available in-stock items with fast delivery</p>
+            </div>
+            
+            <!-- Category Pills Filter -->
+            <div class="real-store-category-bar" id="storeCategoryPills">
+              <!-- Rendered by script.js -->
+            </div>
+          </div>
+
+          <!-- Product Grid -->
+          <div id="storeProductsGrid" class="demo-canvas-grid">
+            <!-- Rendered by script.js -->
+          </div>
+
+        </div>
+
+        <!-- 6. Customer Testimonials & Reviews -->
+        <div class="storefront-reviews-strip" id="storeReviewsSection" style="margin: 0 clamp(12px, 3vw, 24px) 24px clamp(12px, 3vw, 24px);">
+          <div style="text-align:center; margin-bottom:16px;">
+            <div style="font-size:0.76rem; font-weight:800; color:#0052FF; letter-spacing:0.08em;">VERIFIED BUYER EXPERIENCES</div>
+            <h4 style="font-size:1.25rem; margin-top:2px;">What Our Customers Say</h4>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;" id="storeReviewsGrid">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 7. Storefront Footer -->
+        <div style="background:#0F172A; color:#94A3B8; padding:24px clamp(12px, 3vw, 24px); border-top:1px solid #334155;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; font-size:0.84rem;">
+            <div>
+              <strong style="color:#FFF;" id="footerStoreBrand">LUXE APPAREL</strong> • Powered by SuperShowroom
+            </div>
+            <div style="display:flex; gap:12px;">
+              <span>🔒 256-Bit SSL Encrypted</span>
+              <span>⚡ Razorpay Verified</span>
+              <span>📦 Shiprocket Enabled</span>
+            </div>
+          </div>
+          <div style="font-size:0.75rem; text-align:center; color:#64748B;">
+            © 2026 Interactive Storefront Demo. Integrated with UPI QR, WhatsApp Order Bot, and Automated GST Invoicing.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real Shopping Cart & Checkout Drawer -->
+      <div id="demoCartDrawer" style="display:none; position:absolute; top:0; right:0; bottom:0; width:min(340px, 100%); background:#FFFFFF; border-left:1px solid var(--slate-200); box-shadow:-12px 0 30px rgba(0,0,0,0.2); flex-direction:column; z-index:100;">
+        <div style="padding:14px; border-bottom:1px solid var(--slate-200); display:flex; justify-content:space-between; align-items:center; background:var(--slate-50);">
+          <strong style="font-size:1.05rem; color:var(--primary-navy);">Shopping Cart (<span id="cartDrawerCount">0</span>)</strong>
+          <button onclick="closeCartDrawer()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+        
+        <div id="cartDrawerItems" style="flex:1; overflow-y:auto; padding:12px;">
+          <div style="text-align:center; color:var(--slate-500); padding:30px 0;">Your cart is empty!</div>
+        </div>
+
+        <!-- Coupon Code Box -->
+        <div style="padding:10px 14px; border-top:1px solid var(--slate-200); background:#F8FAFC;">
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="cartCouponInput" placeholder="Coupon (try SUPER20)" style="flex:1; padding:6px 10px; border-radius:6px; border:1px solid var(--slate-200); font-size:0.8rem; outline:none; text-transform:uppercase;" />
+            <button class="btn btn-sm btn-outline" onclick="applyCartCoupon()">Apply</button>
+          </div>
+          <div id="couponStatusMsg" style="font-size:0.74rem; margin-top:4px; font-weight:700; display:none;"></div>
+        </div>
+
+        <!-- Cart Summary & Checkout -->
+        <div style="padding:14px; border-top:1px solid var(--slate-200); background:var(--slate-50);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.84rem; color:var(--slate-600);">
+            <span>Subtotal:</span>
+            <span id="cartSubtotalVal">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.84rem; color:var(--success-green);" id="cartDiscountRow">
+            <span>Coupon Discount:</span>
+            <span id="cartDiscountVal">-₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:900; font-size:1.15rem; color:var(--primary-navy);">
+            <span>Total Payable:</span>
+            <span id="cartTotalPayable" style="color:var(--brand-blue);">₹0</span>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="openCheckoutModal()">Proceed to Checkout (Demo) →</button>
+        </div>
+      </div>
+
+      <!-- Real Interactive Checkout Modal Simulation -->
+      <div class="modal-overlay" id="checkoutSimModal" style="z-index:250;">
+        <div class="checkout-modal-card">
+          <button class="modal-close" onclick="closeCheckoutModal()">&times;</button>
+          
+          <div style="margin-bottom:14px;">
+            <span class="section-tag-pill">INSTANT CHECKOUT</span>
+            <h3 style="font-size:1.25rem; margin-top:4px;">Complete Your Order</h3>
+            <p style="font-size:0.84rem; color:var(--slate-500);">Amount to pay: <strong id="checkoutPayableDisplay" style="color:var(--brand-blue);">₹0</strong></p>
+          </div>
+
+          <form onsubmit="handleDemoOrderSubmit(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:0.78rem; font-weight:700;">Full Name</label>
+                <input type="text" id="chkName" placeholder="Priya Sharma" required style="width:100%; padding:7px 10px; border-radius:6px; border:1px solid #CBD5E1; font-size:0.85rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.78rem; font-weight:700;">Phone / WhatsApp</label>
+                <input type="tel" id="chkPhone" placeholder="+91 98765 43210" required style="width:100%; padding:7px 10px; border-radius:6px; border:1px solid #CBD5E1; font-size:0.85rem;" />
+              </div>
+            </div>
+
+            <div style="margin-bottom:10px;">
+              <label style="font-size:0.78rem; font-weight:700;">Delivery Address</label>
+              <input type="text" id="chkAddress" placeholder="Flat 402, Green Glen Layout, Bellandur, Bengaluru" required style="width:100%; padding:7px 10px; border-radius:6px; border:1px solid #CBD5E1; font-size:0.85rem;" />
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <label style="font-size:0.78rem; font-weight:700; display:block; margin-bottom:6px;">Select Payment Mode (Demo)</label>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:0.78rem; font-weight:700;">
+                <label style="border:1px solid #0052FF; background:#EFF6FF; padding:8px 6px; border-radius:6px; text-align:center; cursor:pointer;">
+                  <input type="radio" name="chkPay" checked /> UPI / QR
+                </label>
+                <label style="border:1px solid #CBD5E1; padding:8px 6px; border-radius:6px; text-align:center; cursor:pointer;">
+                  <input type="radio" name="chkPay" /> Cards
+                </label>
+                <label style="border:1px solid #CBD5E1; padding:8px 6px; border-radius:6px; text-align:center; cursor:pointer;">
+                  <input type="radio" name="chkPay" /> Cash (COD)
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">⚡ Place Simulated Order</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Order Confirmation Popup -->
+      <div class="modal-overlay" id="orderSuccessModal" style="z-index:300;">
+        <div style="background:#FFF; padding:28px; border-radius:20px; max-width:400px; text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.4);">
+          <div style="font-size:3rem; margin-bottom:10px;">🎉</div>
+          <h3 style="font-size:1.35rem; color:#0F172A; margin-bottom:6px;">Order Confirmed!</h3>
+          <p style="font-size:0.88rem; color:#64748B; margin-bottom:16px;">Order ID: <strong id="successOrderId" style="color:#0052FF;">#ORD-94812</strong><br>An automated WhatsApp confirmation and tracking link has been generated.</p>
+          <button class="btn btn-primary btn-full btn-sm" onclick="closeOrderSuccessModal()">Continue Shopping →</button>
+        </div>
+      </div>
+
+      <!-- Toast Notification -->
+      <div id="cartToast" style="display:none; position:absolute; bottom:14px; right:14px; background:#10B981; color:#FFF; padding:8px 14px; border-radius:30px; font-weight:800; font-size:0.82rem; box-shadow:0 8px 16px rgba(16,185,129,0.35); z-index:200;">
+        ✓ Added to cart! 🛒
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>© 2026 SuperShowroom by Viral Inbound. All rights reserved.</span>
+        <span>Store Templates & Color Palettes Studio.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SMART CONSULTATION MODAL -->
+  <div class="modal-overlay" id="consultationModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+      
+      <div style="margin-bottom: 14px;">
+        <span class="section-tag-pill">SCHEDULE ONBOARDING</span>
+        <h3 style="font-size: 1.35rem; margin-top: 6px;">Schedule Store Consultation</h3>
+        <div id="modalContextBadge" style="display:inline-block; background:var(--brand-blue-light); color:var(--brand-blue); font-weight:800; font-size:0.82rem; padding:4px 12px; border-radius:20px; margin-top:6px;">Plan: Pro Showroom</div>
+      </div>
+
+      <!-- Channel Selector: Email vs WhatsApp -->
+      <div class="channel-selector-grid">
+        <div class="channel-choice-card whatsapp-active active" id="channelCardWhatsapp" onclick="setConsultChannel('whatsapp')">
+          <div class="channel-icon-badge">💬</div>
+          <div>
+            <div class="channel-title">WhatsApp Call</div>
+            <div class="channel-sub">Direct Call & WhatsApp Chat</div>
+          </div>
+        </div>
+
+        <div class="channel-choice-card" id="channelCardEmail" onclick="setConsultChannel('email')">
+          <div class="channel-icon-badge">📧</div>
+          <div>
+            <div class="channel-title">Email & Meet</div>
+            <div class="channel-sub">Google Meet Video Invite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="storeCreateForm" onsubmit="handleStoreCreateSubmit(event)">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalFullName">Your Name</label>
+            <input type="text" id="modalFullName" placeholder="e.g. Kevin Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="modalBrandName">Store / Brand Name</label>
+            <input type="text" id="modalBrandName" placeholder="e.g. Kevin Boutique" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalPhone">Phone / WhatsApp Number</label>
+            <input type="tel" id="modalPhone" placeholder="+91 98765 43210" required />
+          </div>
+          <div class="form-group" id="modalEmailGroup">
+            <label for="modalEmail">Your Email Address</label>
+            <input type="email" id="modalEmail" placeholder="kevin@example.com" required />
+          </div>
+        </div>
+
+        <!-- Appointment Slot Selector Section -->
+        <div class="modal-slot-picker-wrap">
+          <div style="font-size:0.82rem; font-weight:800; color:var(--primary-navy); margin-bottom:6px;">Select Appointment Date & Time Slot (IST):</div>
+          
+          <div class="modal-dates-row">
+            <div class="modal-date-chip active" onclick="selectModalDate(this, 'Monday, Aug 24, 2026')">Mon, 24 Aug</div>
+            <div class="modal-date-chip" onclick="selectModalDate(this, 'Tuesday, Aug 25, 2026')">Tue, 25 Aug</div>
+            <div class="modal-date-chip" onclick="selectModalDate(this, 'Wednesday, Aug 26, 2026')">Wed, 26 Aug</div>
+            <div class="modal-date-chip" onclick="selectModalDate(this, 'Thursday, Aug 27, 2026')">Thu, 27 Aug</div>
+            <div class="modal-date-chip" onclick="selectModalDate(this, 'Friday, Aug 28, 2026')">Fri, 28 Aug</div>
+          </div>
+
+          <div class="modal-times-grid">
+            <div class="modal-time-chip" onclick="selectModalTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectModalTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <!-- Custom Requirements Message Textarea -->
+        <div class="form-group">
+          <label for="modalCustomMessage">Custom Requirements / Notes (Optional)</label>
+          <textarea id="modalCustomMessage" rows="2" placeholder="e.g. Need delivery partner integration, product variants, and GST invoicing setup..."></textarea>
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-whatsapp btn-full btn-lg">💬 Schedule WhatsApp Call & Details →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

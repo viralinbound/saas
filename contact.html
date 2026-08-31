@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Contact Us & Schedule Consultation — SuperShowroom</title>
+  <meta name="description" content="Book a 30-minute 1:1 onboarding consultation with Kevin Singh. Direct WhatsApp and email support." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sticky WhatsApp Button -->
+  <a href="https://wa.me/918968430834" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <span style="font-size:1.35rem;">💬</span>
+    <span>Chat on WhatsApp</span>
+  </a>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-content">
+      <span class="announcement-badge">✦ 2026 EDITION</span>
+      <span>SuperShowroom: Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% of sales!</span>
+      <a href="pricing.html" class="announcement-link">Compare Plans →</a>
+    </div>
+  </div>
+
+  <!-- Navigation Bar (Exact Header Matching Reference) -->
+  <header class="navbar-container">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo-brochure">
+        <div class="brand-logo-main">supershowroom<span class="sparkle-star">✦</span></div>
+        <div class="brand-logo-sub">BY VIRAL INBOUND</div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="domain-search.html">Domain Search</a>
+        <a href="templates.html">Store Templates</a>
+        <a href="features.html">What You Get</a>
+        <a href="pricing.html">Plans & Pricing</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html" class="active">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openConsultationModal()">Build Store</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="hero-section">
+    <div class="container text-center">
+      <span class="hero-badge-pill">1:1 ONBOARDING DEMO</span>
+      <h1 class="hero-title">schedule a 30-min <span class="highlight-lime">consultation.</span></h1>
+      <p class="hero-subtitle" style="margin: 0 auto;">pick ANY upcoming date and time slot below for a 1:1 Google Meet video call or WhatsApp consultation with Kevin Singh.</p>
+    </div>
+  </section>
+
+  <!-- Google Calendar / Appointment Scheduler Section (Matching Image Reference) -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+
+      <div class="appointment-scheduler-box" style="max-width: 620px; margin: 0 auto; padding:clamp(16px, 3vw, 24px);">
+        
+        <!-- Host Profile Bar -->
+        <div class="scheduler-header-host">
+          <div class="host-avatar-badge">K</div>
+          <div>
+            <div style="font-size:0.84rem; font-weight:800; color:var(--slate-500);">Kevin Singh</div>
+            <div class="host-info-title">15-Min Live Strategy Call</div>
+          </div>
+        </div>
+
+        <div class="scheduler-meta-tags" style="margin-bottom:14px;">
+          <span>⏱ 15 min strategy call</span>
+          <span>💬 WhatsApp Call or Google Meet Video Invite</span>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap" style="background:#F8FAFC; padding:14px; border-radius:12px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:0.95rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="sectionNativeDatePicker" onchange="handleSectionNativeDateChange(this)" style="font-size:0.84rem; padding:4px 8px; border:1px solid var(--slate-300); border-radius:6px; outline:none; background:#FFF; cursor:pointer; font-weight:600;" />
+          </div>
+          
+          <div class="modal-dates-row" id="sectionQuickDatesRow" style="margin-bottom:12px;">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid" id="sectionTimesGrid" style="grid-template-columns: repeat(4, 1fr); gap:6px;">
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectSectionTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectSectionTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="font-size:0.86rem; font-weight:800; color:var(--brand-blue);" id="sectionSelectedSlotDisplay">Selected: Today at 10:00am</div>
+          <button class="btn btn-primary btn-lg" onclick="openConsultationModal('Pro Showroom (₹25,000/yr)')">Book This Appointment Slot →</button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Direct Contact Information -->
+  <section class="section-padding" style="background:var(--slate-50);">
+    <div class="container">
+      <div class="contact-cards-grid">
+        <div style="background:#FFFFFF; border:1px solid var(--slate-200); padding:26px; border-radius:var(--radius-md); box-shadow:var(--shadow-subtle);">
+          <strong style="color:var(--brand-blue); display:block; font-size:0.82rem; margin-bottom:8px;" class="font-mono">WHATSAPP DIRECT</strong>
+          <a href="https://wa.me/918968430834" target="_blank" style="font-size:1.25rem; font-weight:900; color:var(--primary-navy); text-decoration:none;" class="font-mono">+91 89684 30834</a>
+        </div>
+        <div style="background:#FFFFFF; border:1px solid var(--slate-200); padding:26px; border-radius:var(--radius-md); box-shadow:var(--shadow-subtle);">
+          <strong style="color:var(--brand-blue); display:block; font-size:0.82rem; margin-bottom:8px;" class="font-mono">EMAIL DIRECT</strong>
+          <a href="mailto:kevin@viralinbound.com" style="font-size:1.1rem; font-weight:900; color:var(--primary-navy); text-decoration:none; word-break:break-all;" class="font-mono">KEVIN@VIRALINBOUND.COM</a>
+        </div>
+        <div style="background:#FFFFFF; border:1px solid var(--slate-200); padding:26px; border-radius:var(--radius-md); box-shadow:var(--shadow-subtle);">
+          <strong style="color:var(--brand-blue); display:block; font-size:0.82rem; margin-bottom:8px;" class="font-mono">STUDIO LOCATION</strong>
+          <p style="font-size:1rem; font-weight:800; color:var(--primary-navy);" class="font-mono">viralinbound.com · Bengaluru, India</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-logo-brochure">
+            <div class="brand-logo-main" style="color:#FFFFFF;">supershowroom<span class="sparkle-star">✦</span></div>
+            <div class="brand-logo-sub" style="color:var(--accent-cyan);">BY VIRAL INBOUND</div>
+          </div>
+          <p>SuperShowroom by Viral Inbound. Ecommerce websites designed, built & run for you. 350+ projects shipped.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Pages Overview</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home Overview</a></li>
+            <li><a href="domain-search.html">Domain Search Portal</a></li>
+            <li><a href="templates.html">Store Templates Gallery</a></li>
+            <li><a href="features.html">Features & Operations</a></li>
+            <li><a href="pricing.html">Plans & Pricing Table</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact Us</h4>
+          <ul class="footer-links">
+            <li><a href="mailto:kevin@viralinbound.com">kevin@viralinbound.com</a></li>
+            <li><a href="https://wa.me/918968430834">+91 89684 30834</a></li>
+            <li><a href="#">Bengaluru, India</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 SuperShowroom by Viral Inbound. All rights reserved.</span>
+        <span>Built for High-Growth Brands & Merchants across India.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SMART CONSULTATION MODAL (WITH DIRECT DATE/CALENDAR PICKER) -->
+  <div class="modal-overlay" id="consultationModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+      
+      <div style="margin-bottom: 14px;">
+        <span class="section-tag-pill">SCHEDULE ONBOARDING</span>
+        <h3 style="font-size: 1.35rem; margin-top: 6px;">Schedule Store Consultation</h3>
+        <div id="modalContextBadge" style="display:inline-block; background:var(--brand-blue-light); color:var(--brand-blue); font-weight:800; font-size:0.82rem; padding:4px 12px; border-radius:20px; margin-top:6px;">Plan: Pro Showroom</div>
+      </div>
+
+      <!-- Channel Selector: Email vs WhatsApp -->
+      <div class="channel-selector-grid">
+        <div class="channel-choice-card whatsapp-active active" id="channelCardWhatsapp" onclick="setConsultChannel('whatsapp')">
+          <div class="channel-icon-badge">💬</div>
+          <div>
+            <div class="channel-title">WhatsApp Call</div>
+            <div class="channel-sub">Direct Call & WhatsApp Chat</div>
+          </div>
+        </div>
+
+        <div class="channel-choice-card" id="channelCardEmail" onclick="setConsultChannel('email')">
+          <div class="channel-icon-badge">📧</div>
+          <div>
+            <div class="channel-title">Email & Meet</div>
+            <div class="channel-sub">Google Meet Video Invite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="storeCreateForm" onsubmit="handleStoreCreateSubmit(event)">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalFullName">Your Name</label>
+            <input type="text" id="modalFullName" placeholder="e.g. Kevin Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="modalBrandName">Store / Brand Name</label>
+            <input type="text" id="modalBrandName" placeholder="e.g. Kevin Boutique" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalPhone">Phone / WhatsApp Number</label>
+            <input type="tel" id="modalPhone" placeholder="+91 98765 43210" required />
+          </div>
+          <div class="form-group" id="modalEmailGroup">
+            <label for="modalEmail">Your Email Address</label>
+            <input type="email" id="modalEmail" placeholder="kevin@example.com" required />
+          </div>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="modalNativeDatePicker" onchange="handleModalNativeDateChange(this)" style="font-size:0.75rem; padding:3px 6px; border:1px solid var(--slate-200); border-radius:4px; outline:none; background:#FFF; cursor:pointer;" />
+          </div>
+          
+          <div class="modal-dates-row" id="modalQuickDatesRow">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid">
+            <div class="modal-time-chip" onclick="selectModalTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectModalTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <!-- Custom Requirements Message Textarea -->
+        <div class="form-group">
+          <label for="modalCustomMessage">Custom Requirements / Notes (Optional)</label>
+          <textarea id="modalCustomMessage" rows="2" placeholder="e.g. Need delivery partner integration, product variants, and GST invoicing setup..."></textarea>
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-whatsapp btn-full btn-lg">💬 Schedule WhatsApp Call & Details →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

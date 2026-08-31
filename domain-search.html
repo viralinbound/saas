@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domain Search & Pricing Matrix — SuperShowroom</title>
+  <meta name="description" content="Search custom domain names with instant availability, live prices (.com, .in, .co.in, .store, .shop, .online), free SSL, and hosting." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Floating Sticky WhatsApp Quick Chat Button -->
+  <a href="https://wa.me/918968430834" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+    <span style="font-size:1.35rem;">💬</span>
+    <span>Chat on WhatsApp</span>
+  </a>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-content">
+      <span class="announcement-badge">✦ 2026 EDITION</span>
+      <span>SuperShowroom: Ecommerce websites designed, built & run for you. From ₹15,000/yr + 2% of sales!</span>
+      <a href="pricing.html" class="announcement-link">Compare Plans →</a>
+    </div>
+  </div>
+
+  <!-- Navigation Bar (Exact Header Matching Reference) -->
+  <header class="navbar-container">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo-brochure">
+        <div class="brand-logo-main">supershowroom<span class="sparkle-star">✦</span></div>
+        <div class="brand-logo-sub">BY VIRAL INBOUND</div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="domain-search.html" class="active">Domain Search</a>
+        <a href="templates.html">Store Templates</a>
+        <a href="features.html">What You Get</a>
+        <a href="pricing.html">Plans & Pricing</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" onclick="openConsultationModal()">Build Store</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header for Domain Search -->
+  <section class="hero-section" style="padding: 64px 0 80px 0;">
+    <div class="container text-center">
+      <span class="hero-badge-pill">🌐 DOMAIN SEARCH ENGINE</span>
+      <h1 class="hero-title">Find Your Perfect <span class="highlight-lime">Brand Domain</span></h1>
+      <p class="hero-subtitle" style="margin: 0 auto 32px auto;">Check instant availability across all popular extensions (.com, .in, .store, .shop, .online). Includes automated SSL security, DNS management, and 1-click store binding.</p>
+
+      <!-- Domain Search Input -->
+      <div class="domain-search-box" style="max-width:720px; margin:0 auto;">
+        <form onsubmit="handleDomainSearch(event)">
+          <div class="domain-input-group">
+            <input type="text" id="domainQuery" placeholder="Type your store or brand name (e.g. kevinboutique)" required />
+            <button type="submit" class="btn btn-primary">Check All Extensions →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- All Domain Results Grid Matrix -->
+      <div class="all-domains-results-container active" id="allDomainsResults" style="max-width:920px; margin:28px auto 0 auto; text-align:left;">
+        <div class="results-header-info">
+          <div class="results-title">Available Extensions for "<span id="searchedQueryDisplay" style="color:var(--brand-blue);">mybrandstore</span>":</div>
+          <div style="font-size:0.85rem; color:var(--slate-500);">All prices exclude GST • Includes free SSL & hosting</div>
+        </div>
+        <div class="domain-results-grid" id="domainResultsGrid">
+          <!-- Populated by script.js -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Domain Extension Price List Table -->
+  <section class="section-padding" style="background:#FFFFFF;">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-tag-pill">TRANSPARENT DOMAIN PRICING</span>
+        <h2 class="section-title">Popular Domain Extension Rates</h2>
+        <p class="section-sub">Standard renewal pricing with zero hidden fees and automated DNS setup.</p>
+      </div>
+
+      <div class="pricing-matrix-scroll" style="max-width:980px; margin:0 auto;">
+        <table class="pricing-table-brochure">
+          <thead>
+            <tr>
+              <th style="padding:18px 24px;">EXTENSION</th>
+              <th style="padding:18px 24px;">PRICE / YEAR</th>
+              <th style="padding:18px 24px;">SSL CERTIFICATE</th>
+              <th style="padding:18px 24px;">HOSTING & DNS</th>
+              <th style="padding:18px 24px; text-align:right;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.com</span></td>
+              <td style="padding:18px 24px;"><strong>₹899</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.com', '₹899')">Register .com →</button></td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.in</span></td>
+              <td style="padding:18px 24px;"><strong>₹499</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.in', '₹499')">Register .in →</button></td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.co.in</span></td>
+              <td style="padding:18px 24px;"><strong>₹399</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.co.in', '₹399')">Register .co.in →</button></td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.store</span></td>
+              <td style="padding:18px 24px;"><strong>₹299</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.store', '₹299')">Register .store →</button></td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.shop</span></td>
+              <td style="padding:18px 24px;"><strong>₹199</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.shop', '₹199')">Register .shop →</button></td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;"><span class="highlight-lime">.online</span></td>
+              <td style="padding:18px 24px;"><strong>₹149</strong> / year</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Free Automated SSL</td>
+              <td style="padding:18px 24px; color:var(--success-green); font-weight:700;">✓ Included Free</td>
+              <td style="padding:18px 24px; text-align:right;"><button class="btn btn-sm btn-outline" onclick="claimDomain('yourbrand.online', '₹149')">Register .online →</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container">
+      <div class="footer-bottom">
+        <span>© 2026 SuperShowroom by Viral Inbound. All rights reserved.</span>
+        <span>Domain Registration & Website Development Engine.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SMART CONSULTATION MODAL -->
+  <div class="modal-overlay" id="consultationModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+      
+      <div style="margin-bottom: 14px;">
+        <span class="section-tag-pill">CLAIM DOMAIN & LAUNCH</span>
+        <h3 style="font-size: 1.35rem; margin-top: 6px;">Claim Domain & Schedule Consultation</h3>
+        <div id="modalContextBadge" style="display:inline-block; background:var(--brand-blue-light); color:var(--brand-blue); font-weight:800; font-size:0.82rem; padding:4px 12px; border-radius:20px; margin-top:6px;">Plan: Pro Showroom</div>
+      </div>
+
+      <!-- Channel Selector: Email vs WhatsApp -->
+      <div class="channel-selector-grid">
+        <div class="channel-choice-card whatsapp-active active" id="channelCardWhatsapp" onclick="setConsultChannel('whatsapp')">
+          <div class="channel-icon-badge">💬</div>
+          <div>
+            <div class="channel-title">WhatsApp Call</div>
+            <div class="channel-sub">Direct Call & WhatsApp Chat</div>
+          </div>
+        </div>
+
+        <div class="channel-choice-card" id="channelCardEmail" onclick="setConsultChannel('email')">
+          <div class="channel-icon-badge">📧</div>
+          <div>
+            <div class="channel-title">Email & Meet</div>
+            <div class="channel-sub">Google Meet Video Invite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="storeCreateForm" onsubmit="handleStoreCreateSubmit(event)">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalFullName">Your Name</label>
+            <input type="text" id="modalFullName" placeholder="e.g. Kevin Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="modalBrandName">Store / Brand Name</label>
+            <input type="text" id="modalBrandName" placeholder="e.g. Kevin Boutique" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label for="modalPhone">Phone / WhatsApp Number</label>
+            <input type="tel" id="modalPhone" placeholder="+91 98765 43210" required />
+          </div>
+          <div class="form-group" id="modalEmailGroup">
+            <label for="modalEmail">Your Email Address</label>
+            <input type="email" id="modalEmail" placeholder="kevin@example.com" required />
+          </div>
+        </div>
+
+        <!-- Appointment Slot Selector Section with Custom Date Calendar Input -->
+        <div class="modal-slot-picker-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:0.82rem; font-weight:800; color:var(--primary-navy);">Select Date & Time (IST):</div>
+            <input type="date" id="modalNativeDatePicker" onchange="handleModalNativeDateChange(this)" style="font-size:0.75rem; padding:3px 6px; border:1px solid var(--slate-200); border-radius:4px; outline:none; background:#FFF; cursor:pointer;" />
+          </div>
+          
+          <div class="modal-dates-row" id="modalQuickDatesRow">
+            <!-- Dynamically Rendered -->
+          </div>
+
+          <div class="modal-times-grid">
+            <div class="modal-time-chip" onclick="selectModalTime(this, '9:00am')">9:00am</div>
+            <div class="modal-time-chip active" onclick="selectModalTime(this, '10:00am')">10:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '11:00am')">11:00am</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '12:00pm')">12:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '2:00pm')">2:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '3:00pm')">3:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '4:00pm')">4:00pm</div>
+            <div class="modal-time-chip" onclick="selectModalTime(this, '5:00pm')">5:00pm</div>
+          </div>
+        </div>
+
+        <!-- Custom Requirements Message Textarea -->
+        <div class="form-group">
+          <label for="modalCustomMessage">Custom Requirements / Notes (Optional)</label>
+          <textarea id="modalCustomMessage" rows="2" placeholder="e.g. Need delivery partner integration, product variants, and GST invoicing setup..."></textarea>
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-whatsapp btn-full btn-lg">💬 Schedule WhatsApp Call & Details →</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

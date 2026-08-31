@@ -1,0 +1,105 @@
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; }
+body { background: #FAF9F6; color: #14161A; font-family: 'Instrument Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+/* `overflow-x: hidden` (set by the legacy /styles.css) turns <body> into a
+   scroll container and breaks `position: sticky`. `clip` prevents horizontal
+   scroll without creating a scroll container, so the sticky header works.
+   `html body` raises specificity above the legacy `body {}` rule. */
+html body { overflow-x: clip; overflow-y: visible; }
+a { color: inherit; }
+::selection { background: #EEF2F8; color: #14161A; }
+
+/* ── redesign animation vocabulary (ported verbatim from
+   "SuperShowroom Site v1.0.dc.html" + Homepage.dc.html) ───────────────── */
+@keyframes rise      { from { opacity: 0; transform: translateY(56px); } to { opacity: 1; transform: none; } }
+@keyframes riseSm    { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes inL       { from { opacity: 0; transform: translateX(-70px); } to { opacity: 1; transform: none; } }
+@keyframes inR       { from { opacity: 0; transform: translateX(70px); } to { opacity: 1; transform: none; } }
+@keyframes pop       { from { opacity: 0; transform: scale(.8) rotate(-14deg); } to { opacity: 1; transform: scale(1) rotate(-4deg); } }
+@keyframes para      { from { transform: translateY(70px); } to { transform: translateY(-140px); } }
+@keyframes paraSlow  { from { transform: translateY(30px); } to { transform: translateY(-70px); } }
+@keyframes drift     { from { transform: translate(0,60px) rotate(0deg); } to { transform: translate(-40px,-120px) rotate(180deg); } }
+@keyframes bar       { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes wipe      { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes growY     { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes tick      { 0% { transform: translateY(0); } 100% { transform: translateY(-46%); } }
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes ob-spin   { to { transform: rotate(360deg); } }
+@keyframes floaty    { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-16px) rotate(3deg); } }
+@keyframes blink     { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes pulse     { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes sharpen   { from { opacity: 0; filter: blur(6px); transform: translateY(12px); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes mq        { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes kb        { 0%, 100% { transform: scale(1.06) translate(0, 0); } 50% { transform: scale(1.14) translate(-1.5%, -1.5%); } }
+@keyframes tileIn    { from { opacity: 0; transform: translateY(52px) scale(0.9) rotate(var(--tilt, -3deg)); clip-path: inset(14% 14% 14% 14%); } to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); clip-path: inset(0 0 0 0); } }
+
+/* Scroll-linked top progress bar (mockup's `bar` animation on scroll(root)).
+   Falls back to invisible where scroll-timeline is unsupported. */
+.ssr-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: #24457A; transform: scaleX(0); transform-origin: 0 50%;
+  z-index: 99; pointer-events: none;
+}
+@supports (animation-timeline: scroll()) {
+  .ssr-progress {
+    animation: bar auto linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+/* Scroll-reveal: content is visible by default; `html.js-reveal` (added by the
+   IntersectionObserver hook) arms the hidden→animate-in behaviour. */
+.reveal, .reveal-l, .reveal-r, .reveal-blur {
+  transition: opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1), filter .6s ease;
+}
+html.js-reveal .reveal        { opacity: 0; transform: translateY(40px); }
+html.js-reveal .reveal-l      { opacity: 0; transform: translateX(-56px); }
+html.js-reveal .reveal-r      { opacity: 0; transform: translateX(56px); }
+html.js-reveal .reveal-blur   { opacity: 0; transform: translateY(12px); filter: blur(6px); }
+html.js-reveal .reveal.in,
+html.js-reveal .reveal-l.in,
+html.js-reveal .reveal-r.in,
+html.js-reveal .reveal-blur.in { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js-reveal .reveal,
+  html.js-reveal .reveal-l,
+  html.js-reveal .reveal-r,
+  html.js-reveal .reveal-blur { opacity: 1; transform: none; filter: none; transition: none; }
+  .ssr-progress { display: none; }
+}
+
+/* ken-burns helper for imagery */
+.kb-img { animation: kb 20s ease-in-out infinite; }
+
+/* dashboard: stack the chart / needs-you split on narrow screens */
+@media (max-width: 860px) { .ssr-dash-split { grid-template-columns: 1fr !important; } }
+
+/* auto-scrolling phone preview in the "six layouts" section */
+.ssr-phone-scroll:hover { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) { .ssr-phone-scroll { animation: none !important; } }
+
+/* cursor-trail figures spawned in the final CTA */
+.trailfig img { will-change: transform, opacity; }
+
+.ssr-card { transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+.ssr-card:hover { transform: translateY(-6px); }
+
+/* redesign marketing header */
+.ssr-nav-link { color: #14161A; font-size: 15px; font-weight: 600; text-decoration: none; }
+.ssr-nav-link:hover { color: #24457A; }
+.ssr-pill { background: #24457A; color: #fff; font-weight: 700; padding: 12px 22px; border-radius: 34px; text-decoration: none; transition: background .2s ease, transform .2s ease; }
+.ssr-pill:hover { background: #14161A; color: #fff; transform: translateY(-1px); }
+.ssr-foot-link { color: #FAF9F6; text-decoration: none; }
+.ssr-foot-link:hover { color: #9FBBE0; }
+@media (max-width: 900px) {
+  .ssr-nav-desktop { display: none !important; }
+  .ssr-nav-burger { display: inline-flex !important; }
+}
+
+aside::-webkit-scrollbar { width: 8px; }
+aside::-webkit-scrollbar-track { background: transparent; }
+aside::-webkit-scrollbar-thumb { background: rgba(159,187,224,0.28); border-radius: 8px; }
+aside::-webkit-scrollbar-thumb:hover { background: rgba(159,187,224,0.5); }
+aside { scrollbar-width: thin; scrollbar-color: rgba(159,187,224,0.28) transparent; }
+aside a, aside a:hover { text-decoration: none; }

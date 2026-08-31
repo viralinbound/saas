@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #F1EFE9; color: #14161A; font-family: 'Instrument Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, h4, p, ul, li { margin: 0; padding: 0; }
+    ul { list-style: none; }
+    a { color: #24457A; text-decoration: none; }
+    a:hover { color: #14161A; }
+    ::selection { background: #EEF2F8; }
+    input, button, select, textarea { font-family: inherit; }
+    table { border-collapse: collapse; }
+    @keyframes riseSm { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes growY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  </style>
+</helmet>
+
+<div style="display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; background: #F1EFE9;">
+  <aside style="background: #14161A; color: #FAF9F6; padding: 22px 18px; display: flex; flex-direction: column; gap: 26px; position: sticky; top: 0; height: 100vh; overflow-y: auto;">
+    <a href="SuperShowroom%20Site.dc.html" style="color: #FAF9F6; display: block;">
+      <div style="font-size: 21px; font-weight: 700; letter-spacing: -0.028em;">supershowroom<span style="color: #9FBBE0; margin-left: 2px;">✦</span></div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: #9FBBE0; margin-top: 3px;">merchant console</div>
+    </a>
+
+    <div style="border: 1px solid rgba(250,249,246,0.24); padding: 12px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.6;">store</div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 7px;">
+        <span style="font-size: 15px; font-weight: 800;">{{ storeName }}</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #9FBBE0;">▾</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+        <span style="width: 7px; height: 7px; background: #EEF2F8; display: block; animation-name: pulse; animation-duration: 2s; animation-iteration-count: infinite;"></span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em;">{{ storeDomain }}</span>
+      </div>
+    </div>
+
+    <nav style="display: grid; gap: 3px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="7">
+        <div onClick="{{ n.go }}" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 12px; background: {{ n.bg }}; color: {{ n.fg }}; cursor: pointer; border-left: 3px solid {{ n.edge }};" style-hover="background:rgba(250,249,246,0.1)">
+          <span style="font-size: 14px; font-weight: 700;">{{ n.label }}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; opacity: 0.75;">{{ n.meta }}</span>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top: auto; display: grid; gap: 10px;">
+      <div style="border: 1px solid rgba(250,249,246,0.24); padding: 14px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.6;">plan · pro showroom</div>
+        <div style="font-size: 13px; font-weight: 700; margin-top: 6px;">74 / unlimited products</div>
+        <div style="height: 6px; background: rgba(250,249,246,0.18); margin-top: 8px;">
+          <div style="width: 62%; height: 100%; background: #24457A;"></div>
+        </div>
+        <div onClick="{{ goBilling }}" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #9FBBE0; margin-top: 10px; cursor: pointer;">view billing →</div>
+      </div>
+      <a href="#storefront" onClick="{{ goStorefront }}" style="border: 1px solid #9FBBE0; color: #9FBBE0; padding: 11px; text-align: center; font-size: 13px; font-weight: 800;" style-hover="background:#EEF2F8;color:#14161A">view live store ↗</a>
+    </div>
+  </aside>
+
+  <main style="min-width: 0;">
+    <header style="background: #FAF9F6; border-bottom: 1px solid #E4E1DA; padding: 16px 30px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 40;">
+      <div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #24457A;">{{ crumb }}</div>
+        <h1 style="font-size: 25px; font-weight: 700; letter-spacing: -0.025em; margin-top: 2px;">{{ title }}</h1>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+        <div style="border: 1px solid #E4E1DA; background: #FFFFFF; display: flex; align-items: center; gap: 8px; padding: 9px 12px;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.72;">⌘K</span>
+          <input type="text" placeholder="search orders, products, customers" style="border: 0; outline: none; background: transparent; font-size: 13px; width: 230px;" />
+        </div>
+        <div style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">{{ todayLabel }}</div>
+        <div style="width: 38px; height: 38px; border: 1px solid #24457A; background: #24457A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;">n</div>
+      </div>
+    </header>
+
+    <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Signup" style="padding: 34px 30px 60px 30px;">
+        <div style="max-width: 1080px;">
+          <div style="display: flex; gap: 8px; margin-bottom: 28px;">
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.go }}" style="flex: 1; border: 1px solid #E4E1DA; background: {{ s.bg }}; color: {{ s.fg }}; padding: 12px 14px; cursor: pointer;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.75;">step {{ s.n }}</div>
+                <div style="font-size: 15px; font-weight: 800; margin-top: 3px;">{{ s.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 26px; align-items: start;">
+            <div style="border: 1px solid #E4E1DA; background: #FAF9F6; box-shadow: 0 12px 28px rgba(20,22,26,0.10); padding: 30px;">
+              <sc-if value="{{ step1 }}" hint-placeholder-val="{{ true }}">
+                <div>
+                  <h2 style="font-size: 34px; font-weight: 700; letter-spacing: -0.028em;">let's get you a storefront.</h2>
+                  <p style="font-size: 15px; line-height: 1.55; margin-top: 10px; max-width: 520px;">you pay your plan's advance at the last step — everything you set up here is kept.</p>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px;">
+                    <div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px;">your name</div>
+                      <input type="text" value="Neha Raghavan" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 12px; font-size: 15px; font-weight: 600; outline: none;" />
+                    </div>
+                    <div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px;">whatsapp number</div>
+                      <input type="text" value="+91 98450 21188" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 12px; font-size: 15px; font-weight: 600; outline: none;" />
+                    </div>
+                    <div style="grid-column: span 2;">
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px;">email</div>
+                      <input type="text" value="neha@velvetboutique.in" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 12px; font-size: 15px; font-weight: 600; outline: none;" />
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px;">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; width: 100%;">what are you selling?</div>
+                    <sc-for list="{{ industries }}" as="i" hint-placeholder-count="6">
+                      <div onClick="{{ i.pick }}" style="border: 1px solid #E4E1DA; background: {{ i.bg }}; color: {{ i.fg }}; padding: 9px 14px; font-size: 14px; font-weight: 700; cursor: pointer;">{{ i.name }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ step2 }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <h2 style="font-size: 34px; font-weight: 700; letter-spacing: -0.028em;">connect your domain.</h2>
+                  <p style="font-size: 15px; line-height: 1.55; margin-top: 10px; max-width: 520px;">we do not sell domains — bring the one you own (or buy it anywhere) and we connect it free on every plan: dns records, ssl and redirects.</p>
+                  <div style="display: grid; grid-template-columns: 1fr auto; gap: 0; margin-top: 24px; border: 1px solid #E4E1DA; background: #FFFFFF;">
+                    <input type="text" value="velvetboutique.in" style="border: 0; outline: none; padding: 14px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;" />
+                    <div style="border-left: 1px solid #E4E1DA; background: #EEF2F8; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; align-self: stretch; display: flex; align-items: center;">connect it</div>
+                  </div>
+                  <div style="display: grid; gap: 8px; margin-top: 14px;">
+                    <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                      <span style="font-size: 14px; font-weight: 700;">dns records set and maintained</span>
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #2F6B4F;">included</span>
+                    </div>
+                    <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                      <span style="font-size: 14px; font-weight: 700;">ssl certificate &amp; https binding</span>
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #2F6B4F;">automated</span>
+                    </div>
+                    <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                      <span style="font-size: 14px; font-weight: 700;">www and https redirects</span>
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #2F6B4F;">included</span>
+                    </div>
+                  </div>
+                  <div style="margin-top: 20px; border: 2px dashed #14161A; padding: 16px; font-size: 14px; line-height: 1.5;">no domain yet? buy one at any registrar in your own name — godaddy, cloudflare, hostinger — then paste it above. pointing it at us takes about 30 minutes with zero downtime.</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ step3 }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <h2 style="font-size: 34px; font-weight: 700; letter-spacing: -0.028em;">pick a starting theme.</h2>
+                  <p style="font-size: 15px; line-height: 1.55; margin-top: 10px; max-width: 520px;">you can change any of it later in the design editor — nothing here is permanent.</p>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px;">
+                    <sc-for list="{{ themeCards }}" as="t" hint-placeholder-count="6">
+                      <div onClick="{{ t.pick }}" style="border: 1px solid #E4E1DA; background: {{ t.bg }}; box-shadow: {{ t.shadow }}; cursor: pointer; display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; padding: 12px;">
+                        <div style="width: 62px; height: 62px; border: 1px solid #E4E1DA; overflow: hidden;"><img src="{{ t.img }}" alt="{{ t.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                        <div>
+                          <div style="font-size: 15px; font-weight: 800; line-height: 1.15;">{{ t.name }}</div>
+                          <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 5px; color: #24457A;">{{ t.state }}</div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ step4 }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <h2 style="font-size: 34px; font-weight: 700; letter-spacing: -0.028em;">choose how you pay.</h2>
+                  <p style="font-size: 15px; line-height: 1.55; margin-top: 10px; max-width: 520px;">you pay the advance today; the balance is invoiced once your store is live. the 2% sales fee only ever applies to completed orders, ex GST.</p>
+                  <div style="display: grid; gap: 10px; margin-top: 24px;">
+                    <sc-for list="{{ planRows }}" as="p" hint-placeholder-count="4">
+                      <div onClick="{{ p.pick }}" style="border: 1px solid #E4E1DA; background: {{ p.bg }}; color: {{ p.fg }}; padding: 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 18px; align-items: center; cursor: pointer; box-shadow: {{ p.shadow }};">
+                        <div>
+                          <div style="font-size: 19px; font-weight: 700; letter-spacing: -0.03em;">{{ p.name }}</div>
+                          <div style="font-size: 13px; margin-top: 3px; opacity: 0.8;">{{ p.desc }}</div>
+                        </div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">{{ p.fee }}</div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700;">{{ p.price }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div onClick="{{ goDashboard }}" style="margin-top: 24px; border: 1px solid #E4E1DA; background: #24457A; color: #FFFFFF; padding: 17px; text-align: center; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">launch my store →</div>
+                </div>
+              </sc-if>
+
+              <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E4E1DA;">
+                <div onClick="{{ prevStep }}" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; opacity: 0.7;">← back</div>
+                <div onClick="{{ nextStep }}" style="border: 1px solid #E4E1DA; background: #14161A; color: #9FBBE0; padding: 11px 20px; font-size: 14px; font-weight: 800; cursor: pointer;">{{ nextLabel }}</div>
+              </div>
+            </div>
+
+            <div style="border: 1px solid #E4E1DA; background: #14161A; color: #FAF9F6; padding: 22px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #9FBBE0;">what happens next</div>
+              <ul style="display: grid; gap: 14px; margin-top: 16px; font-size: 14px; line-height: 1.5;">
+                <li>✦ your store goes live on a supershowroom subdomain immediately</li>
+                <li>✦ we point your domain and issue its ssl within the hour</li>
+                <li>✦ send us your catalog sheet — we upload the first 50 products for you</li>
+                <li>✦ razorpay, UPI and COD get configured on a 15-min whatsapp call</li>
+                <li>✦ advance clears — your store goes live the same day</li>
+              </ul>
+              <div style="border-top: 1px solid rgba(250,249,246,0.24); margin-top: 20px; padding-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.7; opacity: 0.75;">questions? whatsapp<br />+91 89684 30834</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Dashboard" style="padding: 26px 30px 60px 30px; display: grid; gap: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 20px; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;">today's revenue</div>
+            <div style="font-size: 36px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">₹42,180</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 6px; color: #24457A;">▲ 18% vs yesterday</div>
+          </div>
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 20px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;">orders today</div>
+            <div style="font-size: 36px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">37</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 6px; opacity: 0.7;">9 awaiting dispatch</div>
+          </div>
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 20px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.7;">conversion</div>
+            <div style="font-size: 36px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">2.9%</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 6px; color: #24457A;">▲ 0.4pt this week</div>
+          </div>
+          <div style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 20px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">average order</div>
+            <div style="font-size: 36px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">₹1,140</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 6px;">cart recovery adding ₹6.2k/wk</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 24px;">
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #24457A;">last 14 days</div>
+                <h3 style="font-size: 22px; font-weight: 700; letter-spacing: -0.035em; margin-top: 4px;">revenue &amp; orders</h3>
+              </div>
+              <div style="display: flex; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;">
+                <span><span style="display: inline-block; width: 9px; height: 9px; background: #14161A; margin-right: 5px;"></span>revenue</span>
+                <span><span style="display: inline-block; width: 9px; height: 9px; background: #24457A; margin-right: 5px;"></span>orders</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 8px; height: 210px; margin-top: 26px; border-bottom: 1px solid #E4E1DA; padding-bottom: 2px;">
+              <sc-for list="{{ chart }}" as="c" hint-placeholder-count="14">
+                <div style="flex: 1; display: flex; align-items: flex-end; gap: 3px; height: 100%;">
+                  <div style="flex: 1; height: {{ c.rev }}; background: #14161A; transform-origin: 50% 100%; animation-name: growY; animation-duration: 0.5s; animation-timing-function: cubic-bezier(.2,.8,.2,1);"></div>
+                  <div style="width: 6px; height: {{ c.ord }}; background: #24457A; transform-origin: 50% 100%; animation-name: growY; animation-duration: 0.7s; animation-timing-function: cubic-bezier(.2,.8,.2,1);"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; opacity: 0.6; margin-top: 8px;">
+              <span>13 aug</span><span>20 aug</span><span>26 aug</span>
+            </div>
+          </div>
+
+          <div style="border: 1px solid #E4E1DA; background: #14161A; color: #FAF9F6; padding: 24px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #9FBBE0;">needs you today</div>
+            <div style="display: grid; gap: 12px; margin-top: 16px;">
+              <div style="border: 1px solid rgba(250,249,246,0.25); padding: 14px;">
+                <div style="font-size: 15px; font-weight: 800;">2 products low on stock</div>
+                <div style="font-size: 13px; opacity: 0.75; margin-top: 4px;">linen cuban shirt (m) · 3 left, anarkali gown · 2 left</div>
+                <div onClick="{{ goCatalog }}" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #9FBBE0; margin-top: 10px; cursor: pointer;">restock →</div>
+              </div>
+              <div style="border: 1px solid rgba(250,249,246,0.25); padding: 14px;">
+                <div style="font-size: 15px; font-weight: 800;">4 COD orders to confirm</div>
+                <div style="font-size: 13px; opacity: 0.75; margin-top: 4px;">whatsapp confirmations sent 40 min ago</div>
+                <div onClick="{{ goOrders }}" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #9FBBE0; margin-top: 10px; cursor: pointer;">open orders →</div>
+              </div>
+              <div style="border: 1px solid rgba(250,249,246,0.25); padding: 14px; background: rgba(36,69,122,0.16);">
+                <div style="font-size: 15px; font-weight: 800;">august GST invoice batch ready</div>
+                <div style="font-size: 13px; opacity: 0.75; margin-top: 4px;">312 invoices · auto-filed on the 1st</div>
+                <div onClick="{{ goBilling }}" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #9FBBE0; margin-top: 10px; cursor: pointer;">review →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #E4E1DA; background: #FAF9F6;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; border-bottom: 1px solid #E4E1DA;">
+            <h3 style="font-size: 20px; font-weight: 700; letter-spacing: -0.035em;">live order feed</h3>
+            <div onClick="{{ goOrders }}" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #24457A; cursor: pointer;">all orders →</div>
+          </div>
+          <table style="width: 100%; font-size: 14px;">
+            <thead>
+              <tr style="background: #F1EFE9;">
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">order</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">customer</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">items</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">payment</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">total</th>
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ feed }}" as="o" hint-placeholder-count="5">
+                <tr style="border-top: 1px solid #E4E1DA;">
+                  <td style="padding: 13px 22px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">{{ o.id }}</td>
+                  <td style="padding: 13px 12px; font-weight: 700;">{{ o.customer }}</td>
+                  <td style="padding: 13px 12px; opacity: 0.8;">{{ o.items }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">{{ o.pay }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;">{{ o.total }}</td>
+                  <td style="padding: 13px 22px;"><span style="border: 1px solid #E4E1DA; background: {{ o.bg }}; color: {{ o.fg }}; padding: 4px 9px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">{{ o.status }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Catalog" style="padding: 26px 30px 60px 30px;">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 344px; gap: 20px; align-items: start;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid #E4E1DA; flex-wrap: wrap;">
+              <div style="border: 1px solid #E4E1DA; background: #FFFFFF; padding: 8px 12px;">
+                <input type="text" placeholder="search 74 products" style="border: 0; outline: none; font-size: 13px; width: 180px; background: transparent;" />
+              </div>
+              <sc-for list="{{ catTabs }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.pick }}" style="border: 1px solid #E4E1DA; background: {{ c.bg }}; color: {{ c.fg }}; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; cursor: pointer;">{{ c.name }}</div>
+              </sc-for>
+              <div style="margin-left: auto; border: 1px solid #E4E1DA; background: #24457A; color: #FFFFFF; padding: 9px 15px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">+ add product</div>
+            </div>
+            <table style="width: 100%; font-size: 14px;">
+              <thead>
+                <tr style="background: #F1EFE9;">
+                  <th style="text-align: left; padding: 11px 20px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">product</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">variants</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">price</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">stock</th>
+                  <th style="text-align: left; padding: 11px 20px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">live</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+                  <tr onClick="{{ p.pick }}" style="border-top: 1px solid #E4E1DA; background: {{ p.rowBg }}; cursor: pointer;">
+                    <td style="padding: 11px 20px;">
+                      <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border: 1px solid #E4E1DA; overflow: hidden; flex: none;"><img src="{{ p.img }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                        <div>
+                          <div style="font-weight: 800;">{{ p.name }}</div>
+                          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.6; margin-top: 2px;">{{ p.sku }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">{{ p.variants }}</td>
+                    <td style="padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;">{{ p.price }}</td>
+                    <td style="padding: 11px 12px;"><span style="border: 1px solid #E4E1DA; background: {{ p.stockBg }}; color: {{ p.stockFg }}; padding: 3px 8px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700;">{{ p.stock }}</span></td>
+                    <td style="padding: 11px 20px;">
+                      <div style="width: 40px; height: 22px; border: 1px solid #E4E1DA; background: {{ p.liveBg }}; display: flex; align-items: center; padding: 2px; justify-content: {{ p.liveAlign }};">
+                        <div style="width: 14px; height: 14px; background: #14161A;"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; box-shadow: 0 12px 28px rgba(20,22,26,0.10); position: sticky; top: 96px;">
+            <div style="border-bottom: 1px solid #E4E1DA; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">editing product</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #24457A;">unsaved</div>
+            </div>
+            <div style="padding: 18px; display: grid; gap: 14px;">
+              <div style="height: 150px; border: 1px solid #E4E1DA; overflow: hidden;"><img src="{{ sel.img }}" alt="{{ sel.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+              <div style="display: flex; gap: 8px;">
+                <div style="flex: 1; height: 46px; border: 1px solid #E4E1DA; overflow: hidden;"><img src="{{ sel.img }}" alt="thumb" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                <div style="flex: 1; height: 46px; border: 2px dashed #14161A; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6;">+ photo</div>
+                <div style="flex: 1; height: 46px; border: 2px dashed #14161A; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6;">+ video</div>
+              </div>
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 5px;">title</div>
+                <input type="text" value="{{ sel.name }}" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 10px; font-size: 14px; font-weight: 700; outline: none;" />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 5px;">price</div>
+                  <input type="text" value="{{ sel.price }}" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 10px; font-size: 14px; font-weight: 700; outline: none; font-family: 'JetBrains Mono', monospace;" />
+                </div>
+                <div>
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 5px;">mrp</div>
+                  <input type="text" value="{{ sel.mrp }}" style="width: 100%; border: 1px solid #E4E1DA; background: #FFFFFF; padding: 10px; font-size: 14px; font-weight: 700; outline: none; font-family: 'JetBrains Mono', monospace;" />
+                </div>
+              </div>
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px;">variants &amp; stock</div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <sc-for list="{{ sel.variantList }}" as="v" hint-placeholder-count="4">
+                    <span style="border: 1px solid #E4E1DA; background: {{ v.bg }}; padding: 6px 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;">{{ v.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 5px;">GST rate</div>
+                <div style="display: flex; gap: 6px;">
+                  <span style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 7px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;">5%</span>
+                  <span style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 7px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">12%</span>
+                  <span style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 7px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">18%</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <div style="flex: 1; border: 1px solid #E4E1DA; background: #14161A; color: #9FBBE0; padding: 12px; text-align: center; font-size: 14px; font-weight: 800; cursor: pointer;">save &amp; publish</div>
+                <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 12px 14px; font-size: 14px; font-weight: 800; cursor: pointer;">preview</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Orders" style="padding: 26px 30px 60px 30px;">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 16px 20px; border-bottom: 1px solid #E4E1DA; flex-wrap: wrap;">
+              <sc-for list="{{ orderTabs }}" as="t" hint-placeholder-count="5">
+                <div onClick="{{ t.pick }}" style="border: 1px solid #E4E1DA; background: {{ t.bg }}; color: {{ t.fg }}; padding: 8px 13px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; cursor: pointer;">{{ t.label }}</div>
+              </sc-for>
+              <div style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.65;">{{ orderCount }} shown</div>
+            </div>
+            <table style="width: 100%; font-size: 14px;">
+              <thead>
+                <tr style="background: #F1EFE9;">
+                  <th style="text-align: left; padding: 11px 20px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">order</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">customer &amp; city</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">payment</th>
+                  <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">total</th>
+                  <th style="text-align: left; padding: 11px 20px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ orders }}" as="o" hint-placeholder-count="8">
+                  <tr onClick="{{ o.pick }}" style="border-top: 1px solid #E4E1DA; background: {{ o.rowBg }}; cursor: pointer;">
+                    <td style="padding: 13px 20px;">
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">{{ o.id }}</div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.6; margin-top: 2px;">{{ o.time }}</div>
+                    </td>
+                    <td style="padding: 13px 12px;">
+                      <div style="font-weight: 800;">{{ o.customer }}</div>
+                      <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">{{ o.city }} · {{ o.items }}</div>
+                    </td>
+                    <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;">{{ o.pay }}</td>
+                    <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;">{{ o.total }}</td>
+                    <td style="padding: 13px 20px;"><span style="border: 1px solid #E4E1DA; background: {{ o.bg }}; color: {{ o.fg }}; padding: 4px 9px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">{{ o.status }}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; box-shadow: 0 12px 28px rgba(20,22,26,0.10); position: sticky; top: 96px;">
+            <div style="padding: 18px; border-bottom: 1px solid #E4E1DA; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;">{{ selOrder.id }}</div>
+                <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.03em; margin-top: 3px;">{{ selOrder.customer }}</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">{{ selOrder.address }}</div>
+              </div>
+              <span style="border: 1px solid #E4E1DA; background: {{ selOrder.bg }}; color: {{ selOrder.fg }}; padding: 4px 8px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; white-space: nowrap;">{{ selOrder.status }}</span>
+            </div>
+            <div style="padding: 18px; display: grid; gap: 16px;">
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">timeline</div>
+                <div style="display: grid; gap: 9px;">
+                  <sc-for list="{{ selOrder.timeline }}" as="t" hint-placeholder-count="4">
+                    <div style="display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center;">
+                      <span style="width: 10px; height: 10px; background: {{ t.dot }}; border: 1px solid #E4E1DA; display: block;"></span>
+                      <span style="font-size: 13px; font-weight: 700;">{{ t.label }}</span>
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.6;">{{ t.at }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="border-top: 1px solid #E4E1DA; padding-top: 14px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">items</div>
+                <div style="display: grid; gap: 10px;">
+                  <sc-for list="{{ selOrder.lines }}" as="l" hint-placeholder-count="2">
+                    <div style="display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center;">
+                      <div style="width: 40px; height: 40px; border: 1px solid #E4E1DA; overflow: hidden;"><img src="{{ l.img }}" alt="{{ l.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 700; line-height: 1.2;">{{ l.name }}</div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.65; margin-top: 2px;">{{ l.variant }}</div>
+                      </div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">{{ l.price }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="border-top: 1px solid #E4E1DA; padding-top: 14px; display: grid; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between;"><span style="opacity: 0.7;">subtotal</span><span>{{ selOrder.subtotal }}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span style="opacity: 0.7;">GST (5%)</span><span>{{ selOrder.GST }}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span style="opacity: 0.7;">shipping</span><span>free</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; border-top: 1px solid #E4E1DA; padding-top: 8px; margin-top: 4px;"><span>total</span><span>{{ selOrder.total }}</span></div>
+                <div style="display: flex; justify-content: space-between; color: #24457A;"><span>supershowroom 2% fee</span><span>{{ selOrder.fee }}</span></div>
+              </div>
+              <div style="display: grid; gap: 8px;">
+                <div style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 12px; text-align: center; font-size: 14px; font-weight: 800; cursor: pointer;">book shiprocket pickup</div>
+                <div style="display: flex; gap: 8px;">
+                  <div style="flex: 1; border: 1px solid #E4E1DA; background: #FAF9F6; padding: 11px; text-align: center; font-size: 13px; font-weight: 800; cursor: pointer;">GST invoice</div>
+                  <div style="flex: 1; border: 1px solid #E4E1DA; background: #FAF9F6; padding: 11px; text-align: center; font-size: 13px; font-weight: 800; cursor: pointer;">whatsapp buyer</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Theme editor" style="padding: 0;">
+        <div style="display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); min-height: calc(100vh - 74px);">
+          <div style="border-right: 1px solid #E4E1DA; background: #FAF9F6; padding: 22px; display: grid; gap: 22px; align-content: start;">
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">industry preset</div>
+              <div style="display: grid; gap: 6px;">
+                <sc-for list="{{ presets }}" as="p" hint-placeholder-count="6">
+                  <div onClick="{{ p.pick }}" style="border: 1px solid #E4E1DA; background: {{ p.bg }}; color: {{ p.fg }}; padding: 10px 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
+                    <span>{{ p.name }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">{{ p.mark }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">accent colour</div>
+              <div style="display: flex; gap: 8px;">
+                <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="5">
+                  <div onClick="{{ s.pick }}" style="width: 44px; height: 44px; background: {{ s.color }}; border: {{ s.border }}; cursor: pointer;"></div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">type pairing</div>
+              <div style="display: grid; gap: 6px;">
+                <sc-for list="{{ fonts }}" as="f" hint-placeholder-count="3">
+                  <div onClick="{{ f.pick }}" style="border: 1px solid #E4E1DA; background: {{ f.bg }}; padding: 10px 12px; cursor: pointer; display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+                    <span style="font-family: {{ f.stack }}; font-size: 17px; font-weight: 700;">{{ f.sample }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7;">{{ f.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">corners</div>
+              <div style="display: flex; gap: 6px;">
+                <sc-for list="{{ radii }}" as="r" hint-placeholder-count="3">
+                  <div onClick="{{ r.pick }}" style="flex: 1; border: 1px solid #E4E1DA; background: {{ r.bg }}; padding: 10px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; cursor: pointer;">{{ r.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px;">homepage blocks</div>
+              <div style="display: grid; gap: 6px;">
+                <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5">
+                  <div onClick="{{ b.toggle }}" style="border: 1px solid #E4E1DA; background: {{ b.bg }}; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span style="font-size: 13px; font-weight: 700;">{{ b.name }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px;">{{ b.mark }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #F1EFE9; padding: 26px 30px; display: grid; gap: 18px; align-content: start;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 8px;">
+                <div onClick="{{ viewMobile }}" style="border: 1px solid #E4E1DA; background: {{ mobileBg }}; padding: 9px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; cursor: pointer;">mobile</div>
+                <div onClick="{{ viewDesktop }}" style="border: 1px solid #E4E1DA; background: {{ desktopBg }}; padding: 9px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; cursor: pointer;">desktop</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #24457A;">{{ changeCount }} unpublished changes</span>
+                <div style="border: 1px solid #E4E1DA; background: #24457A; color: #FFFFFF; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">publish theme</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; padding: 10px 0 30px 0;">
+              <div style="border: 1px solid #E4E1DA; background: #14161A; padding: 9px; border-radius: {{ frameRadius }}; box-shadow: 0 12px 28px rgba(20,22,26,0.10); width: {{ frameWidth }};">
+                <div style="border-radius: {{ innerRadius }}; overflow: hidden; background: {{ live.bg }};">
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid {{ live.line }};">
+                    <span style="font-family: {{ live.font }}; font-size: 19px; font-weight: 700; letter-spacing: -0.03em; color: {{ live.fg }};">{{ live.store }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {{ live.accent }};">search · cart (2)</span>
+                  </div>
+                  <div style="position: relative; height: 200px; overflow: hidden;">
+                    <img src="{{ live.hero }}" alt="hero" style="width: 100%; height: 100%; object-fit: cover;" />
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.28) 42%, rgba(0,0,0,0) 72%);"></div>
+                    <div style="position: absolute; left: 16px; bottom: 16px; right: 16px;">
+                      <div style="font-family: {{ live.font }}; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; color: #FFFFFF; line-height: 1;">{{ live.headline }}</div>
+                      <div style="display: inline-block; margin-top: 10px; background: {{ live.accent }}; color: {{ live.btnFg }}; padding: 8px 14px; font-size: 13px; font-weight: 800; border-radius: {{ btnRadius }};">shop the drop</div>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 7px; padding: 14px 16px 8px 16px; overflow: hidden;">
+                    <sc-for list="{{ live.cats }}" as="c" hint-placeholder-count="4">
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.fg }}; padding: 6px 11px; border-radius: {{ btnRadius }}; white-space: nowrap;">{{ c.name }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display: grid; grid-template-columns: {{ gridCols }}; gap: 12px; padding: 10px 16px 20px 16px;">
+                    <sc-for list="{{ live.products }}" as="p" hint-placeholder-count="4">
+                      <div style="border: 1px solid {{ live.line }}; background: {{ live.card }}; border-radius: {{ btnRadius }}; overflow: hidden;">
+                        <div style="height: 118px; overflow: hidden;"><img src="{{ p.img }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                        <div style="padding: 10px;">
+                          <div style="font-size: 12px; font-weight: 700; line-height: 1.25; color: {{ live.fg }};">{{ p.name }}</div>
+                          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 7px;">
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: {{ live.accent }};">{{ p.price }}</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; opacity: 0.6; color: {{ live.fg }};">★ {{ p.rating }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="border-top: 1px solid {{ live.line }}; padding: 12px 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ live.fg }}; opacity: 0.7;">free shipping over ₹999 · COD · GST invoice</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isBilling }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Billing" style="padding: 26px 30px 60px 30px; display: grid; gap: 20px;">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px;">
+          <div style="border: 1px solid #E4E1DA; background: #14161A; color: #FAF9F6; padding: 24px; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #9FBBE0;">current plan</div>
+            <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px;">pro showroom</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top: 6px; opacity: 0.85;">₹25,000/yr + 2% of sales</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 16px; opacity: 0.7;">renews 12 mar 2027 · auto-debit UPI</div>
+            <div onClick="{{ noop }}" style="border: 1px solid #9FBBE0; color: #9FBBE0; padding: 10px; text-align: center; font-size: 13px; font-weight: 800; margin-top: 18px; cursor: pointer;">upgrade to elite →</div>
+          </div>
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 24px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.7;">august sales fee</div>
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">₹18,640</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 6px; opacity: 0.7;">on ₹9,32,000 completed sales</div>
+            <div style="height: 8px; background: #F1EFE9; border: 1px solid #E4E1DA; margin-top: 16px;">
+              <div style="width: 68%; height: 100%; background: #24457A;"></div>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 8px; opacity: 0.7;">billed 1 sep · 312 orders counted</div>
+          </div>
+          <div style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 24px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;">effective take rate</div>
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">2.2%</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 6px;">plan + fee ÷ annual sales</div>
+            <div style="font-size: 13px; line-height: 1.5; margin-top: 16px;">a shopify + apps stack at this volume runs about 5.4%. you're keeping the difference.</div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #E4E1DA; background: #FAF9F6;">
+          <div style="padding: 18px 22px; border-bottom: 1px solid #E4E1DA; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+            <h3 style="font-size: 20px; font-weight: 700; letter-spacing: -0.035em;">monthly statements</h3>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #24457A; cursor: pointer;">download all (csv)</div>
+          </div>
+          <table style="width: 100%; font-size: 14px;">
+            <thead>
+              <tr style="background: #F1EFE9;">
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">month</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">completed sales</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">orders</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">2% fee</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">GST 18%</th>
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ statements }}" as="s" hint-placeholder-count="6">
+                <tr style="border-top: 1px solid #E4E1DA;">
+                  <td style="padding: 13px 22px; font-weight: 800;">{{ s.month }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace;">{{ s.sales }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace;">{{ s.orders }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">{{ s.fee }}</td>
+                  <td style="padding: 13px 12px; font-family: 'JetBrains Mono', monospace; opacity: 0.7;">{{ s.GST }}</td>
+                  <td style="padding: 13px 22px;"><span style="border: 1px solid #E4E1DA; background: {{ s.bg }}; padding: 4px 9px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">{{ s.status }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Analytics" style="padding: 26px 30px 60px 30px; display: grid; gap: 20px;">
+        <div style="display: flex; gap: 8px;">
+          <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="3">
+            <div onClick="{{ r.pick }}" style="border: 1px solid #E4E1DA; background: {{ r.bg }}; color: {{ r.fg }}; padding: 9px 15px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; cursor: pointer;">{{ r.label }}</div>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="border: 1px solid #E4E1DA; background: {{ k.bg }}; padding: 20px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.75;">{{ k.label }}</div>
+              <div style="font-size: 32px; font-weight: 700; letter-spacing: -0.025em; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">{{ k.value }}</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 6px; color: #24457A;">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 24px;">
+            <h3 style="font-size: 20px; font-weight: 700; letter-spacing: -0.035em;">where the money comes from</h3>
+            <div style="display: grid; gap: 14px; margin-top: 20px;">
+              <sc-for list="{{ sources }}" as="s" hint-placeholder-count="5">
+                <div>
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                    <span style="font-size: 15px; font-weight: 700;">{{ s.name }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">{{ s.value }}</span>
+                  </div>
+                  <div style="height: 12px; border: 1px solid #E4E1DA; margin-top: 6px; background: #F1EFE9;">
+                    <div style="width: {{ s.pct }}; height: 100%; background: {{ s.color }}; animation-name: wipe; animation-duration: 0.8s; animation-timing-function: cubic-bezier(.2,.8,.2,1);"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="border: 1px solid #E4E1DA; background: #14161A; color: #FAF9F6; padding: 24px;">
+            <h3 style="font-size: 20px; font-weight: 700; letter-spacing: -0.035em;">checkout funnel</h3>
+            <div style="display: grid; gap: 10px; margin-top: 20px;">
+              <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="5">
+                <div>
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                    <span style="font-size: 14px; font-weight: 700;">{{ f.step }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #9FBBE0;">{{ f.count }}</span>
+                  </div>
+                  <div style="height: 26px; background: rgba(250,249,246,0.12); margin-top: 6px;">
+                    <div style="width: {{ f.pct }}; height: 100%; background: {{ f.color }};"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="border-top: 1px solid rgba(250,249,246,0.24); margin-top: 20px; padding-top: 14px; font-size: 13px; line-height: 1.5; opacity: 0.85;">whatsapp cart recovery brought back <span style="color: #9FBBE0; font-weight: 800;">64 orders</span> this month — ₹71,300 that would have leaked.</div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #E4E1DA; background: #FAF9F6;">
+          <div style="padding: 18px 22px; border-bottom: 1px solid #E4E1DA;">
+            <h3 style="font-size: 20px; font-weight: 700; letter-spacing: -0.035em;">top products</h3>
+          </div>
+          <table style="width: 100%; font-size: 14px;">
+            <thead>
+              <tr style="background: #F1EFE9;">
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">product</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">views</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">units</th>
+                <th style="text-align: left; padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">revenue</th>
+                <th style="text-align: left; padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;">conv.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ topProducts }}" as="p" hint-placeholder-count="5">
+                <tr style="border-top: 1px solid #E4E1DA;">
+                  <td style="padding: 11px 22px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div style="width: 40px; height: 40px; border: 1px solid #E4E1DA; overflow: hidden;"><img src="{{ p.img }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                      <span style="font-weight: 800;">{{ p.name }}</span>
+                    </div>
+                  </td>
+                  <td style="padding: 11px 12px; font-family: 'JetBrains Mono', monospace;">{{ p.views }}</td>
+                  <td style="padding: 11px 12px; font-family: 'JetBrains Mono', monospace;">{{ p.units }}</td>
+                  <td style="padding: 11px 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">{{ p.revenue }}</td>
+                  <td style="padding: 11px 22px; font-family: 'JetBrains Mono', monospace; color: #24457A;">{{ p.conv }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Domain & settings" style="padding: 26px 30px 60px 30px; display: grid; gap: 20px;">
+        <div style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start;">
+          <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 24px; box-shadow: 0 12px 28px rgba(20,22,26,0.10);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+              <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #24457A;">primary domain</div>
+                <div style="font-size: 28px; font-weight: 700; letter-spacing: -0.025em; margin-top: 5px;">{{ storeDomain }}</div>
+              </div>
+              <span style="border: 1px solid #E4E1DA; background: #EEF2F8; padding: 5px 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">ssl active</span>
+            </div>
+            <table style="width: 100%; margin-top: 20px; font-size: 13px;">
+              <thead>
+                <tr style="background: #F1EFE9;">
+                  <th style="text-align: left; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;">type</th>
+                  <th style="text-align: left; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;">name</th>
+                  <th style="text-align: left; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;">value</th>
+                  <th style="text-align: left; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;">state</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ dns }}" as="d" hint-placeholder-count="4">
+                  <tr style="border-top: 1px solid #E4E1DA;">
+                    <td style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">{{ d.type }}</td>
+                    <td style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace;">{{ d.name }}</td>
+                    <td style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace; opacity: 0.75;">{{ d.value }}</td>
+                    <td style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #24457A;">{{ d.state }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <div style="display: flex; gap: 8px; margin-top: 18px;">
+              <div style="border: 1px solid #E4E1DA; background: #14161A; color: #9FBBE0; padding: 11px 16px; font-size: 13px; font-weight: 800; cursor: pointer;">connect another domain</div>
+              <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 11px 16px; font-size: 13px; font-weight: 800; cursor: pointer;">point dns</div>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 16px;">
+            <div style="border: 1px solid #E4E1DA; background: #FAF9F6; padding: 22px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 14px;">payments</div>
+              <div style="display: grid; gap: 8px;">
+                <sc-for list="{{ payments }}" as="p" hint-placeholder-count="5">
+                  <div onClick="{{ p.toggle }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #E4E1DA; background: {{ p.bg }}; padding: 11px 13px; cursor: pointer;">
+                    <div>
+                      <div style="font-size: 14px; font-weight: 800;">{{ p.name }}</div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.7; margin-top: 2px;">{{ p.meta }}</div>
+                    </div>
+                    <div style="width: 40px; height: 22px; border: 1px solid #E4E1DA; background: {{ p.knobBg }}; display: flex; align-items: center; padding: 2px; justify-content: {{ p.align }};">
+                      <div style="width: 14px; height: 14px; background: #14161A;"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="border: 1px solid #E4E1DA; background: #14161A; color: #FAF9F6; padding: 22px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #9FBBE0; margin-bottom: 14px;">delivery &amp; compliance</div>
+              <div style="display: grid; gap: 10px; font-size: 14px;">
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span>shiprocket</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9FBBE0;">connected</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span>porter (same-city)</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9FBBE0;">connected</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span>gstin 29ABCDE1234F1Z5</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9FBBE0;">verified</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span>serviceable pincodes</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.8;">18,240</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span>team logins</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.8;">admin + 3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isStorefront }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Buyer storefront" style="padding: 26px 30px 60px 30px;">
+        <div style="border: 1px solid #E4E1DA; box-shadow: 0 12px 28px rgba(20,22,26,0.10); overflow: hidden; background: {{ live.bg }};">
+          <div style="background: #14161A; color: #FAF9F6; padding: 8px 16px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em;">
+            <span style="display: flex; gap: 5px;"><span style="width: 9px; height: 9px; background: #24457A; display: block;"></span><span style="width: 9px; height: 9px; background: #EEF2F8; display: block;"></span><span style="width: 9px; height: 9px; background: #2F6B4F; display: block;"></span></span>
+            <span style="opacity: 0.8;">https://{{ storeDomain }}</span>
+            <span style="margin-left: auto; opacity: 0.6;">buyer view</span>
+          </div>
+          <div style="background: {{ live.accent }}; color: {{ live.btnFg }}; padding: 8px 16px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">{{ live.promo }} · free shipping over ₹999</div>
+          <div style="display: flex; align-items: center; gap: 22px; padding: 18px 26px; border-bottom: 1px solid {{ live.line }};">
+            <span style="font-family: {{ live.font }}; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; color: {{ live.fg }};">{{ live.store }}</span>
+            <div style="display: flex; gap: 18px; margin-left: 12px; font-size: 14px; font-weight: 600; color: {{ live.fg }};">
+              <sc-for list="{{ live.cats }}" as="c" hint-placeholder-count="4">
+                <span>{{ c.name }}</span>
+              </sc-for>
+            </div>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 14px; color: {{ live.fg }}; font-size: 14px;">
+              <span style="opacity: 0.7;">search</span>
+              <span style="opacity: 0.7;">account</span>
+              <span style="background: {{ live.accent }}; color: {{ live.btnFg }}; padding: 7px 13px; font-weight: 800;">cart · 2</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 300px;">
+            <div>
+              <div style="position: relative; height: 330px; overflow: hidden;">
+                <img src="{{ live.hero }}" alt="hero" style="width: 100%; height: 100%; object-fit: cover;" />
+                <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.28) 42%, rgba(0,0,0,0) 72%);"></div>
+                <div style="position: absolute; left: 30px; bottom: 30px; max-width: 460px;">
+                  <div style="font-family: {{ live.font }}; font-size: 44px; font-weight: 700; letter-spacing: -0.025em; color: #FFFFFF; line-height: 0.95;">{{ live.headline }}</div>
+                  <div style="display: inline-block; margin-top: 16px; background: {{ live.accent }}; color: {{ live.btnFg }}; padding: 12px 20px; font-size: 15px; font-weight: 800;">shop the collection</div>
+                </div>
+              </div>
+              <div style="padding: 26px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px;">
+                  <span style="font-family: {{ live.font }}; font-size: 24px; font-weight: 700; letter-spacing: -0.03em; color: {{ live.fg }};">trending this week</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {{ live.accent }};">view all 74 →</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px;">
+                  <sc-for list="{{ live.products }}" as="p" hint-placeholder-count="4">
+                    <div style="border: 1px solid {{ live.line }}; background: {{ live.card }};">
+                      <div style="height: 170px; overflow: hidden;"><img src="{{ p.img }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                      <div style="padding: 12px;">
+                        <div style="font-size: 13px; font-weight: 700; line-height: 1.3; color: {{ live.fg }};">{{ p.name }}</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 9px;">
+                          <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: {{ live.accent }};">{{ p.price }}</span>
+                          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.6; color: {{ live.fg }};">★ {{ p.rating }}</span>
+                        </div>
+                        <div style="border: 1px solid {{ live.accent }}; color: {{ live.accent }}; text-align: center; padding: 8px; font-size: 12px; font-weight: 800; margin-top: 11px;">add to cart</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; border-top: 1px solid {{ live.line }}; padding-top: 22px;">
+                  <div style="font-size: 13px; color: {{ live.fg }};"><strong>GST invoice</strong><br /><span style="opacity: 0.7;">on every order</span></div>
+                  <div style="font-size: 13px; color: {{ live.fg }};"><strong>COD available</strong><br /><span style="opacity: 0.7;">18,240 pincodes</span></div>
+                  <div style="font-size: 13px; color: {{ live.fg }};"><strong>7-day returns</strong><br /><span style="opacity: 0.7;">no questions asked</span></div>
+                  <div style="font-size: 13px; color: {{ live.fg }};"><strong>whatsapp support</strong><br /><span style="opacity: 0.7;">9am – 9pm ist</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="border-left: 1px solid {{ live.line }}; background: {{ live.card }}; padding: 22px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.03em; color: {{ live.fg }};">your cart</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.6; color: {{ live.fg }};">2 items</span>
+              </div>
+              <div style="display: grid; gap: 14px; margin-top: 18px;">
+                <sc-for list="{{ cart }}" as="c" hint-placeholder-count="2">
+                  <div style="display: grid; grid-template-columns: 54px 1fr; gap: 11px;">
+                    <div style="width: 54px; height: 54px; overflow: hidden; border: 1px solid {{ live.line }};"><img src="{{ c.img }}" alt="{{ c.name }}" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; line-height: 1.25; color: {{ live.fg }};">{{ c.name }}</div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.65; margin-top: 3px; color: {{ live.fg }};">{{ c.variant }}</div>
+                      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; margin-top: 4px; color: {{ live.accent }};">{{ c.price }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="border-top: 1px solid {{ live.line }}; margin-top: 18px; padding-top: 14px; display: grid; gap: 7px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{ live.fg }};">
+                <div style="display: flex; justify-content: space-between;"><span style="opacity: 0.7;">subtotal</span><span>₹5,398</span></div>
+                <div style="display: flex; justify-content: space-between;"><span style="opacity: 0.7;">GST</span><span>₹270</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700;"><span>total</span><span>₹5,668</span></div>
+              </div>
+              <div style="background: {{ live.accent }}; color: {{ live.btnFg }}; text-align: center; padding: 13px; font-size: 15px; font-weight: 800; margin-top: 16px;">checkout · UPI / COD</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.6; margin-top: 14px; opacity: 0.6; color: {{ live.fg }};">powered by supershowroom ✦ delivery in 2–4 days</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let route = 'dashboard';
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const h = window.location.hash.replace('#', '');
+      if (['signup', 'dashboard', 'catalog', 'orders', 'editor', 'billing', 'analytics', 'settings', 'storefront'].indexOf(h) >= 0) route = h;
+    }
+    this.state = {
+      route, step: 1, industry: 'apparel', preset: 0, accent: 0, font: 0, radius: 1,
+      blocks: { hero: true, trending: true, reviews: false, lookbook: true, whatsapp: true },
+      view: 'desktop', product: 0, order: 0, orderTab: 'all', catTab: 'all', range: '30d', plan: 1,
+      pay: { UPI: true, COD: true, card: true, razorpay: true, netbanking: false }
+    };
+  }
+
+  presetData() {
+    return [
+      {
+        name: 'apparel & fashion', store: 'velvet boutique', domain: 'velvetboutique.in',
+        bg: '#FDF6F0', card: '#FFFFFF', fg: '#1A1410', line: '#E3D5C8', accents: ['#98502F', '#14161A', '#8C2F39', '#2F6B4F'],
+        headline: 'festive drop is live', promo: 'festive drop · 30% off', cats: ['ethnic', 'casual', 'lookbook', 'sale'],
+        hero: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&auto=format&fit=crop',
+        products: [
+          { name: 'embroidered silk kurta set', price: '₹3,499', mrp: '₹4,999', rating: '4.9', sku: 'VB-101', variants: 'S / M / L / XL', stock: 'in stock', img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&auto=format&fit=crop' },
+          { name: 'pure linen cuban shirt', price: '₹1,899', mrp: '₹2,499', rating: '4.8', sku: 'VB-102', variants: 'M / L / XL', stock: '3 left', img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&auto=format&fit=crop' },
+          { name: 'georgette anarkali gown', price: '₹4,299', mrp: '₹5,999', rating: '5.0', sku: 'VB-103', variants: 'S / M / L', stock: '2 left', img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&auto=format&fit=crop' },
+          { name: 'handblock chanderi saree', price: '₹2,799', mrp: '₹3,899', rating: '4.9', sku: 'VB-104', variants: 'free size', stock: 'in stock', img: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400&auto=format&fit=crop' },
+          { name: 'merino knit blazer', price: '₹5,499', mrp: '₹7,999', rating: '4.9', sku: 'VB-105', variants: '38 / 40 / 42', stock: 'in stock', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop' },
+          { name: 'stretch chinos (khaki)', price: '₹1,599', mrp: '₹2,199', rating: '4.7', sku: 'VB-106', variants: '30 / 32 / 34', stock: 'in stock', img: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&auto=format&fit=crop' }
+        ]
+      },
+      {
+        name: 'bakery & café', store: 'the cafe club', domain: 'thecafeclub.store',
+        bg: '#FFF8E7', card: '#FFFFFF', fg: '#2B1B0E', line: '#EBDCBE', accents: ['#C2410C', '#14161A', '#7C3F0A', '#2F6B4F'],
+        headline: 'baked fresh at 6am', promo: 'order by 9pm for morning delivery', cats: ['cakes', 'pastries', 'eggless', 'hampers'],
+        hero: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop',
+        products: [
+          { name: 'belgian dark truffle cake', price: '₹650', mrp: '₹850', rating: '5.0', sku: 'CC-201', variants: '500g / 1kg', stock: 'in stock', img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&auto=format&fit=crop' },
+          { name: 'french butter croissants', price: '₹380', mrp: '₹450', rating: '4.9', sku: 'CC-202', variants: 'box of 4 / 8', stock: 'in stock', img: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&auto=format&fit=crop' },
+          { name: 'wild sourdough boule', price: '₹220', mrp: '₹280', rating: '4.8', sku: 'CC-203', variants: 'sliced / whole', stock: '6 left', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop' },
+          { name: 'parisian macarons box', price: '₹490', mrp: '₹600', rating: '4.9', sku: 'CC-204', variants: 'box of 6 / 12', stock: 'in stock', img: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=400&auto=format&fit=crop' }
+        ]
+      },
+      {
+        name: 'organic skincare', store: 'herbal essence', domain: 'herbalessence.shop',
+        bg: '#F2F7F4', card: '#FFFFFF', fg: '#10231A', line: '#D5E5DC', accents: ['#2F9E6E', '#14161A', '#1F6E7A', '#2F6B4F'],
+        headline: 'build your routine', promo: 'routine builder · save 15%', cats: ['serums', 'creams', 'spf', 'bundles'],
+        hero: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&auto=format&fit=crop',
+        products: [
+          { name: '20% vitamin c glow serum', price: '₹799', mrp: '₹1,199', rating: '4.9', sku: 'HE-301', variants: '30ml / 50ml', stock: 'in stock', img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&auto=format&fit=crop' },
+          { name: '5-ceramide barrier cream', price: '₹649', mrp: '₹899', rating: '4.8', sku: 'HE-302', variants: '50g / 100g', stock: 'in stock', img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop' },
+          { name: 'rose & aloe face wash', price: '₹450', mrp: '₹599', rating: '4.8', sku: 'HE-303', variants: '150ml', stock: '4 left', img: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&auto=format&fit=crop' },
+          { name: 'mineral sunscreen spf 50', price: '₹599', mrp: '₹799', rating: '5.0', sku: 'HE-304', variants: '50ml / 100ml', stock: 'in stock', img: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&auto=format&fit=crop' }
+        ]
+      },
+      {
+        name: 'kirana & grocery', store: 'raw organics', domain: 'raworganics.in',
+        bg: '#F5FBF2', card: '#FFFFFF', fg: '#14210F', line: '#D9E8D0', accents: ['#3F8F29', '#14161A', '#8A6B12', '#2F6B4F'],
+        headline: 'same-day delivery', promo: 'order before 2pm · same-day', cats: ['fruits', 'oils', 'dry fruits', 'daily'],
+        hero: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop',
+        products: [
+          { name: 'kashmiri apples (1kg)', price: '₹180', mrp: '₹240', rating: '4.9', sku: 'RO-401', variants: '1kg / 2kg / 5kg', stock: 'in stock', img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&auto=format&fit=crop' },
+          { name: 'cold-pressed olive oil 1l', price: '₹890', mrp: '₹1,200', rating: '4.9', sku: 'RO-402', variants: '500ml / 1l / 5l', stock: 'in stock', img: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop' },
+          { name: 'jumbo almonds (500g)', price: '₹480', mrp: '₹650', rating: '4.8', sku: 'RO-403', variants: '250g / 500g / 1kg', stock: '8 left', img: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=400&auto=format&fit=crop' },
+          { name: 'free-range eggs (12)', price: '₹130', mrp: '₹160', rating: '4.9', sku: 'RO-404', variants: 'pack of 6 / 12', stock: 'in stock', img: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&auto=format&fit=crop' }
+        ]
+      },
+      {
+        name: 'tech & gadgets', store: 'spark electronics', domain: 'sparkelectronics.tech',
+        bg: '#0E1116', card: '#171C24', fg: '#F2F5FA', line: '#2A313D', accents: ['#4F7BFF', '#EEF2F8', '#24457A', '#22D3A6'],
+        headline: 'launch week deals', promo: 'launch week · flat ₹500 off', cats: ['audio', 'wearables', 'charging', 'gaming'],
+        hero: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop',
+        products: [
+          { name: 'pro anc studio headphones', price: '₹4,999', mrp: '₹7,999', rating: '4.9', sku: 'SE-501', variants: 'black / grey', stock: 'in stock', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&auto=format&fit=crop' },
+          { name: 'titanium smart watch s5', price: '₹3,499', mrp: '₹5,999', rating: '4.8', sku: 'SE-502', variants: 'black / blue', stock: '5 left', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop' },
+          { name: 'hot-swap mech keyboard', price: '₹2,899', mrp: '₹4,299', rating: '4.9', sku: 'SE-503', variants: 'red / blue', stock: 'in stock', img: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&auto=format&fit=crop' },
+          { name: '100w gan travel charger', price: '₹1,299', mrp: '₹1,899', rating: '4.8', sku: 'SE-504', variants: '65w / 100w', stock: 'in stock', img: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&auto=format&fit=crop' }
+        ]
+      },
+      {
+        name: 'gold & jewellery', store: 'royal gems', domain: 'royalgems.com',
+        bg: '#FBF7EE', card: '#FFFFFF', fg: '#1C1608', line: '#E8DDC2', accents: ['#8A6A17', '#14161A', '#7C1F3D', '#2F6B4F'],
+        headline: 'bis hallmarked, insured', promo: 'bis hallmarked · insured delivery', cats: ['gold', 'silver', 'diamond', 'bridal'],
+        hero: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&auto=format&fit=crop',
+        products: [
+          { name: '18k solitaire diamond ring', price: '₹24,999', mrp: '₹32,000', rating: '5.0', sku: 'RG-601', variants: 'size 12 / 14 / 16', stock: 'in stock', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&auto=format&fit=crop' },
+          { name: '22k kundan choker set', price: '₹48,500', mrp: '₹60,000', rating: '5.0', sku: 'RG-602', variants: 'standard', stock: '1 left', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&auto=format&fit=crop' },
+          { name: 'sterling emerald earrings', price: '₹3,200', mrp: '₹4,500', rating: '4.9', sku: 'RG-603', variants: 'emerald / sapphire', stock: 'in stock', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&auto=format&fit=crop' },
+          { name: 'rose gold infinity bracelet', price: '₹8,900', mrp: '₹11,500', rating: '4.9', sku: 'RG-604', variants: 'adjustable', stock: 'in stock', img: 'https://images.unsplash.com/photo-1611591475155-4286fa7c2e7f?w=400&auto=format&fit=crop' }
+        ]
+      }
+    ];
+  }
+
+  go(route) {
+    this.setState({ route });
+    if (typeof window !== 'undefined') {
+      try { window.history.replaceState(null, '', '#' + route); } catch (e) {}
+    }
+  }
+
+  orderData() {
+    const p = this.presetData()[this.state.preset];
+    const pr = p.products;
+    return [
+      { id: 'ORD-88214', time: '14 min ago', customer: 'ananya rao', city: 'bengaluru 560038', items: '2 items', pay: 'UPI · verified', total: '₹5,668', status: 'placed', bg: '#EEF2F8', fg: '#14161A' },
+      { id: 'ORD-88213', time: '38 min ago', customer: 'vikram shetty', city: 'mysuru 570011', items: '1 item', pay: 'COD', total: '₹1,899', status: 'to confirm', bg: '#24457A', fg: '#FFFFFF' },
+      { id: 'ORD-88212', time: '1 hr ago', customer: 'pooja mehta', city: 'hyderabad 500081', items: '3 items', pay: 'razorpay', total: '₹8,240', status: 'processing', bg: '#FAF9F6', fg: '#14161A' },
+      { id: 'ORD-88211', time: '2 hrs ago', customer: 'amit khanna', city: 'pune 411045', items: '1 item', pay: 'card', total: '₹4,299', status: 'dispatched', bg: '#F1EFE9', fg: '#14161A' },
+      { id: 'ORD-88210', time: '3 hrs ago', customer: 'sneha iyer', city: 'chennai 600042', items: '2 items', pay: 'UPI · verified', total: '₹3,079', status: 'dispatched', bg: '#F1EFE9', fg: '#14161A' },
+      { id: 'ORD-88209', time: 'yesterday', customer: 'rahul verma', city: 'delhi 110024', items: '4 items', pay: 'COD', total: '₹11,420', status: 'delivered', bg: '#F1EFE9', fg: '#14161A' },
+      { id: 'ORD-88208', time: 'yesterday', customer: 'meera nair', city: 'kochi 682016', items: '1 item', pay: 'UPI · verified', total: '₹2,799', status: 'delivered', bg: '#F1EFE9', fg: '#14161A' },
+      { id: 'ORD-88207', time: '2 days ago', customer: 'kabir singh', city: 'jaipur 302020', items: '2 items', pay: 'razorpay', total: '₹6,398', status: 'delivered', bg: '#F1EFE9', fg: '#14161A' }
+    ].map((o, i) => Object.assign({}, o, {
+      lines: [
+        { name: pr[i % pr.length].name, variant: pr[i % pr.length].variants.split(' / ')[0], price: pr[i % pr.length].price, img: pr[i % pr.length].img },
+        { name: pr[(i + 1) % pr.length].name, variant: pr[(i + 1) % pr.length].variants.split(' / ')[0], price: pr[(i + 1) % pr.length].price, img: pr[(i + 1) % pr.length].img }
+      ]
+    }));
+  }
+
+  renderVals() {
+    const presets = this.presetData();
+    const p = presets[this.state.preset];
+    const accent = p.accents[Math.min(this.state.accent, p.accents.length - 1)];
+    const fonts = [
+      { name: 'bricolage', stack: "'Instrument Sans', sans-serif", sample: 'Aa modern grotesque' },
+      { name: 'instrument', stack: "'Instrument Serif', serif", sample: 'Aa editorial serif' },
+      { name: 'jetbrains', stack: "'JetBrains Mono', monospace", sample: 'Aa technical mono' }
+    ];
+    const radiusVals = ['0px', '8px', '20px'];
+    const radius = radiusVals[this.state.radius];
+    const route = this.state.route;
+    const navDefs = [
+      { key: 'dashboard', label: 'dashboard', meta: '' },
+      { key: 'catalog', label: 'catalog', meta: '74' },
+      { key: 'orders', label: 'orders', meta: '9' },
+      { key: 'editor', label: 'design editor', meta: '' },
+      { key: 'analytics', label: 'analytics', meta: '' },
+      { key: 'billing', label: 'billing & fees', meta: '' },
+      { key: 'settings', label: 'domain & settings', meta: '' },
+      { key: 'storefront', label: 'buyer storefront', meta: '↗' },
+      { key: 'signup', label: 'onboarding flow', meta: '' }
+    ];
+    const titles = {
+      signup: ['getting started', 'create your store'],
+      dashboard: ['overview · 26 aug', 'good morning, neha'],
+      catalog: ['products · 74 live', 'catalog'],
+      orders: ['fulfilment', 'orders'],
+      editor: ['appearance', 'design editor'],
+      billing: ['plan & fees', 'billing'],
+      analytics: ['growth', 'analytics'],
+      settings: ['configuration', 'domain & settings'],
+      storefront: ['buyer view', p.store]
+    };
+    const t = titles[route] || titles.dashboard;
+
+    const chartData = [42, 55, 38, 61, 49, 72, 66, 58, 81, 74, 69, 88, 79, 94];
+    const orders = this.orderData();
+    const filtered = this.state.orderTab === 'all' ? orders : orders.filter((o) => o.status.indexOf(this.state.orderTab) >= 0);
+    const selOrder = orders[Math.min(this.state.order, orders.length - 1)];
+    const products = p.products;
+    const sel = products[Math.min(this.state.product, products.length - 1)];
+    const blocks = this.state.blocks;
+    const changeCount = 1 + this.state.accent + this.state.font + this.state.radius + Object.keys(blocks).filter((k) => !blocks[k]).length;
+
+    return {
+      storeName: p.store,
+      storeDomain: p.domain,
+      crumb: t[0],
+      title: t[1],
+      todayLabel: '26 aug 2026',
+      nav: navDefs.map((n) => ({
+        label: n.label, meta: n.meta,
+        bg: route === n.key ? '#FAF9F6' : 'transparent',
+        fg: route === n.key ? '#14161A' : '#FAF9F6',
+        edge: route === n.key ? '#24457A' : 'transparent',
+        go: () => this.go(n.key)
+      })),
+      isSignup: route === 'signup', isDashboard: route === 'dashboard', isCatalog: route === 'catalog',
+      isOrders: route === 'orders', isEditor: route === 'editor', isBilling: route === 'billing',
+      isAnalytics: route === 'analytics', isSettings: route === 'settings', isStorefront: route === 'storefront',
+      goDashboard: () => this.go('dashboard'), goCatalog: () => this.go('catalog'), goOrders: () => this.go('orders'),
+      goBilling: () => this.go('billing'), goStorefront: () => this.go('storefront'), noop: () => {},
+
+      steps: [
+        { n: '01', label: 'account', on: this.state.step === 1 },
+        { n: '02', label: 'domain', on: this.state.step === 2 },
+        { n: '03', label: 'theme', on: this.state.step === 3 },
+        { n: '04', label: 'plan', on: this.state.step === 4 }
+      ].map((s, i) => ({
+        n: s.n, label: s.label,
+        bg: s.on ? '#14161A' : (this.state.step > i + 1 ? '#EEF2F8' : '#FAF9F6'),
+        fg: s.on ? '#EEF2F8' : '#14161A',
+        go: () => this.setState({ step: i + 1 })
+      })),
+      step1: this.state.step === 1, step2: this.state.step === 2, step3: this.state.step === 3, step4: this.state.step === 4,
+      nextStep: () => this.setState({ step: Math.min(4, this.state.step + 1) }),
+      prevStep: () => this.setState({ step: Math.max(1, this.state.step - 1) }),
+      nextLabel: this.state.step === 4 ? 'finish setup →' : 'continue →',
+      industries: ['apparel', 'bakery', 'skincare', 'grocery', 'electronics', 'jewellery'].map((n) => ({
+        name: n,
+        bg: this.state.industry === n ? '#EEF2F8' : '#FAF9F6',
+        fg: '#14161A',
+        pick: () => this.setState({ industry: n })
+      })),
+      themeCards: presets.map((x, i) => ({
+        name: x.name, img: x.hero,
+        bg: i === this.state.preset ? '#EEF2F8' : '#FAF9F6',
+        shadow: i === this.state.preset ? '0 10px 24px rgba(20,22,26,0.10)' : 'none',
+        state: i === this.state.preset ? 'selected ✦' : 'preview',
+        pick: () => this.setState({ preset: i, product: 0, accent: 0 })
+      })),
+      planRows: [
+        { name: 'essential', desc: 'first store, up to 100 products', fee: '2% of sales', price: '₹15,000' },
+        { name: 'pro showroom', desc: 'unlimited products, video, crm', fee: '2% of sales', price: '₹25,000' },
+        { name: 'elite', desc: 'own branding, sitewide seo, reviews', fee: '2% of sales', price: '₹35,000' },
+        { name: 'plus', desc: 'custom build, dedicated manager', fee: '1% of sales', price: '₹50,000+' }
+      ].map((x, i) => ({
+        name: x.name, desc: x.desc, fee: x.fee, price: x.price,
+        bg: this.state.plan === i ? '#24457A' : '#FAF9F6',
+        fg: this.state.plan === i ? '#FFFFFF' : '#14161A',
+        shadow: this.state.plan === i ? '0 10px 24px rgba(20,22,26,0.10)' : 'none',
+        pick: () => this.setState({ plan: i })
+      })),
+
+      chart: chartData.map((v, i) => ({ rev: v + '%', ord: Math.max(12, v * 0.55) + '%' })),
+      feed: orders.slice(0, 5).map((o) => ({ id: o.id, customer: o.customer, items: o.items, pay: o.pay, total: o.total, status: o.status, bg: o.bg, fg: o.fg })),
+
+      catTabs: ['all', 'new in', 'best sellers', 'low stock'].map((c) => ({
+        name: c,
+        bg: this.state.catTab === c ? '#14161A' : '#FAF9F6',
+        fg: this.state.catTab === c ? '#EEF2F8' : '#14161A',
+        pick: () => this.setState({ catTab: c })
+      })),
+      products: products.map((x, i) => ({
+        name: x.name, sku: x.sku, price: x.price, variants: x.variants, stock: x.stock, img: x.img,
+        rowBg: i === this.state.product ? '#EEF2F8' : 'transparent',
+        stockBg: x.stock === 'in stock' ? '#FAF9F6' : '#24457A',
+        stockFg: x.stock === 'in stock' ? '#14161A' : '#FFFFFF',
+        liveBg: i % 5 === 2 ? '#F1EFE9' : '#EEF2F8',
+        liveAlign: i % 5 === 2 ? 'flex-start' : 'flex-end',
+        pick: () => this.setState({ product: i })
+      })),
+      sel: {
+        name: sel.name, price: sel.price, mrp: sel.mrp, img: sel.img,
+        variantList: sel.variants.split(' / ').map((v, i) => ({ label: v + ' · ' + (12 - i * 3), bg: i === 0 ? '#EEF2F8' : '#FAF9F6' }))
+      },
+
+      orderTabs: ['all', 'placed', 'confirm', 'processing', 'dispatched', 'delivered'].map((x) => ({
+        label: x,
+        bg: this.state.orderTab === x ? '#14161A' : '#FAF9F6',
+        fg: this.state.orderTab === x ? '#EEF2F8' : '#14161A',
+        pick: () => this.setState({ orderTab: x })
+      })),
+      orderCount: filtered.length,
+      orders: filtered.map((o) => {
+        const idx = orders.indexOf(o);
+        return Object.assign({}, o, { rowBg: idx === this.state.order ? '#EEF2F8' : 'transparent', pick: () => this.setState({ order: idx }) });
+      }),
+      selOrder: {
+        id: selOrder.id, customer: selOrder.customer, status: selOrder.status, bg: selOrder.bg, fg: selOrder.fg,
+        address: selOrder.city + ' · ' + selOrder.pay,
+        timeline: [
+          { label: 'order placed', at: selOrder.time, dot: '#EEF2F8' },
+          { label: 'payment verified', at: selOrder.time, dot: '#EEF2F8' },
+          { label: 'packed & labelled', at: selOrder.status === 'placed' ? 'pending' : 'done', dot: selOrder.status === 'placed' ? '#F1EFE9' : '#24457A' },
+          { label: 'shiprocket pickup', at: selOrder.status === 'delivered' ? 'delivered' : 'scheduled', dot: selOrder.status === 'delivered' ? '#24457A' : '#F1EFE9' }
+        ],
+        lines: selOrder.lines,
+        subtotal: selOrder.total, GST: '₹270', total: selOrder.total,
+        fee: '₹' + Math.round(parseInt(selOrder.total.replace(/[^0-9]/g, ''), 10) * 0.02).toLocaleString('en-IN')
+      },
+
+      presets: presets.map((x, i) => ({
+        name: x.name,
+        bg: i === this.state.preset ? '#EEF2F8' : '#FAF9F6',
+        fg: '#14161A',
+        mark: i === this.state.preset ? '✦' : '',
+        pick: () => this.setState({ preset: i, product: 0, accent: 0, order: 0 })
+      })),
+      swatches: p.accents.map((c, i) => ({
+        color: c,
+        border: i === this.state.accent ? '1px solid #E4E1DA' : '1px solid #E4E1DA',
+        pick: () => this.setState({ accent: i })
+      })),
+      fonts: fonts.map((f, i) => ({
+        name: f.name, stack: f.stack, sample: f.sample,
+        bg: i === this.state.font ? '#EEF2F8' : '#FAF9F6',
+        pick: () => this.setState({ font: i })
+      })),
+      radii: ['sharp', 'soft', 'round'].map((r, i) => ({
+        label: r,
+        bg: i === this.state.radius ? '#EEF2F8' : '#FAF9F6',
+        pick: () => this.setState({ radius: i })
+      })),
+      blocks: [
+        { key: 'hero', name: 'hero banner' },
+        { key: 'trending', name: 'trending row' },
+        { key: 'lookbook', name: 'lookbook grid' },
+        { key: 'reviews', name: 'review wall' },
+        { key: 'whatsapp', name: 'whatsapp button' }
+      ].map((b) => ({
+        name: b.name,
+        bg: blocks[b.key] ? '#EEF2F8' : '#F1EFE9',
+        mark: blocks[b.key] ? 'on' : 'off',
+        toggle: () => {
+          const next = Object.assign({}, this.state.blocks);
+          next[b.key] = !next[b.key];
+          this.setState({ blocks: next });
+        }
+      })),
+      viewMobile: () => this.setState({ view: 'mobile' }),
+      viewDesktop: () => this.setState({ view: 'desktop' }),
+      mobileBg: this.state.view === 'mobile' ? '#EEF2F8' : '#FAF9F6',
+      desktopBg: this.state.view === 'desktop' ? '#EEF2F8' : '#FAF9F6',
+      frameWidth: this.state.view === 'mobile' ? '380px' : '100%',
+      frameRadius: this.state.view === 'mobile' ? '34px' : '10px',
+      innerRadius: this.state.view === 'mobile' ? '26px' : '4px',
+      gridCols: this.state.view === 'mobile' ? '1fr 1fr' : 'repeat(4, 1fr)',
+      btnRadius: radius,
+      changeCount,
+
+      live: {
+        bg: p.bg, card: p.card, fg: p.fg, line: p.line, accent: accent, btnFg: p.bg === '#0E1116' ? '#0E1116' : '#FFFFFF',
+        font: fonts[this.state.font].stack, store: p.store, headline: p.headline, promo: p.promo, hero: p.hero,
+        products: p.products.slice(0, 4),
+        cats: p.cats.map((c, i) => ({ name: c, bg: i === 0 ? accent : 'transparent', fg: i === 0 ? (p.bg === '#0E1116' ? '#0E1116' : '#FFFFFF') : p.fg, border: i === 0 ? accent : p.line }))
+      },
+      cart: [
+        { name: p.products[0].name, variant: p.products[0].variants.split(' / ')[0], price: p.products[0].price, img: p.products[0].img },
+        { name: p.products[1].name, variant: p.products[1].variants.split(' / ')[0], price: p.products[1].price, img: p.products[1].img }
+      ],
+
+      statements: [
+        { month: 'august 2026', sales: '₹9,32,000', orders: '312', fee: '₹18,640', GST: '₹3,355', status: 'due 1 sep', bg: '#EEF2F8' },
+        { month: 'july 2026', sales: '₹8,14,500', orders: '278', fee: '₹16,290', GST: '₹2,932', status: 'paid', bg: '#F1EFE9', fg: '#14161A' },
+        { month: 'june 2026', sales: '₹7,42,000', orders: '251', fee: '₹14,840', GST: '₹2,671', status: 'paid', bg: '#F1EFE9', fg: '#14161A' },
+        { month: 'may 2026', sales: '₹6,88,300', orders: '236', fee: '₹13,766', GST: '₹2,478', status: 'paid', bg: '#F1EFE9', fg: '#14161A' },
+        { month: 'april 2026', sales: '₹5,96,100', orders: '201', fee: '₹11,922', GST: '₹2,146', status: 'paid', bg: '#F1EFE9', fg: '#14161A' },
+        { month: 'march 2026', sales: '₹4,80,400', orders: '168', fee: '₹9,608', GST: '₹1,729', status: 'paid', bg: '#F1EFE9', fg: '#14161A' }
+      ],
+
+      ranges: ['7d', '30d', '90d'].map((r) => ({
+        label: 'last ' + r,
+        bg: this.state.range === r ? '#14161A' : '#FAF9F6',
+        fg: this.state.range === r ? '#EEF2F8' : '#14161A',
+        pick: () => this.setState({ range: r })
+      })),
+      kpis: [
+        { label: 'revenue', value: this.state.range === '7d' ? '₹2,18,400' : (this.state.range === '30d' ? '₹9,32,000' : '₹24,60,800'), delta: '▲ 21% vs prev', bg: '#FAF9F6' },
+        { label: 'orders', value: this.state.range === '7d' ? '74' : (this.state.range === '30d' ? '312' : '841'), delta: '▲ 16% vs prev', bg: '#FAF9F6' },
+        { label: 'visitors', value: this.state.range === '7d' ? '2,610' : (this.state.range === '30d' ? '10,780' : '29,410'), delta: '▲ 9% vs prev', bg: '#FAF9F6' },
+        { label: 'repeat rate', value: '31%', delta: '▲ 4pt vs prev', bg: '#EEF2F8' }
+      ],
+      sources: [
+        { name: 'google organic', value: '₹3,42,600', pct: '84%', color: '#14161A' },
+        { name: 'google shopping ads', value: '₹2,18,900', pct: '62%', color: '#24457A' },
+        { name: 'instagram & meta', value: '₹1,74,300', pct: '48%', color: '#2F6B4F' },
+        { name: 'whatsapp campaigns', value: '₹1,12,700', pct: '34%', color: '#EEF2F8' },
+        { name: 'direct & repeat', value: '₹83,500', pct: '24%', color: '#98502F' }
+      ],
+      funnel: [
+        { step: 'store visits', count: '10,780', pct: '100%', color: '#FAF9F6' },
+        { step: 'product views', count: '6,412', pct: '76%', color: '#EEF2F8' },
+        { step: 'added to cart', count: '1,984', pct: '48%', color: '#24457A' },
+        { step: 'checkout started', count: '702', pct: '28%', color: '#2F6B4F' },
+        { step: 'paid orders', count: '312', pct: '16%', color: '#98502F' }
+      ],
+      topProducts: p.products.slice(0, 5).map((x, i) => ({
+        name: x.name, img: x.img,
+        views: (2400 - i * 310).toLocaleString('en-IN'),
+        units: String(88 - i * 12),
+        revenue: '₹' + (88 - i * 12) * parseInt(x.price.replace(/[^0-9]/g, ''), 10) / 1 + '',
+        conv: (4.2 - i * 0.4).toFixed(1) + '%'
+      })).map((x) => ({ name: x.name, img: x.img, views: x.views, units: x.units, revenue: '₹' + Number(x.revenue.replace(/[^0-9]/g, '')).toLocaleString('en-IN'), conv: x.conv })),
+
+      dns: [
+        { type: 'A', name: '@', value: '76.76.21.21', state: 'active' },
+        { type: 'CNAME', name: 'www', value: 'cname.supershowroom.in', state: 'active' },
+        { type: 'TXT', name: '@', value: 'ss-verify=8f21c…', state: 'verified' },
+        { type: 'MX', name: '@', value: 'mx.zoho.in (10)', state: 'active' }
+      ],
+      payments: [
+        { key: 'UPI', name: 'UPI qr', meta: 'auto-verified · 0 fee' },
+        { key: 'razorpay', name: 'razorpay', meta: 'cards, netbanking, wallets' },
+        { key: 'COD', name: 'cash on delivery', meta: 'whatsapp confirmation on' },
+        { key: 'card', name: 'credit / debit cards', meta: 'via razorpay' },
+        { key: 'netbanking', name: 'stripe (international)', meta: 'not connected' }
+      ].map((x) => ({
+        name: x.name, meta: x.meta,
+        bg: this.state.pay[x.key] ? '#FAF9F6' : '#F1EFE9',
+        knobBg: this.state.pay[x.key] ? '#EEF2F8' : '#F1EFE9',
+        align: this.state.pay[x.key] ? 'flex-end' : 'flex-start',
+        toggle: () => {
+          const next = Object.assign({}, this.state.pay);
+          next[x.key] = !next[x.key];
+          this.setState({ pay: next });
+        }
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

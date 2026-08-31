@@ -1,0 +1,32 @@
+{
+  "name": "supershowroom",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "supabase:setup": "node scripts/apply-supabase-schema.mjs",
+    "supabase:migrate": "node scripts/apply-migrations.mjs",
+    "supabase:migrate:all": "node scripts/apply-migrations.mjs --all",
+    "supabase:seed": "node scripts/seed-supabase.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
+    "next": "^15.2.1",
+    "nodemailer": "^9.0.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/nodemailer": "^8.0.1",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "dotenv": "^16.6.1",
+    "pg": "^8.23.0",
+    "typescript": "^5.8.2"
+  }
+}
