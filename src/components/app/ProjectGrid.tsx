@@ -20,24 +20,24 @@ type Project = {
 };
 
 const THEMES = ["fashion", "bakery", "skincare", "kirana", "tech", "jewels"] as const;
-const box: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#fff", borderRadius: 10, overflow: "hidden" };
+const box: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#FAF9F6", borderRadius: 0, overflow: "hidden" };
 const MONO = "'JetBrains Mono', monospace";
-const mini: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#fff", borderRadius: 6, padding: "5px 9px", fontSize: 11, fontWeight: 800, cursor: "pointer" };
+const mini: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#FFFFFF", borderRadius: 0, padding: "7px 11px", fontSize: 11, fontWeight: 700, cursor: "pointer" };
 
 function statusPill(s: string) {
   const map: Record<string, [string, string]> = {
-    live: ["#DCFCE7", "#166534"],
-    preview: ["#FEF3C7", "#92400E"],
-    draft: ["#F1F5F9", "#475569"],
+    live: ["#EAF4EC", "#2F6B4F"],
+    preview: ["#EEF2F8", "#24457A"],
+    draft: ["#F1EFE9", "#475569"],
   };
   const [bg, fg] = map[s] ?? map.draft;
-  return <span style={{ background: bg, color: fg, fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 999, textTransform: "uppercase" }}>{s}</span>;
+  return <span style={{ background: bg, color: fg, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", padding: "3px 9px", borderRadius: 999, textTransform: "uppercase", fontFamily: MONO }}>{s}</span>;
 }
 
 /** Scaled, non-interactive live preview of a store's current draft. */
 function PreviewThumb({ slug, nonce, height = 150 }: { slug: string; nonce: number; height?: number }) {
   return (
-    <div style={{ height, overflow: "hidden", background: "#EEF0F3", position: "relative", borderBottom: "1px solid #E4E1DA" }}>
+    <div style={{ height, overflow: "hidden", background: "#F1EFE9", position: "relative", borderBottom: "1px solid #E4E1DA" }}>
       <iframe
         key={nonce}
         src={`/preview/${slug}?thumb=${nonce}`}
@@ -139,7 +139,7 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
           Publish as many as you like; each goes live on its own <span style={{ fontFamily: MONO }}>&lt;brand&gt;.{ROOT_DOMAIN}</span> (or your custom domain).
         </p>
       )}
-      {msg && <div style={{ border: "1px solid #86EFAC", background: "#F0FDF4", borderRadius: 8, padding: "10px 12px", fontWeight: 600, fontSize: 13 }}>{msg}</div>}
+      {msg && <div style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "10px 12px", fontWeight: 600, fontSize: 13 }}>{msg}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${compact ? 240 : 300}px, 1fr))`, gap: 14 }}>
         {projects.map((p) => {
@@ -156,13 +156,13 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                     <input
                       defaultValue={p.name}
                       onBlur={(e) => e.target.value.trim() && e.target.value !== p.name && rename(p.id, e.target.value.trim())}
-                      style={{ fontWeight: 800, fontSize: 14, border: "1px solid transparent", borderRadius: 6, padding: "2px 4px", flex: 1, background: "transparent" }}
+                      style={{ fontWeight: 800, fontSize: 15, border: "1px solid transparent", borderRadius: 0, padding: "2px 4px", flex: 1, background: "transparent" }}
                     />
                   )}
                   {statusPill(p.status)}
                 </div>
-                <div style={{ fontSize: 11, color: "#64748B", fontFamily: MONO }}>
-                  {p.theme} · {p.plan}{isActive && <span style={{ color: "#16A34A", fontWeight: 800 }}> · ACTIVE</span>}
+                <div style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B", fontFamily: MONO }}>
+                  {p.theme} · {p.plan}{isActive && <span style={{ color: "#2F6B4F", fontWeight: 700 }}> · active</span>}
                 </div>
 
                 {p.stats && (
@@ -173,9 +173,9 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                       ["products", String(p.stats.products)],
                       ["views", String(p.stats.views)],
                     ].map(([k, v]) => (
-                      <div key={k} style={{ background: "#F8FAFC", border: "1px solid #E4E1DA", borderRadius: 6, padding: "5px 6px", textAlign: "center" }}>
-                        <div style={{ fontSize: 12, fontWeight: 900, color: "#0F172A", lineHeight: 1.1 }}>{v}</div>
-                        <div style={{ fontSize: 8, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", fontFamily: MONO }}>{k}</div>
+                      <div key={k} style={{ background: "#FFFFFF", border: "1px solid #E4E1DA", borderRadius: 0, padding: "7px 6px", textAlign: "center" }}>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#14161A", lineHeight: 1.1, fontFamily: MONO, letterSpacing: "-0.02em" }}>{v}</div>
+                        <div style={{ fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "#24457A", fontFamily: MONO, marginTop: 3 }}>{k}</div>
                       </div>
                     ))}
                   </div>
@@ -186,7 +186,7 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                     const url = p.customDomain ? `https://${p.customDomain}` : `https://www.${ROOT_DOMAIN}${p.hostedPath}`;
                     return (
                       <a href={url} target="_blank" rel="noreferrer"
-                        style={{ color: isLive ? "#15803D" : "#0F172A", fontWeight: 800, fontFamily: MONO, textDecoration: "none", wordBreak: "break-all" }}>
+                        style={{ color: isLive ? "#2F6B4F" : "#24457A", fontWeight: 700, fontFamily: MONO, fontSize: 11, textDecoration: "none", wordBreak: "break-all" }}>
                         {url.replace(/^https:\/\//, "")} ↗
                       </a>
                     );
@@ -199,7 +199,7 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                       value={domainDraft[p.id] ?? ""}
                       onChange={(e) => setDomainDraft((s) => ({ ...s, [p.id]: e.target.value }))}
                       placeholder="shop.yourbrand.com"
-                      style={{ flex: 1, border: "1px solid #E2E8F0", borderRadius: 6, padding: "6px 8px", fontSize: 12 }}
+                      style={{ flex: 1, border: "1px solid #E4E1DA", borderRadius: 0, padding: "7px 9px", fontSize: 12 }}
                     />
                     <button type="button" onClick={() => saveDomain(p.id)} style={mini}>Save</button>
                   </div>
@@ -207,14 +207,14 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
 
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <button type="button" disabled={isActive} onClick={() => open(p.id)} style={{ ...mini, background: isActive ? "#EEF2F8" : "#24457A", color: isActive ? "#24457A" : "#fff", borderColor: "#24457A" }}>
-                    {isActive ? "● Active" : "Switch to this"}
+                    {isActive ? "● active" : "switch to this"}
                   </button>
-                  <button type="button" disabled={busyId === p.id} onClick={() => publish(p.id, true)} style={{ ...mini, background: "#16A34A", color: "#fff", borderColor: "#16A34A" }}>
-                    {busyId === p.id ? "…" : isLive ? "Re-publish" : "Publish live"}
+                  <button type="button" disabled={busyId === p.id} onClick={() => publish(p.id, true)} style={{ ...mini, background: "#2F6B4F", color: "#fff", borderColor: "#2F6B4F" }}>
+                    {busyId === p.id ? "…" : isLive ? "re-publish" : "publish live"}
                   </button>
                   {isLive && (
-                    <button type="button" disabled={busyId === p.id} onClick={() => publish(p.id, false)} style={{ ...mini, color: "#B91C1C", borderColor: "#FCA5A5" }}>
-                      Unpublish
+                    <button type="button" disabled={busyId === p.id} onClick={() => publish(p.id, false)} style={{ ...mini, color: "#B91C1C", borderColor: "#E4E1DA" }}>
+                      unpublish
                     </button>
                   )}
                 </div>
@@ -224,22 +224,22 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
         })}
 
         {/* new project */}
-        <div style={{ ...box, border: "1px dashed #CBD5E1", padding: 14, display: "grid", gap: 9, alignContent: "start" }}>
-          <div style={{ fontWeight: 800, fontSize: 14 }}>＋ New project</div>
+        <div style={{ ...box, border: "2px dashed #14161A", padding: 16, display: "grid", gap: 10, alignContent: "start" }}>
+          <div style={{ fontWeight: 800, fontSize: 15 }}>＋ New project</div>
           <input
             value={draft.name}
             onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
             placeholder="Project / store name"
-            style={{ border: "1px solid #E2E8F0", borderRadius: 6, padding: "8px 10px", fontSize: 13 }}
+            style={{ border: "1px solid #E4E1DA", borderRadius: 0, padding: "10px 12px", fontSize: 13, background: "#fff" }}
           />
           <select
             value={draft.theme}
             onChange={(e) => setDraft((d) => ({ ...d, theme: e.target.value as (typeof THEMES)[number] }))}
-            style={{ border: "1px solid #E2E8F0", borderRadius: 6, padding: "8px 10px", fontSize: 13 }}
+            style={{ border: "1px solid #E4E1DA", borderRadius: 0, padding: "10px 12px", fontSize: 13, background: "#fff" }}
           >
             {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <button type="button" onClick={create} disabled={creating} style={{ border: 0, background: "#14161A", color: "#fff", padding: "10px 12px", fontWeight: 800, borderRadius: 8, cursor: "pointer" }}>
+          <button type="button" onClick={create} disabled={creating} style={{ border: "1px solid #14161A", background: "#14161A", color: "#fff", padding: "12px", fontWeight: 700, borderRadius: 0, cursor: "pointer" }}>
             {creating ? "Creating…" : "Create & open builder →"}
           </button>
         </div>
