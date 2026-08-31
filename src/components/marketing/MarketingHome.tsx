@@ -739,9 +739,9 @@ function CursorCatalogCTA() {
     const el = stageRef.current;
     if (!el) return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    // Touch devices (mobile / tablet) have no cursor — skip the trail entirely.
-    const finePointer = window.matchMedia?.("(pointer: fine)").matches ?? true;
-    if (reduce || !finePointer) return;
+    // `pointermove` covers mouse AND touch-drag, so the catalog follows a
+    // finger on phones too — no cursor required. Only bail on reduced-motion.
+    if (reduce) return;
 
     // preload
     TRAIL_POOL.forEach((p) => { const im = new Image(); im.src = p.img; });
@@ -809,7 +809,7 @@ function CursorCatalogCTA() {
 
       <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto", padding: "150px 28px", textAlign: "center", pointerEvents: "none" }}>
         <div className="ssr-cta-hint" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,246,0.45)", marginBottom: 34 }}>
-          move your cursor ✦ the catalog follows
+          move across ✦ the catalog follows
         </div>
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9FBBE0" }}>ready when you are</div>
         <h2 className="reveal-blur" style={{ fontFamily: SERIF, fontSize: "clamp(44px, 6.4vw, 100px)", lineHeight: 0.86, fontWeight: 400, letterSpacing: "-0.03em", marginTop: 18 }}>
