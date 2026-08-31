@@ -508,7 +508,7 @@ export function MarketingHome() {
                 const active = k === themeIx;
                 return (
                   <button key={t.name} onClick={() => setThemeIx(k)} style={{ width: "100%", textAlign: "left", border: `1px solid ${active ? "#24457A" : "#E4E1DA"}`, borderRadius: 26, background: active ? "#fff" : "#FAF9F6", padding: "18px 20px", marginBottom: 14, display: "grid", gridTemplateColumns: "72px 1fr auto", gap: 18, alignItems: "center", cursor: "pointer" }}>
-                    <div style={{ width: 72, height: 72, borderRadius: 18, overflow: "hidden", border: "1px solid #E4E1DA" }}>
+                    <div className="ssr-kb" style={{ width: 72, height: 72, borderRadius: 18, overflow: "hidden", border: "1px solid #E4E1DA" }}>
                       <img src={t.hero} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     </div>
                     <div>

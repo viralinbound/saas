@@ -85,7 +85,15 @@ export function MarketingNav() {
               </Link>
             ))}
             {user ? (
-              <Link href="/app" onClick={() => setMenu(false)} style={{ marginTop: 16, textAlign: "center", background: "#24457A", color: "#fff", fontSize: 16, fontWeight: 700, padding: 15, borderRadius: 34, textDecoration: "none" }}>my store →</Link>
+              <>
+                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#24457A", padding: "13px 0", borderBottom: "1px solid #E4E1DA" }}>
+                  signed in as {user.name}
+                </div>
+                <Link href="/app" onClick={() => setMenu(false)} style={{ marginTop: 16, textAlign: "center", background: "#24457A", color: "#fff", fontSize: 16, fontWeight: 700, padding: 15, borderRadius: 34, textDecoration: "none" }}>my store →</Link>
+                <button type="button" onClick={() => { setMenu(false); logout(); }} style={{ marginTop: 10, textAlign: "center", background: "none", border: "1px solid #E4E1DA", color: "#14161A", fontSize: 15, fontWeight: 700, padding: 14, borderRadius: 34, cursor: "pointer", fontFamily: "inherit" }}>
+                  log out
+                </button>
+              </>
             ) : (
               <>
                 <Link href="/login" onClick={() => setMenu(false)} style={{ color: "#14161A", fontSize: 19, fontWeight: 700, padding: "13px 0", borderBottom: "1px solid #E4E1DA", textDecoration: "none" }}>log in</Link>

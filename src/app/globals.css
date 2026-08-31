@@ -162,3 +162,16 @@ aside a, aside a:hover { text-decoration: none; }
   .ssr-catalog-cta { cursor: default !important; }
   .ssr-cta-hint { display: none !important; }
 }
+
+/* Touch devices have no :hover, so the desktop card-lift + image effects never
+   fire. Give the same imagery a gentle ken-burns so phones get parity, and add
+   a tap (:active) lift for feedback. Honours reduced-motion. */
+@media (hover: none) {
+  .ssr-card img,
+  .ssr-kb img { animation: kb 24s ease-in-out infinite; }
+  .ssr-card:active { transform: translateY(-4px); }
+}
+@media (hover: none) and (prefers-reduced-motion: reduce) {
+  .ssr-card img,
+  .ssr-kb img { animation: none; }
+}
