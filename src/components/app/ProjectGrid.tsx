@@ -42,6 +42,7 @@ function PreviewThumb({ slug, nonce, height = 150 }: { slug: string; nonce: numb
         key={nonce}
         src={`/preview/${slug}?thumb=${nonce}`}
         title={`${slug} preview`}
+        loading="lazy"
         tabIndex={-1}
         style={{
           width: "333%",

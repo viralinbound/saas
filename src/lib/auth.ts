@@ -1,15 +1,15 @@
+import { cache } from "react";
 import { createClient } from "./supabase/server";
 import { mapStoreWithRelations } from "./db-mapper";
 import { resolveActiveStore } from "./activeStore";
+import { getSessionUser } from "./session";
 import type { OnboardingData } from "./onboarding";
 import type { StoreWithRelations, User } from "./types";
 
-export async function getCurrentUser(): Promise<User | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const getCurrentUser = cache(async (): Promise<User | null> => {
+  const user = await getSessionUser();
   if (!user) return null;
+  const supabase = await createClient();
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -23,14 +23,12 @@ export async function getCurrentUser(): Promise<User | null> {
     email: user.email || profile?.phone || user.phone || "",
     phone: profile?.phone ?? user.phone ?? null,
   };
-}
+});
 
-export async function getCurrentStore(): Promise<StoreWithRelations | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const getCurrentStore = cache(async (): Promise<StoreWithRelations | null> => {
+  const user = await getSessionUser();
   if (!user) return null;
+  const supabase = await createClient();
 
   const email = user.email || user.phone || "";
 
@@ -38,33 +36,24 @@ export async function getCurrentStore(): Promise<StoreWithRelations | null> {
   const storeRow = await resolveActiveStore<Parameters<typeof mapStoreWithRelations>[0] & { id: string }>("*");
   if (!storeRow) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  // Independent — fetch in parallel instead of one after another.
+  const [{ data: profile }, { data: products }, { data: orders }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("products")
+      .select("*")
+      .eq("store_id", storeRow.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("store_id", storeRow.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("*")
-    .eq("store_id", storeRow.id)
-    .order("created_at", { ascending: false });
-
-  const { data: orders } = await supabase
-    .from("orders")
-    .select("*, order_items(*)")
-    .eq("store_id", storeRow.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  return mapStoreWithRelations(
-    storeRow,
-    profile,
-    email,
-    products || [],
-    orders || []
-  );
-}
+  return mapStoreWithRelations(storeRow, profile, email, products || [], orders || []);
+});
 
 export async function requireUser() {
   const user = await getCurrentUser();
@@ -78,16 +67,14 @@ export async function requireStore() {
   return store;
 }
 
-export async function getOnboardingIntent(): Promise<Partial<OnboardingData>> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const getOnboardingIntent = cache(async (): Promise<Partial<OnboardingData>> => {
+  const user = await getSessionUser();
   if (!user) return {};
 
   const meta = user.user_metadata?.onboarding as Partial<OnboardingData> | undefined;
   if (meta?.goal) return meta;
 
+  const supabase = await createClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("onboarding_data")
@@ -95,4 +82,4 @@ export async function getOnboardingIntent(): Promise<Partial<OnboardingData>> {
     .maybeSingle();
 
   return (profile?.onboarding_data as Partial<OnboardingData>) || {};
-}
+});

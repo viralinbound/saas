@@ -1,4 +1,6 @@
+import { cache } from "react";
 import { createClient } from "./supabase/server";
+import { getSessionUser } from "./session";
 
 export type Organization = {
   id: string;
@@ -55,12 +57,10 @@ export function mapOrg(row: DbOrg): Organization {
 }
 
 /** The caller's memberships, newest org first. Empty array if the org layer isn't provisioned. */
-export async function getMemberships(): Promise<Membership[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const getMemberships = cache(async (): Promise<Membership[]> => {
+  const user = await getSessionUser();
   if (!user) return [];
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("organization_members")
@@ -76,15 +76,13 @@ export async function getMemberships(): Promise<Membership[]> {
     status: m.status as string,
     title: (m.title as string) ?? null,
   }));
-}
+});
 
 /** The caller's current (primary) organization, or null if none / not provisioned. */
-export async function getCurrentOrg(): Promise<Organization | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const getCurrentOrg = cache(async (): Promise<Organization | null> => {
+  const user = await getSessionUser();
   if (!user) return null;
+  const supabase = await createClient();
 
   const { data: memberships, error: mErr } = await supabase
     .from("organization_members")
@@ -103,14 +101,12 @@ export async function getCurrentOrg(): Promise<Organization | null> {
     .limit(1);
 
   return orgs && orgs[0] ? mapOrg(orgs[0]) : null;
-}
+});
 
 export async function getRoleInOrg(orgId: string): Promise<Membership["role"] | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return null;
+  const supabase = await createClient();
   const { data } = await supabase
     .from("organization_members")
     .select("role")
