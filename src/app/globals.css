@@ -206,17 +206,30 @@ aside a, aside a:hover { text-decoration: none; }
   .ssr-editor-2col { grid-template-columns: 1fr !important; }
   .ssr-editor-side { position: static !important; }
 
-  .ssr-builder { height: auto !important; min-height: 0 !important; }
-  .ssr-builder-cols { grid-template-columns: 1fr !important; overflow: visible !important; }
+  /* the whole builder becomes a contained card with even spacing on every side */
+  .ssr-builder {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 4px 0 24px !important;
+    border: 1px solid #E4E1DA !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #FAF9F6 !important;
+  }
+  .ssr-builder-cols { grid-template-columns: minmax(0, 1fr) !important; overflow: visible !important; }
   .ssr-builder-pane, .ssr-builder-canvas {
-    overflow: visible !important;
     border-right: 0 !important;
     border-left: 0 !important;
     border-bottom: 1px solid #E4E1DA !important;
+    padding: 16px !important;
   }
-  .ssr-builder-pane { max-height: 44vh; overflow-y: auto !important; }
-  .ssr-builder-canvas { padding: 12px !important; }
+  .ssr-builder-pane { max-height: 44vh; overflow-y: auto !important; overflow-x: hidden !important; }
+  /* the live preview can be wider than the phone — let it scroll inside the card
+     instead of spilling past the rounded border */
+  .ssr-builder-canvas { padding: 16px !important; overflow: auto !important; }
+  .ssr-builder-cols > :last-child { border-bottom: 0 !important; }
   .ssr-builder-host { display: none !important; }
+
 }
 @media (max-width: 760px) {
   .ssr-editor-note {
