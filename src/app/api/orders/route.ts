@@ -5,11 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 const schema = z.object({
   storeSlug: z.string(),
   customerName: z.string().min(2),
-  customerPhone: z.string().min(10),
-  customerEmail: z.string().email().optional(),
+  customerPhone: z.string().min(8),
+  customerEmail: z.union([z.string().email(), z.literal(""), z.null()]).optional(),
   address: z.string().min(5),
-  city: z.string().optional(),
-  pincode: z.string().optional(),
+  city: z.string().nullish(),
+  pincode: z.string().nullish(),
   paymentMethod: z.enum(["cod", "upi", "card"]).default("cod"),
   deliverySlot: z.string().nullish(),
   customEngraving: z.string().nullish(),
@@ -58,7 +58,11 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ order });
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } catch (e) {
+    const msg =
+      e instanceof z.ZodError
+        ? e.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; ")
+        : "Invalid request";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
