@@ -748,13 +748,9 @@ function CursorCatalogCTA() {
 
     let last: { x: number; y: number } | null = null;
     let i = 0;
+    let hold = 0; // interval id kept alive while a finger/button is held down
 
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      if (last && Math.hypot(x - last.x, y - last.y) < 88) return;
-      last = { x, y };
+    const spawn = (x: number, y: number) => {
       const item = TRAIL_POOL[i % TRAIL_POOL.length];
       const tilt = (i % 2 ? 1 : -1) * (4 + (i % 4) * 2);
       i++;
@@ -782,12 +778,43 @@ function CursorCatalogCTA() {
       window.setTimeout(() => { fig.remove(); }, 1200);
 
       const live = el.querySelectorAll(".trailfig");
-      if (live.length > 9) live[0].remove();
+      if (live.length > 12) live[0].remove();
     };
 
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      // denser threshold → the trail flows continuously as the finger drags
+      if (last && Math.hypot(x - last.x, y - last.y) < 44) {
+        last = { x, y };
+        return;
+      }
+      last = { x, y };
+      spawn(x, y);
+    };
+
+    // While a finger (or button) is held, keep emitting from the last point so
+    // even a slow or paused drag stays in continuous motion.
+    const startHold = () => {
+      if (hold) return;
+      hold = window.setInterval(() => { if (last) spawn(last.x, last.y); }, 130);
+    };
+    const stopHold = () => { if (hold) { window.clearInterval(hold); hold = 0; } };
+
     el.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerdown", startHold, { passive: true });
+    el.addEventListener("pointerup", stopHold, { passive: true });
+    el.addEventListener("pointercancel", stopHold, { passive: true });
+    el.addEventListener("pointerleave", stopHold, { passive: true });
+
     return () => {
+      stopHold();
       el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerdown", startHold);
+      el.removeEventListener("pointerup", stopHold);
+      el.removeEventListener("pointercancel", stopHold);
+      el.removeEventListener("pointerleave", stopHold);
       el.querySelectorAll(".trailfig").forEach((n) => n.remove());
     };
   }, []);
