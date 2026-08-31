@@ -41,7 +41,7 @@ export function PlansClient({ currentPlan, companyName }: { currentPlan: string;
   }
 
   return (
-    <div style={{ display: "grid", gap: 22, maxWidth: 1160 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 22, maxWidth: 1160 }}>
       <div style={{ ...box, background: "#EEF2F8" }}>
         <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#24457A" }}>
           {companyName} · current plan: {PLANS[currentPlan as PlanKey]?.name || currentPlan}

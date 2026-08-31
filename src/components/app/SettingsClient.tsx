@@ -41,10 +41,10 @@ export function SettingsClient({ store }: { store: StoreInfo }) {
   }
 
   return (
-    <div style={{ display: "grid", gap: 20, maxWidth: 720 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 20, maxWidth: 720, margin: "0 auto" }}>
       <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 24 }}>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>hosted URL</div>
-        <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8 }}>{store.url}</div>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A" }}>hosted URL</div>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, marginTop: 8, wordBreak: "break-all" }}>{store.url}</div>
         <p style={{ marginTop: 8, fontSize: 14 }}>In production this becomes <code>{store.slug}.supershowroom.com</code></p>
       </div>
 

@@ -200,6 +200,42 @@ aside a, aside a:hover { text-decoration: none; }
   .ssr-projstats { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
+/* ── Visual editors (design & publish / website builder) on tablet + phone ── */
+.ssr-editor-note { display: none; }
+@media (max-width: 1024px) {
+  .ssr-editor-2col { grid-template-columns: 1fr !important; }
+  .ssr-editor-side { position: static !important; }
+
+  .ssr-builder { height: auto !important; min-height: 0 !important; }
+  .ssr-builder-cols { grid-template-columns: 1fr !important; overflow: visible !important; }
+  .ssr-builder-pane, .ssr-builder-canvas {
+    overflow: visible !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 1px solid #E4E1DA !important;
+  }
+  .ssr-builder-pane { max-height: 44vh; overflow-y: auto !important; }
+  .ssr-builder-canvas { padding: 12px !important; }
+  .ssr-builder-host { display: none !important; }
+}
+@media (max-width: 760px) {
+  .ssr-editor-note {
+    display: block;
+    background: #EEF2F8;
+    border: 1px solid #E4E1DA;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #24457A;
+    margin-bottom: 12px;
+  }
+}
+/* pricing / plans ROI card + more breathing room on phones */
+@media (max-width: 560px) {
+  .ssr-roi { padding: 22px 18px !important; border-radius: 18px !important; }
+  .console-body { padding: 18px 18px 64px !important; }
+}
+
 /* the catalog-follow CTA works with a finger too (pointermove fires on touch),
    so keep the hint; just drop the crosshair cursor where there's no cursor. */
 @media (hover: none), (pointer: coarse) {

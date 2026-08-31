@@ -104,7 +104,7 @@ export function PricingBlock({
 
       {/* ROI calculator */}
       {showRoi && (
-      <div style={{ border: "1px solid #E4E1DA", borderRadius: 34, background: "#14161A", color: "#FAF9F6", padding: 34, marginTop: showHeader ? 42 : 0 }}>
+      <div className="ssr-roi" style={{ border: "1px solid #E4E1DA", borderRadius: 34, background: "#14161A", color: "#FAF9F6", padding: 34, marginTop: showHeader ? 42 : 0 }}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
           <div>
             <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9FBBE0" }}>estimated monthly store sales</div>

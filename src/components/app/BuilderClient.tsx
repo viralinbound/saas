@@ -305,11 +305,11 @@ export function BuilderClient({
 
   // ─────────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: "grid", gridTemplateRows: "auto 1fr", height: "calc(100vh - 0px)", minHeight: 600 }}>
+    <div className="ssr-builder" style={{ display: "grid", gridTemplateRows: "auto 1fr", height: "calc(100vh - 0px)", minHeight: 600 }}>
       {/* top bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: "1px solid #E4E1DA", background: "#FAF9F6", flexWrap: "wrap" }}>
         <strong style={{ fontSize: 14 }}>Website builder</strong>
-        <span style={{ fontSize: 11, fontFamily: MONO, color: "#64748B" }}>www.supershowroom.in{store.hostedPath ?? ""}</span>
+        <span className="ssr-builder-host" style={{ fontSize: 11, fontFamily: MONO, color: "#64748B" }}>www.supershowroom.in{store.hostedPath ?? ""}</span>
         <div style={{ display: "flex", gap: 4, marginLeft: 8 }}>
           <button type="button" onClick={() => setMode("edit")} style={tab(mode === "edit")}>Edit</button>
           <button type="button" onClick={() => setMode("preview")} style={tab(mode === "preview")}>Preview</button>
@@ -348,9 +348,9 @@ export function BuilderClient({
           </div>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "230px 1fr 300px", overflow: "hidden" }}>
+        <div className="ssr-builder-cols" style={{ display: "grid", gridTemplateColumns: "230px 1fr 300px", overflow: "hidden" }}>
           {/* LEFT — pages + palette */}
-          <div style={{ borderRight: "1px solid #E4E1DA", overflow: "auto", padding: 12, background: "#FAF9F6" }}>
+          <div className="ssr-builder-pane" style={{ borderRight: "1px solid #E4E1DA", overflow: "auto", padding: 12, background: "#FAF9F6" }}>
             <div style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#64748B", fontFamily: MONO }}>Pages</div>
             <div style={{ display: "grid", gap: 4, marginTop: 8 }}>
               {site.pages.map((p) => (
@@ -420,7 +420,8 @@ export function BuilderClient({
           </div>
 
           {/* CENTER — visual canvas / layers */}
-          <div style={{ overflow: "auto", padding: 16, background: "#EEF1F4" }}>
+          <div className="ssr-builder-canvas" style={{ overflow: "auto", padding: 16, background: "#EEF1F4" }}>
+            <div className="ssr-editor-note">Tip: drag-and-drop is easiest on a laptop. On a phone, use each block&apos;s ↑ ↓ buttons to reorder — everything else (add, edit, publish) works here.</div>
             {page && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
                 <input value={page.name} onChange={(e) => renamePage(page.id, e.target.value)} style={{ border: "1px solid #E4E1DA", borderRadius: 6, padding: "6px 10px", fontWeight: 800, fontSize: 14 }} />
@@ -477,7 +478,7 @@ export function BuilderClient({
           </div>
 
           {/* RIGHT — inspector */}
-          <div style={{ borderLeft: "1px solid #E4E1DA", overflow: "auto", padding: 14, background: "#FAF9F6" }}>
+          <div className="ssr-builder-pane" style={{ borderLeft: "1px solid #E4E1DA", overflow: "auto", padding: 14, background: "#FAF9F6" }}>
             {!selected ? (
               <p style={{ fontSize: 12, color: "#64748B" }}>Select a block to edit its content{canStyle ? " and style" : ""}.</p>
             ) : (

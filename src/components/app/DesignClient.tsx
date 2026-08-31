@@ -220,9 +220,10 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   const hostedFull = `https://www.${ROOT_DOMAIN}${hostedPath || `/${storeSlug}`}`;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 20, alignItems: "start" }}>
+    <div className="ssr-editor-2col" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 20, alignItems: "start" }}>
       {/* ── editor column ── */}
       <div style={{ display: "grid", gap: 16 }}>
+        <div className="ssr-editor-note">Tip: fine-tuning is easier on a laptop — but the preview, theme picks and Publish all work here.</div>
         {/* live draft preview */}
         <div style={{ ...box, padding: 0, overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid #E4E1DA", background: "#FAFAF8" }}>
@@ -349,7 +350,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
       </div>
 
       {/* ── side column: templates + theme ── */}
-      <div style={{ display: "grid", gap: 16, position: "sticky", top: 16 }}>
+      <div className="ssr-editor-side" style={{ display: "grid", gap: 16, position: "sticky", top: 16 }}>
         <div style={box}>
           <label style={label}>Starter template</label>
           <p style={{ fontSize: 11, color: "#94A3B8", margin: "0 0 8px" }}>Free templates are open. Premium & future templates unlock with a plan.</p>
