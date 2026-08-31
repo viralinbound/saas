@@ -6,14 +6,15 @@ import { mapProduct, toProductInsert } from "@/lib/db-mapper";
 
 const schema = z.object({
   name: z.string().min(2),
-  description: z.string().optional(),
+  description: z.string().nullish(),
   price: z.number().int().positive(),
-  mrp: z.number().int().optional(),
-  image: z.string().optional(),
-  category: z.string().optional(),
-  stock: z.number().int().optional(),
-  sku: z.string().optional(),
-  variants: z.string().optional(),
+  mrp: z.number().int().nullish(),
+  image: z.string().nullish(),
+  category: z.string().nullish(),
+  stock: z.number().int().nullish(),
+  sku: z.string().nullish(),
+  variants: z.string().nullish(),
+  published: z.boolean().optional(),
 });
 
 async function getOwnedStore(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
@@ -71,6 +72,7 @@ export async function POST(req: Request) {
           stock: data.stock,
           sku: data.sku,
           variants: data.variants,
+          published: data.published,
         })
       )
       .select()
@@ -80,8 +82,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ product: mapProduct(product) });
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } catch (e) {
+    const msg =
+      e instanceof z.ZodError
+        ? e.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; ")
+        : "Invalid request";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
 

@@ -157,14 +157,15 @@ export function mapStoreWithRelations(
 export function toProductInsert(data: {
   storeId: string;
   name: string;
-  description?: string;
+  description?: string | null;
   price: number;
-  mrp?: number;
-  image?: string;
-  category?: string;
-  stock?: number;
-  sku?: string;
-  variants?: string;
+  mrp?: number | null;
+  image?: string | null;
+  category?: string | null;
+  stock?: number | null;
+  sku?: string | null;
+  variants?: string | null;
+  published?: boolean;
 }) {
   return {
     store_id: data.storeId,
@@ -177,6 +178,7 @@ export function toProductInsert(data: {
     stock: data.stock ?? 100,
     sku: data.sku ?? null,
     variants: data.variants ?? null,
+    ...(data.published !== undefined ? { published: data.published } : {}),
   };
 }
 
