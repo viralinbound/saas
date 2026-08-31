@@ -63,26 +63,28 @@ export function TeamClient() {
 
       <div style={box}>
         <h3 style={{ fontSize: 18, fontWeight: 800 }}>Members ({members.length})</h3>
-        <table style={{ width: "100%", marginTop: 12, borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ textAlign: "left", fontSize: 12, color: "#64748B" }}>
-              <th style={{ padding: "6px 4px" }}>User ID</th>
-              <th style={{ padding: "6px 4px" }}>Role</th>
-              <th style={{ padding: "6px 4px" }}>Status</th>
-              <th style={{ padding: "6px 4px" }}>Joined</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((m) => (
-              <tr key={m.id} style={{ borderTop: "1px solid #E4E1DA", fontSize: 13 }}>
-                <td style={{ padding: "8px 4px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>{m.user_id.slice(0, 8)}…</td>
-                <td style={{ padding: "8px 4px", fontWeight: 700 }}>{m.role}</td>
-                <td style={{ padding: "8px 4px" }}>{m.status}</td>
-                <td style={{ padding: "8px 4px" }}>{new Date(m.created_at).toLocaleDateString()}</td>
+        <div className="rtable" style={{ overflowX: "auto", marginTop: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ textAlign: "left", fontSize: 12, color: "#64748B" }}>
+                <th style={{ padding: "6px 4px" }}>User ID</th>
+                <th style={{ padding: "6px 4px" }}>Role</th>
+                <th style={{ padding: "6px 4px" }}>Status</th>
+                <th style={{ padding: "6px 4px" }}>Joined</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {members.map((m) => (
+                <tr key={m.id} style={{ borderTop: "1px solid #E4E1DA", fontSize: 13 }}>
+                  <td data-label="user id" style={{ padding: "8px 4px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>{m.user_id.slice(0, 8)}…</td>
+                  <td data-label="role" style={{ padding: "8px 4px", fontWeight: 700 }}>{m.role}</td>
+                  <td data-label="status" style={{ padding: "8px 4px" }}>{m.status}</td>
+                  <td data-label="joined" style={{ padding: "8px 4px" }}>{new Date(m.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {canManage && (

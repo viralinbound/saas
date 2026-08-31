@@ -99,7 +99,7 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
           <h3 style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.035em" }}>live order feed</h3>
           <a href="/app/orders" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#24457A", textDecoration: "none" }}>all orders →</a>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="rtable" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F1EFE9" }}>
@@ -111,12 +111,12 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
             <tbody>
               {recent.map((o) => (
                 <tr key={o.id} style={{ borderTop: "1px solid #E4E1DA" }}>
-                  <td style={{ padding: "13px 22px", fontFamily: MONO, fontSize: 12, fontWeight: 700 }}>{o.orderNumber}</td>
-                  <td style={{ padding: "13px 12px", fontWeight: 700 }}>{o.customerName}</td>
-                  <td style={{ padding: "13px 12px", opacity: 0.8 }}>{o.items.length} item{o.items.length === 1 ? "" : "s"}</td>
-                  <td style={{ padding: "13px 12px", fontFamily: MONO, fontSize: 12, textTransform: "uppercase" }}>{o.paymentMethod}</td>
-                  <td style={{ padding: "13px 12px", fontFamily: MONO, fontSize: 13, fontWeight: 700 }}>{formatMoney(o.total, currency)}</td>
-                  <td style={{ padding: "13px 22px" }}>
+                  <td data-label="order" style={{ padding: "13px 22px", fontFamily: MONO, fontSize: 12, fontWeight: 700 }}>{o.orderNumber}</td>
+                  <td data-label="customer" style={{ padding: "13px 12px", fontWeight: 700 }}>{o.customerName}</td>
+                  <td data-label="items" style={{ padding: "13px 12px", opacity: 0.8 }}>{o.items.length} item{o.items.length === 1 ? "" : "s"}</td>
+                  <td data-label="payment" style={{ padding: "13px 12px", fontFamily: MONO, fontSize: 12, textTransform: "uppercase" }}>{o.paymentMethod}</td>
+                  <td data-label="total" style={{ padding: "13px 12px", fontFamily: MONO, fontSize: 13, fontWeight: 700 }}>{formatMoney(o.total, currency)}</td>
+                  <td data-label="status" style={{ padding: "13px 22px" }}>
                     <span style={{ border: "1px solid #E4E1DA", background: statusTint(o.status), padding: "4px 9px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>{o.status}</span>
                   </td>
                 </tr>

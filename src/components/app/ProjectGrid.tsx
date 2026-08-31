@@ -166,7 +166,7 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                 </div>
 
                 {p.stats && (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, margin: "2px 0" }}>
+                  <div className="ssr-projstats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, margin: "2px 0" }}>
                     {[
                       ["revenue", formatINR(p.stats.revenue)],
                       ["orders", String(p.stats.orders)],

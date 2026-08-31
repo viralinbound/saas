@@ -216,7 +216,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
           </button>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
+        <div className="rtable" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F1EFE9" }}>
@@ -235,7 +235,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
                     onClick={() => { setError(""); setDraft(draftFromProduct(p)); }}
                     style={{ borderTop: "1px solid #E4E1DA", background: selected ? "#EEF2F8" : "transparent", cursor: "pointer" }}
                   >
-                    <td style={{ padding: "11px 20px" }}>
+                    <td className="rt-wide" data-label="product" style={{ padding: "11px 20px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{ width: 44, height: 44, border: "1px solid #E4E1DA", overflow: "hidden", flex: "none", background: "#F1EFE9" }}>
                           {cover && <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
@@ -246,14 +246,14 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 11, opacity: 0.8 }}>{p.category}</td>
-                    <td style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 13, fontWeight: 700 }}>{formatINR(p.price)}</td>
-                    <td style={{ padding: "11px 12px" }}>
+                    <td data-label="category" style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 11, opacity: 0.8 }}>{p.category}</td>
+                    <td data-label="price" style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 13, fontWeight: 700 }}>{formatINR(p.price)}</td>
+                    <td data-label="stock" style={{ padding: "11px 12px" }}>
                       <span style={{ border: "1px solid #E4E1DA", background: p.stock <= 3 ? "#FFF1E6" : "#F1EFE9", padding: "3px 8px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700 }}>
                         {p.stock} left
                       </span>
                     </td>
-                    <td style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 11, color: p.published ? "#2F6B4F" : "#98502F" }}>
+                    <td data-label="live" style={{ padding: "11px 12px", fontFamily: MONO, fontSize: 11, color: p.published ? "#2F6B4F" : "#98502F" }}>
                       {p.published ? "live" : "hidden"}
                     </td>
                   </tr>
