@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { Store, User, Product, Order } from "@/lib/types";
 import { UserMenu } from "./UserMenu";
 import { ProjectSwitcher } from "./ProjectSwitcher";
+import { ConsoleMenuToggle } from "./ConsoleMenuToggle";
 
 type StoreWithRelations = Store & {
   owner: User;
@@ -49,8 +50,8 @@ export function AppShell({
     : Math.min(100, store.products.length * 3);
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "252px minmax(0, 1fr)", minHeight: "100vh", background: "#F1EFE9", fontFamily: "'Instrument Sans', system-ui, sans-serif", color: "#14161A" }}>
-      <aside style={{ background: "#14161A", color: "#FAF9F6", padding: "22px 18px 28px", display: "flex", flexDirection: "column", gap: 22, position: "sticky", top: 0, height: "100vh", overflowY: "auto", overscrollBehavior: "contain" }}>
+    <div className="console-grid" style={{ display: "grid", gridTemplateColumns: "252px minmax(0, 1fr)", minHeight: "100vh", background: "#F1EFE9", fontFamily: "'Instrument Sans', system-ui, sans-serif", color: "#14161A" }}>
+      <aside id="console-aside" className="console-aside" style={{ background: "#14161A", color: "#FAF9F6", padding: "22px 18px 28px", display: "flex", flexDirection: "column", gap: 22, position: "sticky", top: 0, height: "100vh", overflowY: "auto", overscrollBehavior: "contain" }}>
         <Link href="/" style={{ color: "#FAF9F6", textDecoration: "none" }}>
           <div style={{ fontSize: 21, fontWeight: 700, letterSpacing: "-0.028em" }}>supershowroom<span style={{ color: "#9FBBE0", marginLeft: 2 }}>✦</span></div>
           <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: "0.22em", textTransform: "uppercase", color: "#9FBBE0", marginTop: 3 }}>merchant console</div>
@@ -108,23 +109,24 @@ export function AppShell({
       </aside>
 
       <main style={{ minWidth: 0 }}>
-        <header style={{ background: "#FAF9F6", borderBottom: "1px solid #E4E1DA", padding: "16px 30px", display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 40 }}>
-          <div>
+        <header className="console-header" style={{ background: "#FAF9F6", borderBottom: "1px solid #E4E1DA", padding: "16px 30px", display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 40 }}>
+          <ConsoleMenuToggle />
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>{crumb}</div>
-            <h1 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: "-0.01em", marginTop: 2 }}>{title}</h1>
+            <h1 className="console-title" style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: "-0.01em", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h1>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ border: "1px solid #E4E1DA", background: "#fff", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
+            <div className="console-search" style={{ border: "1px solid #E4E1DA", background: "#fff", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
               <span style={{ fontFamily: MONO, fontSize: 10, opacity: 0.6 }}>⌘K</span>
               <input type="text" placeholder="search orders, products, customers" style={{ border: 0, outline: "none", background: "transparent", fontSize: 13, width: 220 }} />
             </div>
-            <span style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "9px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
+            <span className="console-datepill" style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "9px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
               {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
             </span>
             <UserMenu name={store.owner.name} email={store.owner.email} />
           </div>
         </header>
-        <section style={{ padding: "26px 30px 60px" }}>{children}</section>
+        <section className="console-body" style={{ padding: "26px 30px 60px" }}>{children}</section>
       </main>
     </div>
   );

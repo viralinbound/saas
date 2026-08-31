@@ -31,7 +31,7 @@ export function ActivityFeed() {
   }, []);
 
   return (
-    <div style={{ border: "1px solid #E4E1DA", background: "#fff", padding: 20 }}>
+    <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 20 }}>
       <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A" }}>
         recent activity
       </div>

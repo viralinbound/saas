@@ -887,7 +887,9 @@ function CursorCatalogCTA() {
     const el = stageRef.current;
     if (!el) return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    // Touch devices (mobile / tablet) have no cursor — skip the trail entirely.
+    const finePointer = window.matchMedia?.("(pointer: fine)").matches ?? true;
+    if (reduce || !finePointer) return;
 
     // preload
     TRAIL_POOL.forEach((p) => { const im = new Image(); im.src = p.img; });
@@ -941,6 +943,7 @@ function CursorCatalogCTA() {
   return (
     <section
       ref={stageRef}
+      className="ssr-catalog-cta"
       style={{ background: "#14161A", color: "#FAF9F6", borderTop: "1px solid #E4E1DA", position: "relative", overflow: "hidden", cursor: "crosshair" }}
     >
       {/* faint static scatter */}
@@ -953,7 +956,7 @@ function CursorCatalogCTA() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto", padding: "150px 28px", textAlign: "center", pointerEvents: "none" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,246,0.45)", marginBottom: 34 }}>
+        <div className="ssr-cta-hint" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,246,0.45)", marginBottom: 34 }}>
           move your cursor ✦ the catalog follows
         </div>
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9FBBE0" }}>ready when you are</div>

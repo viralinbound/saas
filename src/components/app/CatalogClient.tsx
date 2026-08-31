@@ -170,7 +170,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: draft ? "minmax(0,1fr) 360px" : "minmax(0,1fr)", gap: 20, alignItems: "start" }}>
+    <div className="ssr-catalog-grid" style={{ display: "grid", gridTemplateColumns: draft ? "minmax(0,1fr) 360px" : "minmax(0,1fr)", gap: 20, alignItems: "start" }}>
       {/* ---------------- list ---------------- */}
       <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", borderBottom: "1px solid #E4E1DA", flexWrap: "wrap" }}>
@@ -273,7 +273,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
 
       {/* ---------------- editor drawer ---------------- */}
       {draft && (
-        <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", boxShadow: "0 12px 28px rgba(20,22,26,0.10)", position: "sticky", top: 96 }}>
+        <div className="ssr-catalog-editor" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", boxShadow: "0 12px 28px rgba(20,22,26,0.10)", position: "sticky", top: 96 }}>
           <div style={{ borderBottom: "1px solid #E4E1DA", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
               {draft.id ? "editing product" : "new product"}
