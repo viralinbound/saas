@@ -34,12 +34,14 @@ export function AppShell({
   title,
   children,
   activePath = "/app",
+  flush = false,
 }: {
   store: StoreWithRelations;
   crumb: string;
   title: string;
   children: React.ReactNode;
   activePath?: string;
+  flush?: boolean;
 }) {
   if (!store) redirect("/login");
 
@@ -113,7 +115,7 @@ export function AppShell({
           <ConsoleMenuToggle />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>{crumb}</div>
-            <h1 className="console-title" style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: "-0.01em", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h1>
+            <h1 className="console-title" style={{ fontSize: 25, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h1>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
             <div className="console-search" style={{ border: "1px solid #E4E1DA", background: "#fff", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
@@ -126,7 +128,7 @@ export function AppShell({
             <UserMenu name={store.owner.name} email={store.owner.email} />
           </div>
         </header>
-        <section className="console-body" style={{ padding: "26px 30px 60px" }}>{children}</section>
+        <section className="console-body" style={{ padding: flush ? 0 : "26px 30px 60px" }}>{children}</section>
       </main>
     </div>
   );

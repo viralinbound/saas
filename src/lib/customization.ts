@@ -27,6 +27,8 @@ export type ThemeTokens = {
 
 export type StoreConfig = {
   sections: Section[];
+  layout?: Record<string, unknown>;
+  blocks?: Record<string, boolean>;
 };
 
 export const DEFAULT_TOKENS: ThemeTokens = {
@@ -135,8 +137,11 @@ export function newSection(type: SectionType): Section {
 }
 
 export function coerceConfig(raw: unknown, storeName: string): StoreConfig {
-  if (raw && typeof raw === "object" && Array.isArray((raw as StoreConfig).sections) && (raw as StoreConfig).sections.length) {
-    return raw as StoreConfig;
+  if (raw && typeof raw === "object") {
+    const r = raw as StoreConfig;
+    const extras = { layout: r.layout, blocks: r.blocks };
+    if (Array.isArray(r.sections) && r.sections.length) return { sections: r.sections, ...extras };
+    if (r.layout) return { ...defaultConfigFor(storeName), ...extras };
   }
   return defaultConfigFor(storeName);
 }

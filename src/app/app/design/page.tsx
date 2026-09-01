@@ -8,7 +8,7 @@ export default async function DesignPage() {
   if (!store) redirect("/onboarding");
 
   return (
-    <AppShell store={store} crumb="storefront" title="design & publish" activePath="/app/design">
+    <AppShell store={store} crumb="storefront" title="design editor" activePath="/app/design" flush>
       <DesignClient storeSlug={store.slug} />
     </AppShell>
   );

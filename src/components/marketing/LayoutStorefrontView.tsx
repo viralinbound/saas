@@ -7,6 +7,7 @@
  */
 
 import { MONO, avatarFor, inr, numOf, type Layout } from "@/lib/layoutPreviews";
+import { DEFAULT_LAYOUT_BLOCKS, type LayoutBlocks } from "@/lib/layoutCommerce";
 
 type P = Layout["products"][number];
 type Slide = { kicker: string; img: string; headline: string; sub: string; cta: string };
@@ -69,7 +70,7 @@ function pMatch(p: P, term: string) {
 }
 
 export function LayoutStorefrontView({
-  L, screen, v, btnFg, onDark, idx, onSlide, shop,
+  L, screen, v, btnFg, onDark, idx, onSlide, shop, blocks, showBranding = true,
 }: {
   L: Layout;
   screen: "home" | "product" | "cart";
@@ -79,7 +80,10 @@ export function LayoutStorefrontView({
   idx: number;
   onSlide: (n: number) => void;
   shop?: ShopApi;
+  blocks?: Partial<LayoutBlocks>;
+  showBranding?: boolean;
 }) {
+  const b: LayoutBlocks = { ...DEFAULT_LAYOUT_BLOCKS, ...blocks };
   const slideData = v.slides[v.si];
   const setSlide = onSlide;
   const i = idx;
@@ -118,7 +122,7 @@ export function LayoutStorefrontView({
 
   return (
             <div style={{ background: L.bg }}>
-<div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>
+{b.promo && <div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>}
 <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "15px 24px", borderBottom: `1px solid ${L.line}`, flexWrap: "wrap" }}>
   <span onClick={shop?.goHome} style={{ fontFamily: L.font, fontSize: 23, fontWeight: 700, letterSpacing: "-0.03em", color: L.fg, ...pointer }}>{L.store}</span>
   <div style={{ display: "flex", gap: 15, marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
@@ -142,6 +146,7 @@ export function LayoutStorefrontView({
 
 {screen === "home" && (
   <div>
+    {b.hero && (
     <div style={{ position: "relative" }}>
       <div style={{ aspectRatio: "24 / 9", minHeight: 320, maxHeight: 520, overflow: "hidden" }}>
         <img src={slideData.img} alt={slideData.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -165,7 +170,9 @@ export function LayoutStorefrontView({
         </div>
       </div>
     </div>
+    )}
 
+    {b.chips && (
     <div style={{ display: "flex", gap: 8, padding: "18px 24px 4px", flexWrap: "wrap" }}>
       {L.chips.map((c, k) => {
         const on = shop ? norm(shop.cat || L.chips[0]) === norm(c) : k === 0;
@@ -174,7 +181,9 @@ export function LayoutStorefrontView({
         );
       })}
     </div>
+    )}
 
+    {b.tiles && (<>
     <div style={{ padding: "18px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>shop by category</span>
       <span onClick={() => { shop?.setCat(L.chips[0]); shop?.toGrid(); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>all categories →</span>
@@ -190,7 +199,9 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
+    </>)}
 
+    {b.products && (<>
     <div id="ssr-grid" style={{ padding: "8px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap", scrollMarginTop: 60 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>
         {filterLabel ? `${L.gridTitle} · ${filterLabel}` : L.gridTitle}
@@ -233,7 +244,9 @@ export function LayoutStorefrontView({
       ))}
     </div>
     )}
+    </>)}
 
+    {b.lookbook && (
     <div id="ssr-lookbook" style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}`, scrollMarginTop: 60 }}>
       <div style={{ aspectRatio: "16 / 10", overflow: "hidden" }}>
         <img src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -245,6 +258,7 @@ export function LayoutStorefrontView({
         <div onClick={shop?.toGrid} style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700, ...pointer }}>{L.banner.cta}</div>
       </div>
     </div>
+    )}
 
     <div style={{ margin: "0 24px 22px", border: `1px solid ${L.line}`, background: L.card }}>
       <div style={{ padding: "14px 16px", borderBottom: `1px solid ${L.line}`, display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
@@ -273,6 +287,7 @@ export function LayoutStorefrontView({
       ))}
     </div>
 
+    {b.reviews && (<>
     <div style={{ padding: "0 24px 6px" }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>what buyers say</span>
     </div>
@@ -293,7 +308,9 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
+    </>)}
 
+    {b.trust && (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 180px), 1fr))", gap: 12, padding: "0 24px 20px" }}>
       {L.trust.map((t) => (
         <div key={t.title} style={{ borderTop: `1px solid ${L.line}`, paddingTop: 12 }}>
@@ -302,6 +319,7 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
+    )}
 
     <div style={{ margin: "0 24px 24px", border: `1px solid ${L.accent}`, background: L.card, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
       <div>
@@ -341,7 +359,7 @@ export function LayoutStorefrontView({
           </div>
         ))}
       </div>
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.18)", marginTop: 20, paddingTop: 14, fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.65 }}>powered by supershowroom ✦ GST invoice on every order</div>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.18)", marginTop: 20, paddingTop: 14, fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.65 }}>{showBranding ? "powered by supershowroom ✦ " : ""}GST invoice on every order</div>
     </div>
   </div>
 )}

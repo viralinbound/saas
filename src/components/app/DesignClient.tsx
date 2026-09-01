@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/lib/customization";
 import { buildTemplateConfig } from "@/lib/templatePresets";
 import { ROOT_DOMAIN } from "@/lib/domains";
+import { THEMES } from "@/lib/constants";
 
 type Gate = { plan: string; isDemo: boolean; canPublishLive: boolean; customDomain: boolean; label: string };
 
@@ -30,9 +31,38 @@ type TemplateRow = {
   locked?: boolean;
 };
 
-const box: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#fff", padding: 16 };
-const label: React.CSSProperties = { fontSize: 11, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569", display: "block", marginBottom: 6 };
-const inp: React.CSSProperties = { width: "100%", padding: "9px 11px", border: "1px solid #E2E8F0", borderRadius: 8, fontSize: 14 };
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
+const box: React.CSSProperties = { border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 16 };
+const label: React.CSSProperties = {
+  fontFamily: MONO,
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+  color: "#14161A",
+  display: "block",
+  marginBottom: 10,
+};
+const inp: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 12px",
+  border: "1px solid #E4E1DA",
+  borderRadius: 0,
+  fontSize: 14,
+  background: "#FFFFFF",
+};
+
+const FONT_PAIRS = [
+  { name: "bricolage", stack: "'Instrument Sans', system-ui, sans-serif", sample: "Aa modern grotesque" },
+  { name: "instrument", stack: "'Instrument Serif', Georgia, serif", sample: "Aa editorial serif" },
+  { name: "jetbrains", stack: "'JetBrains Mono', monospace", sample: "Aa technical mono" },
+] as const;
+
+const RADII = [
+  { label: "sharp", value: "0px" },
+  { label: "soft", value: "8px" },
+  { label: "round", value: "20px" },
+] as const;
 
 export function DesignClient({ storeSlug }: { storeSlug: string }) {
   const router = useRouter();
@@ -50,19 +80,24 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   const [storeId, setStoreId] = useState<string>("");
   const [customDomain, setCustomDomain] = useState("");
   const [domainMsg, setDomainMsg] = useState("");
-  const [hostedPath, setHostedPath] = useState("");   // /h/<brand>
+  const [hostedPath, setHostedPath] = useState("");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [msg, setMsg] = useState("");
   const [previewNonce, setPreviewNonce] = useState(0);
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("mobile");
+  const [showCopy, setShowCopy] = useState(false);
 
   useEffect(() => {
     fetch("/api/design")
       .then((r) => r.json())
       .then((d) => {
-        if (d.error) { setMsg(d.error); setLoaded(true); return; }
+        if (d.error) {
+          setMsg(d.error);
+          setLoaded(true);
+          return;
+        }
         setConfig(d.draftConfig);
         setTokens(d.tokens);
         setTemplateKey(d.templateKey);
@@ -77,7 +112,10 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
         setHostedPath(d.store?.hostedPath || "");
         setLoaded(true);
       })
-      .catch(() => { setMsg("Could not load the editor."); setLoaded(true); });
+      .catch(() => {
+        setMsg("Could not load the editor.");
+        setLoaded(true);
+      });
   }, [storeSlug]);
 
   const mutate = useCallback((fn: (c: StoreConfig) => StoreConfig) => {
@@ -115,6 +153,11 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     mutate((c) => ({ sections: [...c.sections, newSection(type)] }));
   }
 
+  function patchTokens(p: Partial<ThemeTokens>) {
+    setTokens((t) => ({ ...t, ...p }));
+    setDirty(true);
+  }
+
   async function persist(cfg: StoreConfig, tks: ThemeTokens, tkey: string) {
     const res = await fetch("/api/design", {
       method: "PUT",
@@ -126,18 +169,22 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   }
 
   async function save() {
-    setSaving(true); setMsg("");
+    setSaving(true);
+    setMsg("");
     const r = await persist(config, tokens, templateKey);
     setSaving(false);
-    if (r.ok) { setDirty(false); setMsg("Draft saved."); setPreviewNonce((n) => n + 1); }
-    else if ((r.error || "").includes("TEMPLATE_LOCKED") || r.status === 403) {
+    if (r.ok) {
+      setDirty(false);
+      setMsg("Draft saved.");
+      setPreviewNonce((n) => n + 1);
+    } else if ((r.error || "").includes("TEMPLATE_LOCKED") || r.status === 403) {
       setMsg("That template needs a higher plan — choose a plan to unlock it.");
-    }
-    else setMsg(r.error || "Save failed.");
+    } else setMsg(r.error || "Save failed.");
   }
 
   async function publish() {
-    setPublishing(true); setMsg("");
+    setPublishing(true);
+    setMsg("");
     if (dirty) await save();
     const res = await fetch("/api/design/publish", {
       method: "POST",
@@ -160,10 +207,14 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   }
 
   async function unpublish() {
-    setPublishing(true); setMsg("");
+    setPublishing(true);
+    setMsg("");
     const res = await fetch("/api/design/publish", { method: "DELETE" });
     setPublishing(false);
-    if (res.ok) { setStatus("draft"); setMsg("Store unpublished."); }
+    if (res.ok) {
+      setStatus("draft");
+      setMsg("Store unpublished.");
+    }
   }
 
   async function saveDomain() {
@@ -188,7 +239,6 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     if (preset) {
       setConfig(preset.config);
       setTokens(preset.tokens);
-      // cloud-save immediately so the live preview matches /preview/template/<key>
       setSaving(true);
       const r = await persist(preset.config, preset.tokens, t.key);
       setSaving(false);
@@ -198,9 +248,11 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
         setMsg(`"${t.name}" applied & saved — the preview now matches the template demo. Edit anything, then Publish.`);
       } else {
         setDirty(true);
-        setMsg(r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
-          ? "That template needs a higher plan — choose a plan to unlock it."
-          : `"${t.name}" applied (not saved: ${r.error || "error"}). Click Save.`);
+        setMsg(
+          r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
+            ? "That template needs a higher plan — choose a plan to unlock it."
+            : `"${t.name}" applied (not saved: ${r.error || "error"}). Click Save.`
+        );
       }
     } else {
       setTokens((tk) => ({ ...tk, accent: t.accent_color || tk.accent }));
@@ -213,232 +265,385 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     }
   }
 
-  if (!loaded) return <p style={{ opacity: 0.6 }}>Loading editor…</p>;
+  const swatches = useMemo(() => {
+    const colors = [...THEMES.map((t) => t.accent), tokens.accent];
+    return Array.from(new Set(colors)).slice(0, 5);
+  }, [tokens.accent]);
 
-  const previewWidth = previewDevice === "mobile" ? 390 : "100%";
-  // hosted URL = https://www.supershowroom.in/h/<company>/<project>
+  const fontKey = tokens.headingFont.includes("JetBrains")
+    ? "jetbrains"
+    : tokens.headingFont.includes("Serif") || tokens.headingFont.includes("Playfair") || tokens.headingFont.includes("Fraunces")
+      ? "instrument"
+      : "bricolage";
+
+  const radiusPx = Number.parseInt(tokens.radius, 10);
+  const radiusKey = radiusPx === 0 ? "sharp" : radiusPx <= 10 ? "soft" : "round";
+
+  if (!loaded) return <p style={{ opacity: 0.6, padding: 24 }}>Loading editor…</p>;
+
   const hostedFull = `https://www.${ROOT_DOMAIN}${hostedPath || `/${storeSlug}`}`;
+  const mobile = previewDevice === "mobile";
+  const changeLabel = dirty ? "1 unpublished change" : status === "draft" ? "draft · not published" : "theme saved";
 
   return (
-    <div className="ssr-editor-2col" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 20, alignItems: "start" }}>
-      {/* ── editor column ── */}
-      <div style={{ display: "grid", gap: 16 }}>
+    <div className="ssr-editor-shell">
+      <aside className="ssr-editor-rail">
         <div className="ssr-editor-note">Tip: fine-tuning is easier on a laptop — but the preview, theme picks and Publish all work here.</div>
-        {/* live draft preview */}
-        <div style={{ ...box, padding: 0, overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid #E4E1DA", background: "#FAFAF8" }}>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A" }}>live preview · your draft</span>
-            <div style={{ display: "flex", gap: 6 }}>
-              {(["desktop", "mobile"] as const).map((d) => (
-                <button key={d} type="button" onClick={() => setPreviewDevice(d)} style={{ border: `1px solid ${previewDevice === d ? "#24457A" : "#E2E8F0"}`, background: previewDevice === d ? "#EEF2F8" : "#fff", color: previewDevice === d ? "#24457A" : "#64748B", padding: "4px 9px", borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: "pointer" }}>
-                  {d === "desktop" ? "🖥 Desktop" : "📱 Mobile"}
+
+        <div>
+          <div style={label}>industry preset</div>
+          <div style={{ display: "grid", gap: 6 }}>
+            {(templates.length ? templates : THEMES.map((t) => ({ key: t.key, name: t.name, locked: false, tierLabel: null }))).map((t) => {
+              const selected = templateKey === t.key;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => applyTemplate(t as TemplateRow)}
+                  style={{
+                    border: "1px solid #E4E1DA",
+                    background: selected ? "#14161A" : "#FAF9F6",
+                    color: selected ? "#FAF9F6" : "#14161A",
+                    padding: "10px 12px",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    textAlign: "left",
+                    opacity: t.locked ? 0.72 : 1,
+                  }}
+                >
+                  <span>{t.key}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 9 }}>
+                    {t.locked ? "lock" : selected ? "on" : ""}
+                  </span>
                 </button>
-              ))}
-              <button type="button" onClick={() => setPreviewNonce((n) => n + 1)} style={{ border: "1px solid #E2E8F0", background: "#fff", padding: "4px 9px", borderRadius: 6, fontSize: 11, fontWeight: 800, cursor: "pointer" }}>↻ Refresh</button>
-              <a href={`/preview/${storeSlug}`} target="_blank" rel="noreferrer" style={{ border: "1px solid #E2E8F0", background: "#fff", padding: "4px 9px", borderRadius: 6, fontSize: 11, fontWeight: 800, textDecoration: "none", color: "#24457A" }}>Open ↗</a>
-            </div>
+              );
+            })}
           </div>
-          <div style={{ background: "#EEF0F3", padding: previewDevice === "mobile" ? 12 : 0, display: "flex", justifyContent: "center" }}>
-            <iframe
-              key={previewNonce}
-              src={`/preview/${storeSlug}?n=${previewNonce}`}
-              title="Storefront preview"
-              style={{ width: previewWidth, maxWidth: "100%", height: 460, border: 0, background: "#fff", borderRadius: previewDevice === "mobile" ? 12 : 0, boxShadow: previewDevice === "mobile" ? "0 4px 16px rgba(0,0,0,0.12)" : "none" }}
-            />
-          </div>
-          {dirty && (
-            <div style={{ padding: "6px 12px", fontSize: 12, color: "#B45309", background: "#FFF7ED", borderTop: "1px solid #FED7AA" }}>
-              Unsaved changes — click <strong>Save draft</strong> to update this preview.
-            </div>
-          )}
+          <Link href="/app/plans" style={{ display: "block", marginTop: 10, fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2F6B4F", textDecoration: "none", fontWeight: 700 }}>
+            unlock premium presets →
+          </Link>
         </div>
 
-        <div style={{ ...box, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", justifyContent: "space-between",
-          background: status === "live" ? "#F0FDF4" : status === "preview" ? "#FFF7ED" : gate.isDemo ? "#FFF7ED" : "#F8FAFC",
-          borderLeft: status === "live" ? "4px solid #16A34A" : status === "preview" ? "4px solid #B45309" : "4px solid #CBD5E1" }}>
-          <div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              plan · {gate.label} · status ·
-              {status === "live" ? (
-                <span style={{ background: "#DCFCE7", color: "#166534", fontWeight: 800, padding: "2px 8px", borderRadius: 999, letterSpacing: "0.08em" }}>● LIVE</span>
-              ) : status === "preview" ? (
-                <span style={{ background: "#FEF3C7", color: "#92400E", fontWeight: 800, padding: "2px 8px", borderRadius: 999, letterSpacing: "0.08em" }}>DEMO PREVIEW</span>
-              ) : (
-                <span style={{ color: "#64748B" }}>{status}</span>
-              )}
-              {publishedAt ? ` · last published ${new Date(publishedAt).toLocaleDateString()}` : ""}
-            </div>
-            <div style={{ fontWeight: 800, marginTop: 6, display: "grid", gap: 3 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B" }}>
-                {status === "live" ? "your live website" : status === "preview" ? "your demo website" : "will publish to"}
-              </span>
-              <a href={hostedFull} target="_blank" rel="noreferrer"
-                style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, color: status === "live" ? "#15803D" : "#0F172A", fontWeight: 800, wordBreak: "break-all" }}>
-                {hostedFull} ↗
-              </a>
-              <span style={{ fontWeight: 500, fontSize: 12, color: "#94A3B8" }}>
-                editor preview <a href={`/s/${storeSlug}`} target="_blank" rel="noreferrer" style={{ color: "#24457A", fontWeight: 700 }}>/s/{storeSlug}</a>
-              </span>
-            </div>
-          </div>
+        <div>
+          <div style={label}>accent colour</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={save} disabled={saving || !dirty} style={{ border: "1px solid #24457A", background: "#fff", color: "#24457A", padding: "10px 14px", fontWeight: 800, cursor: dirty ? "pointer" : "default", opacity: dirty ? 1 : 0.5 }}>
-              {saving ? "Saving…" : "Save draft"}
-            </button>
-            <button type="button" onClick={publish} disabled={publishing} style={{ border: 0, background: gate.isDemo ? "#B45309" : status === "live" ? "#16A34A" : "#24457A", color: "#fff", padding: "10px 16px", fontWeight: 800, cursor: "pointer" }}>
-              {publishing ? "Publishing…" : gate.isDemo ? "Publish demo preview" : status === "live" ? "✓ Live · re-publish" : "Publish live"}
-            </button>
-            {gate.isDemo && (
-              <Link href="/app/plans" style={{ border: "1px solid #16A34A", background: "#F0FDF4", color: "#15803D", padding: "10px 14px", fontWeight: 800, borderRadius: 8, textDecoration: "none" }}>
-                🔓 Unlock live — choose a plan
-              </Link>
-            )}
-            {(status === "live" || status === "preview") && (
-              <button type="button" onClick={unpublish} disabled={publishing} style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#fff", padding: "10px 14px", fontWeight: 800, cursor: "pointer" }}>
-                Unpublish
-              </button>
-            )}
-          </div>
-        </div>
-
-        {msg && <div style={{ ...box, background: status === "live" ? "#F0FDF4" : "#F0F9FF", borderColor: status === "live" ? "#86EFAC" : "#BAE6FD", color: status === "live" ? "#15803D" : undefined, fontWeight: 600, fontSize: 14 }}>{msg}</div>}
-
-        <div style={box}>
-          <label style={label}>Project address (used in the hosted URL)</label>
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-            <span style={{ color: "#94A3B8", fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>{`www.${ROOT_DOMAIN}/<company>/`}</span>
+            {swatches.map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-label={c}
+                onClick={() => patchTokens({ accent: c })}
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: c,
+                  border: tokens.accent.toLowerCase() === c.toLowerCase() ? "2px solid #14161A" : "1px solid #E4E1DA",
+                  cursor: "pointer",
+                  padding: 0,
+                }}
+              />
+            ))}
             <input
-              value={subdomain}
-              onChange={(e) => setSubdomain(e.target.value)}
-              placeholder="krish"
-              style={{ ...inp, maxWidth: 180, fontFamily: "'JetBrains Mono', monospace" }}
+              type="color"
+              value={tokens.accent}
+              onChange={(e) => patchTokens({ accent: e.target.value })}
+              style={{ width: 44, height: 44, border: "1px solid #E4E1DA", background: "#fff", padding: 0, cursor: "pointer" }}
             />
           </div>
-          <p style={{ fontSize: 12.5, marginTop: 8, color: "#475569" }}>
-            Publishing goes live at{" "}
-            <a href={hostedFull} target="_blank" rel="noreferrer" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: "#15803D", wordBreak: "break-all" }}>
-              {hostedFull}
-            </a>
-          </p>
         </div>
 
-        <div style={{ display: "grid", gap: 10 }}>
-          {config.sections.map((s, idx) => (
-            <SectionCard
-              key={s.id}
-              s={s}
-              first={idx === 0}
-              last={idx === config.sections.length - 1}
-              onField={setField}
-              onToggle={toggleVisible}
-              onMove={move}
-              onRemove={remove}
-            />
-          ))}
+        <div>
+          <div style={label}>type pairing</div>
+          <div style={{ display: "grid", gap: 6 }}>
+            {FONT_PAIRS.map((f) => {
+              const on = fontKey === f.name;
+              return (
+                <button
+                  key={f.name}
+                  type="button"
+                  onClick={() =>
+                    patchTokens({
+                      headingFont: f.stack,
+                      bodyFont: f.name === "jetbrains" ? f.stack : "'Instrument Sans', system-ui, sans-serif",
+                    })
+                  }
+                  style={{
+                    border: "1px solid #E4E1DA",
+                    background: on ? "#EEF2F8" : "#FAF9F6",
+                    padding: "10px 12px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                    gap: 10,
+                    textAlign: "left",
+                  }}
+                >
+                  <span style={{ fontFamily: f.stack, fontSize: 17, fontWeight: 700 }}>{f.sample}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.7 }}>{f.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div style={box}>
-          <label style={label}>Add a section</label>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {SECTION_LIBRARY.map((l) => (
-              <button key={l.type} type="button" onClick={() => add(l.type)} style={{ border: "1px dashed #94A3B8", background: "#F8FAFC", padding: "8px 12px", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-                + {l.label}
+        <div>
+          <div style={label}>corners</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {RADII.map((r) => {
+              const on = radiusKey === r.label;
+              return (
+                <button
+                  key={r.label}
+                  type="button"
+                  onClick={() => patchTokens({ radius: r.value })}
+                  style={{
+                    flex: 1,
+                    border: "1px solid #E4E1DA",
+                    background: on ? "#EEF2F8" : "#FAF9F6",
+                    padding: 10,
+                    textAlign: "center",
+                    fontFamily: MONO,
+                    fontSize: 10,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <div style={label}>homepage blocks</div>
+          <div style={{ display: "grid", gap: 6 }}>
+            {config.sections.map((s) => {
+              const lib = SECTION_LIBRARY.find((l) => l.type === s.type);
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => toggleVisible(s.id)}
+                  style={{
+                    border: "1px solid #E4E1DA",
+                    background: s.visible ? "#EEF2F8" : "#FAF9F6",
+                    padding: "10px 12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>{(lib?.label || s.type).toLowerCase()}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10 }}>{s.visible ? "on" : "off"}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+            {SECTION_LIBRARY.filter((l) => !config.sections.some((s) => s.type === l.type)).map((l) => (
+              <button
+                key={l.type}
+                type="button"
+                onClick={() => add(l.type)}
+                style={{ border: "1px dashed #E4E1DA", background: "#fff", padding: "6px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+              >
+                + {l.label.toLowerCase()}
               </button>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* ── side column: templates + theme ── */}
-      <div className="ssr-editor-side" style={{ display: "grid", gap: 16, position: "sticky", top: 16 }}>
-        <div style={box}>
-          <label style={label}>Starter template</label>
-          <p style={{ fontSize: 11, color: "#94A3B8", margin: "0 0 8px" }}>Free templates are open. Premium & future templates unlock with a plan.</p>
-          <div style={{ display: "grid", gap: 12 }}>
-            {templates.map((t) => {
-              const selected = templateKey === t.key;
-              return (
-                <div
-                  key={t.key}
-                  style={{
-                    border: selected ? "2px solid #24457A" : "1px solid #E2E8F0",
-                    borderRadius: 10, overflow: "hidden", background: "#fff",
-                    opacity: t.locked ? 0.75 : 1,
-                  }}
-                >
-                  {/* live mini preview of the real template storefront */}
-                  <button
-                    type="button"
-                    onClick={() => applyTemplate(t)}
-                    title={t.locked ? `${t.tierLabel || "Premium"} — choose a plan to unlock` : `Apply ${t.name}`}
-                    style={{ display: "block", width: "100%", border: 0, padding: 0, cursor: "pointer", background: "#EEF0F3" }}
-                  >
-                    <div style={{ height: 118, overflow: "hidden", position: "relative", borderBottom: "1px solid #E2E8F0" }}>
-                      <iframe
-                        src={`/preview/template/${t.key}`}
-                        title={`${t.name} preview`}
-                        tabIndex={-1}
-                        style={{ width: "312%", height: 378, border: 0, transform: "scale(0.32)", transformOrigin: "top left", pointerEvents: "none", filter: t.locked ? "grayscale(0.6)" : "none" }}
-                      />
-                    </div>
-                  </button>
-                  <div style={{ padding: "8px 10px", display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ fontWeight: 800, fontSize: 13, flex: 1 }}>{t.name}</span>
-                    {t.locked ? (
-                      <span style={{ fontSize: 10, fontWeight: 800, background: "#FEF3C7", color: "#92400E", padding: "2px 6px", borderRadius: 999 }}>🔒 {t.tierLabel || "Premium"}</span>
-                    ) : t.isPremium ? (
-                      <span style={{ fontSize: 10, fontWeight: 800, background: "#DCFCE7", color: "#166534", padding: "2px 6px", borderRadius: 999 }}>✓ {t.tierLabel}</span>
-                    ) : null}
-                  </div>
-                  <div style={{ padding: "0 10px 10px", display: "flex", gap: 12, alignItems: "center" }}>
-                    <button type="button" onClick={() => applyTemplate(t)} style={{ border: 0, background: selected ? "#EEF2F8" : "#24457A", color: selected ? "#24457A" : "#fff", padding: "6px 12px", borderRadius: 6, fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
-                      {selected ? "● Applied" : "Use this template"}
-                    </button>
-                    <a href={`/preview/template/${t.key}`} target="_blank" rel="noreferrer" style={{ fontSize: 11, fontWeight: 800, color: "#24457A", textDecoration: "none" }}>
-                      Full preview ↗
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <Link href="/app/plans" style={{ display: "block", marginTop: 8, fontSize: 12, fontWeight: 700, color: "#15803D" }}>
-            🔓 Unlock premium templates →
-          </Link>
-        </div>
-
-        <div style={box}>
-          <label style={label}>Accent colour</label>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <input type="color" value={tokens.accent} onChange={(e) => { setTokens({ ...tokens, accent: e.target.value }); setDirty(true); }} style={{ width: 44, height: 34, border: "1px solid #E2E8F0", borderRadius: 6, background: "#fff" }} />
-            <input value={tokens.accent} onChange={(e) => { setTokens({ ...tokens, accent: e.target.value }); setDirty(true); }} style={inp} />
+        <div>
+          <div style={label}>project address</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+            <span style={{ color: "#94A3B8", fontSize: 11, fontFamily: MONO }}>{`www.${ROOT_DOMAIN}/`}</span>
+            <input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} style={{ ...inp, maxWidth: 140, fontFamily: MONO, fontSize: 12 }} />
           </div>
         </div>
 
-        <div style={box}>
-          <label style={label}>Custom domain</label>
+        <div>
+          <div style={label}>custom domain</div>
           {gate.customDomain ? (
             <>
-              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 6 }}>
                 <input value={customDomain} onChange={(e) => setCustomDomain(e.target.value)} placeholder="shop.yourbrand.in" style={inp} />
-                <button type="button" onClick={saveDomain} style={{ border: 0, background: "#24457A", color: "#fff", padding: "9px 12px", fontWeight: 800, borderRadius: 8, cursor: "pointer" }}>Save</button>
+                <button type="button" onClick={saveDomain} style={{ border: 0, background: "#24457A", color: "#fff", padding: "9px 12px", fontWeight: 800, cursor: "pointer" }}>
+                  save
+                </button>
               </div>
               {domainMsg && <p style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>{domainMsg}</p>}
             </>
           ) : (
-            <div style={{ fontSize: 12, color: "#78716C" }}>
-              🔒 Custom domains are on <strong>Pro</strong> and above.{" "}
-              <Link href="/app/plans" style={{ color: "#15803D", fontWeight: 700 }}>Upgrade →</Link>
+            <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.5 }}>
+              custom domains unlock on pro.{" "}
+              <Link href="/app/plans" style={{ color: "#2F6B4F", fontWeight: 700, textDecoration: "none" }}>
+                unlock →
+              </Link>
             </div>
           )}
         </div>
+      </aside>
+
+      <div className="ssr-editor-canvas">
+        {gate.isDemo && (
+          <div style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "14px 16px", display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+            <div>
+              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A" }}>demo mode · {gate.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginTop: 4 }}>watermarked preview until you unlock a plan</div>
+            </div>
+            <Link href="/app/plans" style={{ border: 0, background: "#2F6B4F", color: "#FAF9F6", padding: "10px 16px", fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
+              unlock live →
+            </Link>
+          </div>
+        )}
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            {(["mobile", "desktop"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setPreviewDevice(d)}
+                style={{
+                  border: "1px solid #E4E1DA",
+                  background: previewDevice === d ? "#EEF2F8" : "#FAF9F6",
+                  padding: "9px 14px",
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {d}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPreviewNonce((n) => n + 1)}
+              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "9px 14px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, cursor: "pointer" }}
+            >
+              refresh
+            </button>
+            <a
+              href={`/preview/${storeSlug}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "9px 14px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", color: "#14161A" }}
+            >
+              open ↗
+            </a>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "#24457A" }}>{changeLabel}</span>
+            <button type="button" onClick={save} disabled={saving || !dirty} style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "10px 14px", fontSize: 13, fontWeight: 700, cursor: dirty ? "pointer" : "default", opacity: dirty ? 1 : 0.45 }}>
+              {saving ? "saving…" : "save draft"}
+            </button>
+            <button
+              type="button"
+              onClick={publish}
+              disabled={publishing}
+              style={{ border: "1px solid #E4E1DA", background: "#24457A", color: "#FFFFFF", padding: "10px 18px", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}
+            >
+              {publishing ? "publishing…" : "publish theme"}
+            </button>
+            {(status === "live" || status === "preview") && (
+              <button type="button" onClick={unpublish} disabled={publishing} style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#fff", padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+                unpublish
+              </button>
+            )}
+          </div>
+        </div>
+
+        {msg && (
+          <div style={{ ...box, background: status === "live" ? "#EAF4EC" : "#EEF2F8", fontWeight: 600, fontSize: 14 }}>{msg}</div>
+        )}
+
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B" }}>
+          {status === "live" ? "live" : status === "preview" ? "demo preview" : "will publish to"} ·{" "}
+          <a href={hostedFull} target="_blank" rel="noreferrer" style={{ color: "#24457A", fontWeight: 700, wordBreak: "break-all" }}>
+            {hostedFull}
+          </a>
+          {liveUrl ? ` · ${liveUrl}` : ""}
+          {publishedAt ? ` · ${new Date(publishedAt).toLocaleDateString()}` : ""}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 8px" }}>
+          <div
+            style={{
+              border: "1px solid #E4E1DA",
+              background: "#14161A",
+              padding: 9,
+              borderRadius: mobile ? 34 : 0,
+              boxShadow: "0 12px 28px rgba(20,22,26,0.10)",
+              width: mobile ? 380 : "100%",
+              maxWidth: "100%",
+            }}
+          >
+            <iframe
+              key={previewNonce}
+              src={`/preview/${storeSlug}?n=${previewNonce}`}
+              title="Storefront preview"
+              style={{
+                display: "block",
+                width: "100%",
+                height: mobile ? 640 : 720,
+                border: 0,
+                background: "#fff",
+                borderRadius: mobile ? 26 : 0,
+              }}
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowCopy((v) => !v)}
+          style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "10px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, cursor: "pointer", textAlign: "left" }}
+        >
+          {showCopy ? "hide block copy" : "edit block copy"}
+        </button>
+
+        {showCopy && (
+          <div style={{ display: "grid", gap: 10 }}>
+            {config.sections.map((s, idx) => (
+              <SectionCard
+                key={s.id}
+                s={s}
+                first={idx === 0}
+                last={idx === config.sections.length - 1}
+                onField={setField}
+                onToggle={toggleVisible}
+                onMove={move}
+                onRemove={remove}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 function SectionCard({
-  s, first, last, onField, onToggle, onMove, onRemove,
+  s,
+  first,
+  last,
+  onField,
+  onToggle,
+  onMove,
+  onRemove,
 }: {
   s: Section;
   first: boolean;
@@ -454,10 +659,20 @@ function SectionCard({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <strong style={{ fontSize: 14 }}>{lib?.label || s.type}</strong>
         <div style={{ display: "flex", gap: 4 }}>
-          <button type="button" onClick={() => onMove(s.id, -1)} disabled={first} style={iconBtn}>↑</button>
-          <button type="button" onClick={() => onMove(s.id, 1)} disabled={last} style={iconBtn}>↓</button>
-          <button type="button" onClick={() => onToggle(s.id)} style={iconBtn}>{s.visible ? "🙈" : "👁"}</button>
-          {lib?.removable && <button type="button" onClick={() => onRemove(s.id)} style={{ ...iconBtn, color: "#DC2626" }}>✕</button>}
+          <button type="button" onClick={() => onMove(s.id, -1)} disabled={first} style={iconBtn}>
+            ↑
+          </button>
+          <button type="button" onClick={() => onMove(s.id, 1)} disabled={last} style={iconBtn}>
+            ↓
+          </button>
+          <button type="button" onClick={() => onToggle(s.id)} style={iconBtn}>
+            {s.visible ? "on" : "off"}
+          </button>
+          {lib?.removable && (
+            <button type="button" onClick={() => onRemove(s.id)} style={{ ...iconBtn, color: "#DC2626" }}>
+              ✕
+            </button>
+          )}
         </div>
       </div>
       <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
@@ -483,4 +698,14 @@ function SectionCard({
   );
 }
 
-const iconBtn: React.CSSProperties = { width: 28, height: 28, border: "1px solid #E2E8F0", background: "#fff", borderRadius: 6, cursor: "pointer", fontSize: 12 };
+const iconBtn: React.CSSProperties = {
+  minWidth: 28,
+  height: 28,
+  border: "1px solid #E4E1DA",
+  background: "#fff",
+  borderRadius: 0,
+  cursor: "pointer",
+  fontSize: 11,
+  fontWeight: 700,
+  padding: "0 6px",
+};

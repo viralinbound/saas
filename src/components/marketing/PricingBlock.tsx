@@ -45,6 +45,7 @@ export function PricingBlock({
   showMatrix = true,
   kicker,
   currentPlan,
+  onSelectPlan,
 }: {
   ctaHref?: string;
   plusHref?: string;
@@ -54,6 +55,7 @@ export function PricingBlock({
   showMatrix?: boolean;
   kicker?: string;
   currentPlan?: string;
+  onSelectPlan?: (key: PaidKey) => void;
 }) {
   const [sales, setSales] = useState(100000);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -174,6 +176,23 @@ export function PricingBlock({
             const p = PLANS[t.key];
             const href = t.plus ? plusHref : `${ctaHref}${ctaHref.includes("?") ? "&" : "?"}plan=${t.key}`;
             const priceLabel = t.plus ? `${p.price.toLocaleString("en-IN")}+` : p.price.toLocaleString("en-IN");
+            const isCurrent = currentPlan === t.key;
+            const ctaText = isCurrent ? "current plan" : onSelectPlan ? (t.plus ? "unlock plus →" : `unlock ${t.key} →`) : PLAN_CTA[t.key];
+            const ctaStyle: React.CSSProperties = {
+              marginTop: 20,
+              textAlign: "center",
+              border: `1px solid ${t.featured ? "#FFFFFF" : "#E4E1DA"}`,
+              background: t.featured ? "#FFFFFF" : t.plus ? "#EEF2F8" : "#FAF9F6",
+              color: t.featured ? "#24457A" : "#14161A",
+              fontSize: 15,
+              fontWeight: t.featured ? 700 : 800,
+              padding: 13,
+              textDecoration: "none",
+              width: "100%",
+              cursor: isCurrent ? "default" : "pointer",
+              fontFamily: "inherit",
+              opacity: isCurrent ? 0.7 : 1,
+            };
             return (
               <div
                 key={t.key}
@@ -206,23 +225,15 @@ export function PricingBlock({
                     <li key={b}>✓ {b}</li>
                   ))}
                 </ul>
-                <a
-                  href={href}
-                  className={`ssr-plan-cta ${t.featured ? "pro" : t.plus ? "plus" : "cream"}`}
-                  style={{
-                    marginTop: 20,
-                    textAlign: "center",
-                    border: `1px solid ${t.featured ? "#FFFFFF" : "#E4E1DA"}`,
-                    background: t.featured ? "#FFFFFF" : t.plus ? "#EEF2F8" : "#FAF9F6",
-                    color: t.featured ? "#24457A" : "#14161A",
-                    fontSize: 15,
-                    fontWeight: t.featured ? 700 : 800,
-                    padding: 13,
-                    textDecoration: "none",
-                  }}
-                >
-                  {PLAN_CTA[t.key]}
-                </a>
+                {onSelectPlan ? (
+                  <button type="button" disabled={isCurrent} onClick={() => onSelectPlan(t.key)} className={`ssr-plan-cta ${t.featured ? "pro" : t.plus ? "plus" : "cream"}`} style={ctaStyle}>
+                    {ctaText}
+                  </button>
+                ) : (
+                  <a href={href} className={`ssr-plan-cta ${t.featured ? "pro" : t.plus ? "plus" : "cream"}`} style={ctaStyle}>
+                    {ctaText}
+                  </a>
+                )}
               </div>
             );
           })}
