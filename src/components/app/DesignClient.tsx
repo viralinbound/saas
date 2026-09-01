@@ -15,8 +15,25 @@ import {
 import { buildTemplateConfig } from "@/lib/templatePresets";
 import { ROOT_DOMAIN } from "@/lib/domains";
 import { THEMES } from "@/lib/constants";
+import {
+  isStarterTemplate,
+  starterLayout,
+  seedLayoutPatch,
+  tokensFromLayout,
+  DEFAULT_LAYOUT_BLOCKS,
+  LAYOUT_BLOCKS,
+  type LayoutPatch,
+} from "@/lib/layoutCommerce";
 
-type Gate = { plan: string; isDemo: boolean; canPublishLive: boolean; customDomain: boolean; label: string };
+type Gate = {
+  plan: string;
+  isDemo: boolean;
+  canPublishLive: boolean;
+  customDomain: boolean;
+  label: string;
+  sectionStyleEditor?: boolean;
+  addSections?: boolean;
+};
 
 type TemplateRow = {
   key: string;
@@ -158,6 +175,21 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     setDirty(true);
   }
 
+  // ── starter (.dc) layout editing ─────────────────────────────────────
+  const isStarter = !!(config.layout && Object.keys(config.layout).length > 0);
+  const patch = (config.layout || {}) as LayoutPatch;
+  const blockState: Record<string, boolean> = { ...DEFAULT_LAYOUT_BLOCKS, ...(config.blocks || {}) };
+
+  function patchLayout(p: Partial<LayoutPatch>) {
+    mutate((c) => ({ ...c, layout: { ...(c.layout as LayoutPatch), ...p } }));
+  }
+  function toggleBlock(id: string) {
+    mutate((c) => {
+      const cur: Record<string, boolean> = { ...DEFAULT_LAYOUT_BLOCKS, ...(c.blocks || {}) };
+      return { ...c, blocks: { ...cur, [id]: !cur[id] } };
+    });
+  }
+
   async function persist(cfg: StoreConfig, tks: ThemeTokens, tkey: string) {
     const res = await fetch("/api/design", {
       method: "PUT",
@@ -235,6 +267,37 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
       return;
     }
     setTemplateKey(t.key);
+
+    // The six redesigned .dc layouts — seed a layout patch + block toggles,
+    // then reuse the same cloud-save path as every other template.
+    if (isStarterTemplate(t.key)) {
+      const L = starterLayout(t.key);
+      const starterCfg: StoreConfig = {
+        sections: [],
+        layout: seedLayoutPatch(L, storeName || "Your Store"),
+        blocks: { ...DEFAULT_LAYOUT_BLOCKS },
+      };
+      const starterTokens = tokensFromLayout(L);
+      setConfig(starterCfg);
+      setTokens(starterTokens);
+      setSaving(true);
+      const r = await persist(starterCfg, starterTokens, t.key);
+      setSaving(false);
+      if (r.ok) {
+        setDirty(false);
+        setPreviewNonce((n) => n + 1);
+        setMsg(`"${t.name}" applied & saved — customise every part below, then Publish.`);
+      } else {
+        setDirty(true);
+        setMsg(
+          r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
+            ? "That template needs a higher plan — choose a plan to unlock it."
+            : `"${t.name}" applied (not saved: ${r.error || "error"}). Click Save.`
+        );
+      }
+      return;
+    }
+
     const preset = buildTemplateConfig(t.key, storeName || "Your Store");
     if (preset) {
       setConfig(preset.config);
@@ -422,6 +485,99 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           </div>
         </div>
 
+        {isStarter ? (
+          <>
+            <div>
+              <div style={label}>homepage content</div>
+              <div style={{ display: "grid", gap: 10 }}>
+                {([
+                  ["store", "store name"],
+                  ["promo", "promo bar text"],
+                  ["headline", "hero headline"],
+                  ["sub", "hero sub-text"],
+                  ["cta", "hero button"],
+                  ["cta2", "secondary button"],
+                  ["gridTitle", "product grid title"],
+                  ["gridMeta", "product grid link"],
+                ] as [keyof LayoutPatch, string][]).map(([k, lbl]) => (
+                  <label key={k} style={{ display: "block" }}>
+                    <span style={{ ...label, marginBottom: 6 }}>{lbl}</span>
+                    <input
+                      style={inp}
+                      value={String((patch[k] as string) ?? "")}
+                      onChange={(e) => patchLayout({ [k]: e.target.value } as Partial<LayoutPatch>)}
+                    />
+                  </label>
+                ))}
+                <label style={{ display: "block" }}>
+                  <span style={{ ...label, marginBottom: 6 }}>categories (comma separated)</span>
+                  <input
+                    style={inp}
+                    value={(patch.chips ?? []).join(", ")}
+                    onChange={(e) => patchLayout({ chips: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>feature banner</div>
+              <div style={{ display: "grid", gap: 10 }}>
+                {([
+                  ["kicker", "eyebrow"],
+                  ["headline", "headline"],
+                  ["sub", "text"],
+                  ["cta", "button"],
+                  ["img", "image URL"],
+                ] as [string, string][]).map(([k, lbl]) => (
+                  <label key={k} style={{ display: "block" }}>
+                    <span style={{ ...label, marginBottom: 6 }}>{lbl}</span>
+                    <input
+                      style={inp}
+                      value={String((patch.banner?.[k as keyof typeof patch.banner] as string) ?? "")}
+                      onChange={(e) => patchLayout({ banner: { ...(patch.banner || {}), [k]: e.target.value } })}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>sections {gate.addSections === false ? "· plan-gated" : ""}</div>
+              <div style={{ display: "grid", gap: 6, opacity: gate.addSections === false ? 0.55 : 1 }}>
+                {LAYOUT_BLOCKS.map((blk) => {
+                  const on = blockState[blk.id] !== false;
+                  return (
+                    <button
+                      key={blk.id}
+                      type="button"
+                      disabled={gate.addSections === false}
+                      onClick={() => toggleBlock(blk.id)}
+                      style={{
+                        border: "1px solid #E4E1DA",
+                        background: on ? "#EEF2F8" : "#FAF9F6",
+                        padding: "10px 12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        cursor: gate.addSections === false ? "not-allowed" : "pointer",
+                        textAlign: "left",
+                      }}
+                    >
+                      <span style={{ fontSize: 13, fontWeight: 700 }}>{blk.label}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 10 }}>{on ? "on" : "off"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {gate.addSections === false && (
+                <Link href="/app/plans" style={{ display: "block", marginTop: 8, fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2F6B4F", textDecoration: "none", fontWeight: 700 }}>
+                  choose a plan to toggle sections →
+                </Link>
+              )}
+            </div>
+          </>
+        ) : (
         <div>
           <div style={label}>homepage blocks</div>
           <div style={{ display: "grid", gap: 6 }}>
@@ -462,6 +618,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
             ))}
           </div>
         </div>
+        )}
 
         <div>
           <div style={label}>project address</div>
@@ -607,6 +764,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           </div>
         </div>
 
+        {!isStarter && (
         <button
           type="button"
           onClick={() => setShowCopy((v) => !v)}
@@ -614,8 +772,9 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
         >
           {showCopy ? "hide block copy" : "edit block copy"}
         </button>
+        )}
 
-        {showCopy && (
+        {!isStarter && showCopy && (
           <div style={{ display: "grid", gap: 10 }}>
             {config.sections.map((s, idx) => (
               <SectionCard

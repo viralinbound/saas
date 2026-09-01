@@ -77,7 +77,13 @@ export async function GET() {
 }
 
 const putSchema = z.object({
-  draftConfig: z.object({ sections: z.array(z.any()) }),
+  draftConfig: z
+    .object({
+      sections: z.array(z.any()),
+      layout: z.record(z.any()).optional(),
+      blocks: z.record(z.boolean()).optional(),
+    })
+    .passthrough(),
   tokens: z.record(z.any()).optional(),
   templateKey: z.string().optional(),
 });

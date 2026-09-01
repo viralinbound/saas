@@ -5,6 +5,8 @@ import { V2Storefront } from "@/components/builder/V2Storefront";
 import { mapProduct } from "@/lib/db-mapper";
 import { coerceConfig, coerceTokens } from "@/lib/customization";
 import { coerceSite, isV2 } from "@/lib/builder";
+import { isStarterLayoutConfig } from "@/lib/layoutCommerce";
+import { MerchantLayoutStorefront } from "@/components/storefront/MerchantLayoutStorefront";
 import { demoProductsFor } from "@/lib/demoProducts";
 import type { Product, Store } from "@/lib/types";
 
@@ -65,6 +67,20 @@ export default async function DraftPreviewPage({
     updatedAt: new Date(storeRow.updated_at),
     products: shownProducts,
   };
+
+  if (isStarterLayoutConfig(cust?.draft_config)) {
+    return (
+      <MerchantLayoutStorefront
+        templateKey={storeRow.template_key || storeRow.theme || "fashion"}
+        storeName={store.name}
+        storeSlug={store.slug}
+        config={coerceConfig(cust?.draft_config, store.name)}
+        tokens={coerceTokens(cust?.theme_tokens)}
+        products={real}
+        demo={storeRow.plan === "free"}
+      />
+    );
+  }
 
   if (isV2(cust?.draft_config)) {
     return (

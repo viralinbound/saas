@@ -1,6 +1,7 @@
 import type { Product } from "./types";
 import type { StoreConfig, ThemeTokens } from "./customization";
 import { LAYOUTS, inr, type Layout } from "./layoutPreviews";
+import { mediaCover } from "./media";
 
 export const STARTER_TEMPLATE_KEYS = ["fashion", "bakery", "skincare", "kirana", "tech", "jewels"] as const;
 export type StarterKey = (typeof STARTER_TEMPLATE_KEYS)[number];
@@ -53,6 +54,13 @@ export const DEFAULT_LAYOUT_BLOCKS: LayoutBlocks = {
 
 export function isStarterTemplate(key: string | null | undefined): key is StarterKey {
   return !!key && (STARTER_TEMPLATE_KEYS as readonly string[]).includes(key);
+}
+
+/** A saved config belongs to a .dc starter layout when it carries a `layout` patch. */
+export function isStarterLayoutConfig(raw: unknown): boolean {
+  if (!raw || typeof raw !== "object") return false;
+  const layout = (raw as StoreConfig).layout;
+  return !!layout && typeof layout === "object" && Object.keys(layout).length > 0;
 }
 
 export function starterLayout(key: string | null | undefined): Layout {
@@ -184,7 +192,7 @@ export function catalogToLayoutProducts(products: Product[], fallback: Layout["p
       rating: fb.rating,
       badge: p.category || fb.badge,
       variants: variants.length ? variants : fb.variants,
-      img: p.image || fb.img,
+      img: mediaCover(p.image) || fb.img,
     };
   });
 }
