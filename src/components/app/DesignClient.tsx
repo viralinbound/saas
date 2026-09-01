@@ -116,8 +116,18 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           setLoaded(true);
           return;
         }
-        setConfig(d.draftConfig);
-        setTokens(d.tokens);
+        // A store on one of the six .dc templates whose saved config predates
+        // the redesign: upgrade it in-place to the .dc starter config (Save
+        // persists it; the storefront already renders the new design).
+        if (isStarterTemplate(d.templateKey) && !(d.draftConfig && d.draftConfig.layout)) {
+          const seeded = seedStarterConfig(d.templateKey, d.store?.name || "Your Store");
+          setConfig(seeded.config);
+          setTokens(seeded.tokens);
+          setDirty(true);
+        } else {
+          setConfig(d.draftConfig);
+          setTokens(d.tokens);
+        }
         setTemplateKey(d.templateKey);
         setTemplates(d.templates || []);
         setStoreName(d.store?.name || "");

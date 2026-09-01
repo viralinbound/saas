@@ -4,7 +4,7 @@ import { StorefrontClient } from "@/components/storefront/StorefrontClient";
 import { V2Storefront } from "@/components/builder/V2Storefront";
 import { coerceConfig, DEFAULT_TOKENS } from "@/lib/customization";
 import { coerceSite, isV2 } from "@/lib/builder";
-import { isStarterLayoutConfig } from "@/lib/layoutCommerce";
+import { isStarterLayoutConfig, isStarterTemplate, seedStarterConfig } from "@/lib/layoutCommerce";
 import { MerchantLayoutStorefront } from "@/components/storefront/MerchantLayoutStorefront";
 
 export default async function StorePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -13,14 +13,17 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
   // Published path: get_storefront() RPC returns only published data for live stores.
   const front = await getStorefront(slug);
   if (front) {
-    if (isStarterLayoutConfig(front.rawConfig)) {
+    const starterKey = front.store.theme || "fashion";
+    if (isStarterLayoutConfig(front.rawConfig) || isStarterTemplate(starterKey)) {
+      const useSaved = isStarterLayoutConfig(front.rawConfig);
+      const seeded = seedStarterConfig(starterKey, front.store.name);
       return (
         <MerchantLayoutStorefront
-          templateKey={front.store.theme || "fashion"}
+          templateKey={starterKey}
           storeName={front.store.name}
           storeSlug={front.store.slug}
-          config={front.config}
-          tokens={front.tokens}
+          config={useSaved ? front.config : seeded.config}
+          tokens={useSaved ? front.tokens : seeded.tokens}
           products={front.store.products}
           demo={front.demo}
         />
