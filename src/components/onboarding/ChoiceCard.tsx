@@ -26,11 +26,12 @@ export function ChoiceCard({
         width: "100%",
         textAlign: "left",
         padding: compact ? "12px 14px" : "16px 18px",
-        border: `1px solid ${selected ? "#24457A" : "#E4E1DA"}`,
+        border: "1px solid #E4E1DA",
         borderRadius: 0,
-        background: selected ? "#EEF2F8" : "#FFFFFF",
+        background: selected ? "#EEF2F8" : "#FAF9F6",
+        boxShadow: selected ? "0 10px 24px rgba(20,22,26,0.10)" : "none",
         cursor: "pointer",
-        transition: "border-color 0.15s, background 0.15s",
+        transition: "background 0.15s, box-shadow 0.15s",
       }}
     >
       {icon && (
@@ -82,12 +83,12 @@ export function MultiChoiceChip({
         gap: 6,
         padding: "9px 14px",
         borderRadius: 0,
-        border: `1px solid ${selected ? "#24457A" : "#E4E1DA"}`,
-        background: selected ? "#EEF2F8" : "#FFFFFF",
+        border: "1px solid #E4E1DA",
+        background: selected ? "#EEF2F8" : "#FAF9F6",
         fontWeight: 700,
-        fontSize: "0.85rem",
+        fontSize: 14,
         cursor: "pointer",
-        color: selected ? "#24457A" : "#475569",
+        color: "#14161A",
       }}
     >
       {icon && <span>{icon}</span>}

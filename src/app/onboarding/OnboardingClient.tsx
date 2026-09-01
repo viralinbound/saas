@@ -236,14 +236,14 @@ export default function OnboardingClient() {
     return (
       <OnboardingShell userName={userName} step={8} totalSteps={TOTAL_STEPS} onLogout={logout}>
         <div style={{ textAlign: "center", padding: "24px 0 48px" }}>
-          <div style={{ width: 72, height: 72, background: "#EEF2F8", display: "grid", placeItems: "center", margin: "0 auto 20px", fontSize: 32 }}>
-            🎉
+          <div style={{ width: 72, height: 72, background: "#EEF2F8", border: "1px solid #E4E1DA", display: "grid", placeItems: "center", margin: "0 auto 20px", fontSize: 32 }}>
+            ✦
           </div>
           <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A", margin: 0 }}>
             store launched
           </p>
-          <h2 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "clamp(2rem, 4.4vw, 2.6rem)", fontWeight: 400, letterSpacing: "-0.02em", marginTop: 10 }}>
-            You&apos;re live, {userName || "merchant"}!
+          <h2 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.028em", lineHeight: 1.05, marginTop: 10 }}>
+            you&apos;re live, {(userName || "merchant").toLowerCase()}.
           </h2>
           <p style={{ marginTop: 12, fontSize: 16, color: "#64748B", maxWidth: 520, margin: "12px auto 0", lineHeight: 1.6 }}>
             <strong>{createdStore.name}</strong> is ready with sample products and checkout.
@@ -261,8 +261,8 @@ export default function OnboardingClient() {
             </a>
           </div>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32, flexWrap: "wrap" }}>
-            <Link href="/app" style={{ background: "#24457A", color: "#fff", padding: "14px 28px", fontWeight: 700, textDecoration: "none", borderRadius: 0 }}>
-              Go to dashboard →
+            <Link href="/app" style={{ background: "#14161A", color: "#9FBBE0", padding: "14px 28px", fontWeight: 800, textDecoration: "none", border: "1px solid #E4E1DA" }}>
+              go to dashboard →
             </Link>
             <Link href="/app/design" style={{ border: "1px solid #E4E1DA", padding: "14px 28px", fontWeight: 700, color: "#14161A", textDecoration: "none", borderRadius: 0, background: "#FAF9F6" }}>
               Open the editor
@@ -273,62 +273,53 @@ export default function OnboardingClient() {
     );
   }
 
-  const stepTitles: Record<number, { kicker: string; title: string; subtitle: string }> = {
+  const stepTitles: Record<number, { title: string; subtitle: string }> = {
     1: {
-      kicker: "Step 1 of 7",
-      title: "What brings you to SuperShowroom?",
-      subtitle: "We'll personalize your setup based on your goals — just like Shopify.",
+      title: "let's get you a storefront.",
+      subtitle: "you pay your plan's advance at the last step — everything you set up here is kept.",
     },
     2: {
-      kicker: "Step 2 of 7",
-      title: "What do you plan to sell?",
-      subtitle: "Pick your main category. We'll suggest the right theme and sample products.",
+      title: "what are you selling?",
+      subtitle: "pick your main category. we'll suggest the right theme and sample products.",
     },
     3: {
-      kicker: "Step 3 of 7",
-      title: "Tell us about your business",
-      subtitle: "This helps us tailor your dashboard and recommendations.",
+      title: "tell us about your business.",
+      subtitle: "this helps us tailor your dashboard and recommendations.",
     },
     4: {
-      kicker: "Step 4 of 7",
-      title: "What should we call your store?",
-      subtitle: "You can change this anytime. Use your brand name or business name.",
+      title: "what should we call your store?",
+      subtitle: "you can change this anytime. use your brand name or legal company name.",
     },
     5: {
-      kicker: "Step 5 of 7",
-      title: "Choose your store address",
-      subtitle: "This is the URL customers will visit. Keep it short and memorable.",
+      title: "connect your domain.",
+      subtitle: "we do not sell domains — bring the one you own (or buy it anywhere) and we connect it free on every plan: dns records, ssl and redirects.",
     },
     6: {
-      kicker: "Step 6 of 7",
-      title: "Pick a storefront theme",
-      subtitle: selectedCategory ? `Recommended for ${selectedCategory.label.toLowerCase()}` : "Choose a look that matches your brand.",
+      title: "pick a starting theme.",
+      subtitle: selectedCategory
+        ? `recommended for ${selectedCategory.label.toLowerCase()} — you can change any of it later in the design editor.`
+        : "you can change any of it later in the design editor — nothing here is permanent.",
     },
     7: {
-      kicker: "Step 7 of 7",
-      title: "Select your plan",
-      subtitle: "Start free today. Upgrade when you're ready to grow.",
+      title: "choose how you pay.",
+      subtitle: "you pay the advance today; the balance is invoiced once your store is live. the 2% sales fee only ever applies to completed orders, ex GST.",
     },
   };
 
   const meta = stepTitles[step];
 
   return (
-    <OnboardingShell userName={userName} step={step} totalSteps={TOTAL_STEPS} onLogout={logout}>
-      <div style={{ marginBottom: 24 }}>
-        <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A", margin: 0 }}>
-          {userName ? `Welcome, ${userName} · ` : ""}{meta.kicker}
-        </p>
-        <h2 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: "clamp(1.9rem, 3.6vw, 2.4rem)", fontWeight: 400, marginTop: 8, letterSpacing: "-0.02em", lineHeight: 1.05 }}>
-          {meta.title}
-        </h2>
-        <p style={{ marginTop: 8, color: "#64748B", fontSize: "0.95rem", lineHeight: 1.5, maxWidth: 560 }}>
-          {meta.subtitle}
-        </p>
-      </div>
-
-      <div className="onboarding-layout" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(260px, 300px)", gap: 24, alignItems: "start" }}>
-        <div key={step} className="onboarding-step-card" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "28px 28px 24px", borderRadius: 0, boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}>
+    <OnboardingShell userName={userName} step={step} totalSteps={TOTAL_STEPS} onLogout={logout} onJump={(n) => setStep(n)}>
+      <div className="onboarding-layout" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 320px", gap: 26, alignItems: "start" }}>
+        <div key={step} className="onboarding-step-card" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 30, borderRadius: 0, boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}>
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.028em", lineHeight: 1.05, margin: 0 }}>
+              {meta.title}
+            </h2>
+            <p style={{ marginTop: 10, fontSize: 15, lineHeight: 1.55, maxWidth: 520, color: "#14161A" }}>
+              {meta.subtitle}
+            </p>
+          </div>
           {step === 1 && (
             <div style={{ display: "grid", gap: 10 }}>
               {ONBOARDING_GOALS.map((g) => (
@@ -345,17 +336,28 @@ export default function OnboardingClient() {
           )}
 
           {step === 2 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
-              {SELLING_CATEGORIES.map((cat) => (
-                <ChoiceCard
-                  key={cat.id}
-                  selected={intent.category === cat.id}
-                  onClick={() => selectCategory(cat.id)}
-                  icon={cat.icon}
-                  title={cat.label}
-                  compact
-                />
-              ))}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {SELLING_CATEGORIES.map((cat) => {
+                const on = intent.category === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => selectCategory(cat.id)}
+                    style={{
+                      border: "1px solid #E4E1DA",
+                      background: on ? "#EEF2F8" : "#FAF9F6",
+                      color: "#14161A",
+                      padding: "9px 14px",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {cat.label.toLowerCase()}
+                  </button>
+                );
+              })}
             </div>
           )}
 
@@ -502,87 +504,125 @@ export default function OnboardingClient() {
 
           {step === 5 && (
             <>
-              <label style={labelStyle}>Store URL</label>
-              <div style={{ display: "flex", border: "1px solid #E4E1DA", background: "#FFFFFF", borderRadius: 0, overflow: "hidden" }}>
-                <span style={{ padding: "12px 12px", fontSize: 13, color: "#64748B", borderRight: "1px solid #E4E1DA", whiteSpace: "nowrap", fontFamily: "'JetBrains Mono', monospace" }}>/s/</span>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 0, border: "1px solid #E4E1DA", background: "#FFFFFF" }}>
                 <input
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder={slugify(form.name) || "your-store"}
-                  style={{ ...inputStyle, border: 0, borderRadius: 0, flex: 1 }}
+                  value={form.customDomain}
+                  onChange={(e) => setForm({ ...form, customDomain: e.target.value })}
+                  placeholder="yourbrand.in"
+                  style={{ border: 0, outline: "none", padding: 14, fontSize: 20, fontWeight: 700, letterSpacing: "-0.02em", background: "transparent" }}
                   autoFocus
                 />
+                <div style={{ borderLeft: "1px solid #E4E1DA", background: "#EEF2F8", padding: "14px 18px", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+                  connect it
+                </div>
               </div>
-              <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: slugStatus === "available" ? "#16A34A" : slugStatus === "taken" ? "#DC2626" : "#64748B" }}>
-                {slugStatus === "checking" && "Checking availability..."}
-                {slugStatus === "available" && `✓ ${previewSlug} is available`}
-                {slugStatus === "taken" && "✗ This URL is already taken"}
-                {slugStatus === "invalid" && "✗ URL must be at least 3 characters"}
-                {slugStatus === "idle" && previewSlug.length >= 3 && "We'll check availability when you continue"}
+              <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
+                {[
+                  ["dns records set and maintained", "included"],
+                  ["ssl certificate & https binding", "automated"],
+                  ["www and https redirects", "included"],
+                ].map(([left, right]) => (
+                  <div key={left} style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>{left}</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2F6B4F" }}>{right}</span>
+                  </div>
+                ))}
               </div>
-              <label style={{ ...labelStyle, marginTop: 20 }}>
-                Custom domain <span style={{ fontWeight: 500, color: "#94A3B8" }}>(optional)</span>
-              </label>
-              <input value={form.customDomain} onChange={(e) => setForm({ ...form, customDomain: e.target.value })} placeholder="yourbrand.in" style={inputStyle} />
+              <div style={{ marginTop: 20, border: "2px dashed #14161A", padding: 16, fontSize: 14, lineHeight: 1.5 }}>
+                no domain yet? buy one at any registrar in your own name — godaddy, cloudflare, hostinger — then paste it above. pointing it at us takes about 30 minutes with zero downtime.
+              </div>
+              <div style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid #E4E1DA" }}>
+                <label style={labelStyle}>your supershowroom url</label>
+                <div style={{ display: "flex", border: "1px solid #E4E1DA", background: "#FFFFFF", overflow: "hidden" }}>
+                  <span style={{ padding: "12px 12px", fontSize: 13, color: "#64748B", borderRight: "1px solid #E4E1DA", whiteSpace: "nowrap", fontFamily: "'JetBrains Mono', monospace" }}>/s/</span>
+                  <input
+                    value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    placeholder={slugify(form.name) || "your-store"}
+                    style={{ ...inputStyle, border: 0, flex: 1 }}
+                  />
+                </div>
+                <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: slugStatus === "available" ? "#2F6B4F" : slugStatus === "taken" ? "#DC2626" : "#64748B" }}>
+                  {slugStatus === "checking" && "checking availability..."}
+                  {slugStatus === "available" && `✦ ${previewSlug} is available`}
+                  {slugStatus === "taken" && "this url is already taken"}
+                  {slugStatus === "invalid" && "url must be at least 3 characters"}
+                  {slugStatus === "idle" && previewSlug.length >= 3 && "we'll check availability when you continue"}
+                </div>
+              </div>
             </>
           )}
 
           {step === 6 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
-              {THEMES.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  onClick={() => setForm({ ...form, theme: t.key })}
-                  style={{
-                    border: `1px solid ${form.theme === t.key ? "#24457A" : "#E4E1DA"}`,
-                    background: form.theme === t.key ? "#EEF2F8" : "#FFFFFF",
-                    padding: 8,
-                    textAlign: "left",
-                    cursor: "pointer",
-                    borderRadius: 0,
-                  }}
-                >
-                  <img src={t.hero} alt={t.name} style={{ width: "100%", height: 72, objectFit: "cover", marginBottom: 8 }} />
-                  <div style={{ fontWeight: 800, fontSize: 12, lineHeight: 1.3 }}>{t.name}</div>
-                  {t.key === selectedCategory?.theme && (
-                    <div style={{ fontSize: 10, color: "#24457A", fontWeight: 700, marginTop: 4 }}>Recommended</div>
-                  )}
-                </button>
-              ))}
+            <div className="onboarding-theme-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {THEMES.map((t) => {
+                const on = form.theme === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setForm({ ...form, theme: t.key })}
+                    style={{
+                      border: "1px solid #E4E1DA",
+                      background: on ? "#EEF2F8" : "#FAF9F6",
+                      boxShadow: on ? "0 10px 24px rgba(20,22,26,0.10)" : "none",
+                      cursor: "pointer",
+                      display: "grid",
+                      gridTemplateColumns: "62px 1fr",
+                      gap: 12,
+                      alignItems: "center",
+                      padding: 12,
+                      textAlign: "left",
+                    }}
+                  >
+                    <div style={{ width: 62, height: 62, border: "1px solid #E4E1DA", overflow: "hidden" }}>
+                      <img src={t.hero} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.15 }}>{t.name.toLowerCase()}</div>
+                      <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 5, color: "#24457A" }}>
+                        {on ? "selected ✦" : t.key === selectedCategory?.theme ? "recommended" : "preview"}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
 
           {step === 7 && (
             <div style={{ display: "grid", gap: 10 }}>
-              {(["free", "essential", "pro", "elite"] as const).map((key) => {
+              {(["free", "essential", "pro", "elite", "plus"] as const).map((key) => {
                 const plan = PLANS[key];
+                const on = form.plan === key;
                 return (
                   <button
                     key={key}
                     type="button"
                     onClick={() => setForm({ ...form, plan: key })}
                     style={{
-                      border: `1px solid ${form.plan === key ? "#24457A" : "#E4E1DA"}`,
-                      background: form.plan === key ? "#24457A" : "#FFFFFF",
-                      color: form.plan === key ? "#fff" : "#14161A",
-                      padding: 16,
-                      textAlign: "left",
+                      border: "1px solid #E4E1DA",
+                      background: on ? "#24457A" : "#FAF9F6",
+                      color: on ? "#FFFFFF" : "#14161A",
+                      padding: 18,
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto auto",
+                      gap: 18,
+                      alignItems: "center",
                       cursor: "pointer",
-                      borderRadius: 0,
+                      textAlign: "left",
+                      boxShadow: on ? "0 10px 24px rgba(20,22,26,0.10)" : "none",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                      <div>
-                        <div style={{ fontWeight: 800, fontSize: 16 }}>
-                          {plan.name}
-                          {key === "free" && <span style={{ marginLeft: 8, fontSize: 11, opacity: 0.9 }}>✦ recommended</span>}
-                        </div>
-                        <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{plan.tagline}</div>
-                      </div>
-                      <div style={{ fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap" }}>
-                        {plan.price === 0 ? "Free" : `₹${(plan.price / 1000).toFixed(0)}k/yr`}
-                      </div>
+                    <div>
+                      <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>{plan.name.toLowerCase()}</div>
+                      <div style={{ fontSize: 13, marginTop: 3, opacity: 0.8 }}>{plan.tagline.toLowerCase()}</div>
+                    </div>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                      {plan.feePercent}% of sales
+                    </div>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 700, whiteSpace: "nowrap" }}>
+                      {plan.price === 0 ? "free" : `₹${plan.price.toLocaleString("en-IN")}`}
                     </div>
                   </button>
                 );
@@ -604,68 +644,69 @@ export default function OnboardingClient() {
             </div>
           )}
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28, paddingTop: 20, borderTop: "1px solid #E4E1DA" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 30, paddingTop: 20, borderTop: "1px solid #E4E1DA" }}>
             <button
               type="button"
               onClick={() => setStep((s) => Math.max(1, s - 1))}
               disabled={step === 1}
-              style={{ background: "none", border: 0, cursor: step === 1 ? "default" : "pointer", opacity: step === 1 ? 0.3 : 1, fontWeight: 700, color: "#475569", fontSize: "0.9rem" }}
+              style={{
+                background: "none",
+                border: 0,
+                cursor: step === 1 ? "default" : "pointer",
+                opacity: step === 1 ? 0.35 : 0.7,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#14161A",
+              }}
             >
-              ← Back
+              ← back
             </button>
             {step < 7 ? (
-              <button type="button" disabled={!canContinue()} onClick={goNext} style={{ ...btnPrimary, opacity: canContinue() ? 1 : 0.45, cursor: canContinue() ? "pointer" : "not-allowed" }}>
-                Continue →
+              <button
+                type="button"
+                disabled={!canContinue()}
+                onClick={goNext}
+                style={{
+                  ...btnPrimary,
+                  opacity: canContinue() ? 1 : 0.45,
+                  cursor: canContinue() ? "pointer" : "not-allowed",
+                }}
+              >
+                continue →
               </button>
             ) : (
               <button type="button" onClick={finish} disabled={loading || !canContinue()} style={{ ...btnPrimary, opacity: loading ? 0.7 : 1 }}>
-                {loading ? "Launching your store..." : "Launch my store →"}
+                {loading ? "launching your store..." : "launch my store →"}
               </button>
             )}
           </div>
         </div>
 
-        <aside className="onboarding-preview" style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", padding: 22, borderRadius: 0, position: "sticky", top: 120 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: "#9FBBE0", letterSpacing: "0.16em", textTransform: "uppercase" }}>
-            your store preview
+        <aside className="onboarding-preview" style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", padding: 22, position: "sticky", top: 88 }}>
+          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: "#9FBBE0", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            what happens next
           </div>
-          <div style={{ marginTop: 14, fontWeight: 800, fontSize: 18 }}>{form.name || "Your Store"}</div>
-          <div style={{ marginTop: 6, fontSize: 12, wordBreak: "break-all", color: "#CBD5E1" }}>{previewUrl}</div>
-
-          {intent.goal && (
-            <div style={{ marginTop: 16, padding: "10px 12px", background: "rgba(255,255,255,0.06)", fontSize: 12, color: "#CBD5E1" }}>
-              <span style={{ color: "#9FBBE0", fontWeight: 700 }}>Goal · </span>
-              {ONBOARDING_GOALS.find((g) => g.id === intent.goal)?.title}
-            </div>
-          )}
-          {selectedCategory && (
-            <div style={{ marginTop: 8, padding: "10px 12px", background: "rgba(255,255,255,0.06)", fontSize: 12, color: "#CBD5E1" }}>
-              <span style={{ color: "#9FBBE0", fontWeight: 700 }}>Category · </span>
-              {selectedCategory.icon} {selectedCategory.label}
-            </div>
-          )}
-
-          {form.companyName && (
-            <div style={{ marginTop: 8, padding: "10px 12px", background: "rgba(255,255,255,0.06)", fontSize: 12, color: "#CBD5E1" }}>
-              <span style={{ color: "#9FBBE0", fontWeight: 700 }}>Company · </span>
-              {form.companyName}{form.city ? ` · ${form.city}` : ""}
-            </div>
-          )}
-          <div style={{ marginTop: 8, padding: "10px 12px", background: "rgba(255,255,255,0.06)", fontSize: 12, color: "#CBD5E1" }}>
-            <span style={{ color: "#9FBBE0", fontWeight: 700 }}>Plan · </span>
-            {PLANS[form.plan]?.name || "Start Free"}{form.plan === "free" ? " (demo)" : ""}
-          </div>
-
-          {form.theme && (
-            <img src={THEMES.find((t) => t.key === form.theme)?.hero} alt="" style={{ width: "100%", height: 96, objectFit: "cover", marginTop: 16 }} />
-          )}
-
-          <ul style={{ marginTop: 18, display: "grid", gap: 8, fontSize: 12, lineHeight: 1.5, color: "#94A3B8", paddingLeft: 16 }}>
-            <li>Sample products on launch</li>
-            <li>Cart &amp; checkout included</li>
-            <li>Edit &amp; publish a demo instantly</li>
-            <li>Full Shopify-style admin + live analytics</li>
+          <ul style={{ display: "grid", gap: 14, marginTop: 16, fontSize: 14, lineHeight: 1.5, listStyle: "none", padding: 0, marginBottom: 0 }}>
+            <li>✦ your store goes live on a supershowroom subdomain immediately</li>
+            <li>✦ we point your domain and issue its ssl within the hour</li>
+            <li>✦ send us your catalog sheet — we upload the first 50 products for you</li>
+            <li>✦ razorpay, UPI and COD get configured on a 15-min whatsapp call</li>
+            <li>✦ advance clears — your store goes live the same day</li>
           </ul>
+          {(form.name || selectedCategory) && (
+            <div style={{ borderTop: "1px solid rgba(250,249,246,0.24)", marginTop: 20, paddingTop: 16, fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+              {form.name ? <div style={{ fontWeight: 800 }}>{form.name}</div> : null}
+              {selectedCategory ? <div style={{ marginTop: 4, opacity: 0.8 }}>{selectedCategory.label.toLowerCase()}</div> : null}
+              <div style={{ marginTop: 6, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, wordBreak: "break-all", color: "#9FBBE0" }}>{previewUrl}</div>
+            </div>
+          )}
+          <div style={{ borderTop: "1px solid rgba(250,249,246,0.24)", marginTop: 20, paddingTop: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, lineHeight: 1.7, opacity: 0.75 }}>
+            questions? whatsapp
+            <br />
+            +91 89684 30834
+          </div>
         </aside>
       </div>
     </OnboardingShell>
@@ -678,14 +719,17 @@ function OnboardingShell({
   step,
   totalSteps,
   onLogout,
+  onJump,
 }: {
   children: React.ReactNode;
   userName: string;
   step: number;
   totalSteps: number;
   onLogout: () => void;
+  onJump?: (n: number) => void;
 }) {
-  const progress = step >= totalSteps + 1 ? 100 : Math.round(((step - 1) / totalSteps) * 100);
+  const todayLabel = new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+  const initial = (userName || "s").charAt(0).toLowerCase();
 
   return (
     <div style={{ minHeight: "100vh", background: "#F1EFE9", color: "#14161A", fontFamily: "'Instrument Sans', system-ui, sans-serif" }}>
@@ -693,65 +737,76 @@ function OnboardingShell({
         .onboarding-step-card { animation: ob-fade 0.28s ease; }
         @keyframes ob-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes ob-spin { to { transform: rotate(360deg); } }
-        @media (max-width: 860px) {
+        @media (max-width: 920px) {
           .onboarding-layout { grid-template-columns: 1fr !important; }
-          .onboarding-preview { position: static !important; order: -1; }
-          .onboarding-header-meta { display: none !important; }
+          .onboarding-preview { position: static !important; }
+          .onboarding-header-search { display: none !important; }
+          .onboarding-theme-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-      <header style={{ background: "#14161A", color: "#FAF9F6", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
+      <header style={{ background: "#FAF9F6", borderBottom: "1px solid #E4E1DA", padding: "16px 30px", display: "flex", alignItems: "center", gap: 20, position: "sticky", top: 0, zIndex: 40 }}>
         <div>
-          <Link href="/" style={{ color: "#FAF9F6", textDecoration: "none" }}>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>supershowroom<span style={{ color: "#9FBBE0" }}>✦</span></div>
+          <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>
+              getting started
+            </div>
+            <h1 style={{ fontSize: 25, fontWeight: 700, letterSpacing: "-0.025em", margin: "2px 0 0", lineHeight: 1.1 }}>
+              create your store
+            </h1>
           </Link>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9FBBE0" }}>
-            store setup
-          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {step <= totalSteps && (
-            <span style={{ fontSize: 12, color: "#9FBBE0", fontFamily: "'JetBrains Mono', monospace" }}>
-              {Math.min(step, totalSteps)} / {totalSteps}
-            </span>
-          )}
-          {userName && <span className="onboarding-header-meta" style={{ fontSize: 13, opacity: 0.85 }}>{userName}</span>}
-          <button type="button" onClick={onLogout} style={{ background: "none", border: "1px solid rgba(255,255,255,0.2)", color: "#FAF9F6", padding: "6px 12px", fontSize: 12, cursor: "pointer", borderRadius: 0 }}>
-            Log out
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="onboarding-header-search" style={{ border: "1px solid #E4E1DA", background: "#FFFFFF", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, opacity: 0.72 }}>⌘K</span>
+            <span style={{ fontSize: 13, color: "#94A3B8" }}>search orders, products, customers</span>
+          </div>
+          <div style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "9px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
+            {todayLabel}
+          </div>
+          <button
+            type="button"
+            onClick={onLogout}
+            title="log out"
+            style={{ width: 38, height: 38, border: "1px solid #24457A", background: "#24457A", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+          >
+            {initial}
           </button>
         </div>
       </header>
 
-      {step <= totalSteps && (
-        <div style={{ background: "#FAF9F6", borderBottom: "1px solid #E4E1DA" }}>
-          <div style={{ maxWidth: 1080, margin: "0 auto", padding: "14px 24px" }}>
-            <div style={{ height: 4, background: "#E4E1DA", overflow: "hidden", marginBottom: 12 }}>
-              <div style={{ height: "100%", width: `${progress}%`, background: "#24457A", transition: "width 0.3s ease" }} />
-            </div>
-            <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
-              {ONBOARDING_STEPS.map((s) => (
-                <div
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "34px 30px 60px" }}>
+        {step <= totalSteps && (
+          <div style={{ display: "flex", gap: 8, marginBottom: 28, overflowX: "auto" }}>
+            {ONBOARDING_STEPS.map((s) => {
+              const on = step === s.id;
+              const done = step > s.id;
+              return (
+                <button
                   key={s.id}
+                  type="button"
+                  onClick={() => onJump?.(s.id)}
                   style={{
-                    flex: "1 0 auto",
-                    minWidth: 72,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 8,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: step >= s.id ? "#24457A" : "#94A3B8",
-                    fontWeight: step === s.id ? 800 : 600,
-                    textAlign: "center",
+                    flex: 1,
+                    minWidth: 92,
+                    border: "1px solid #E4E1DA",
+                    background: on ? "#14161A" : done ? "#EEF2F8" : "#FAF9F6",
+                    color: on ? "#EEF2F8" : "#14161A",
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                    textAlign: "left",
                   }}
                 >
-                  {s.label}
-                </div>
-              ))}
-            </div>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+                    step {s.n}
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, marginTop: 3 }}>{s.label}</div>
+                </button>
+              );
+            })}
           </div>
-        </div>
-      )}
-
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 24px 60px" }}>{children}</div>
+        )}
+        {children}
+      </div>
     </div>
   );
 }
@@ -777,12 +832,12 @@ const inputStyle: React.CSSProperties = {
   outline: "none",
 };
 const btnPrimary: React.CSSProperties = {
-  background: "#24457A",
-  color: "#fff",
-  border: "1px solid #24457A",
-  padding: "13px 24px",
-  fontWeight: 700,
+  background: "#14161A",
+  color: "#9FBBE0",
+  border: "1px solid #E4E1DA",
+  padding: "11px 20px",
+  fontWeight: 800,
   cursor: "pointer",
   borderRadius: 0,
-  fontSize: "0.92rem",
+  fontSize: 14,
 };

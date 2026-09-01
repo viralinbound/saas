@@ -110,13 +110,13 @@ export type OnboardingData = {
 };
 
 export const ONBOARDING_STEPS = [
-  { id: 1, label: "Your goal" },
-  { id: 2, label: "What you sell" },
-  { id: 3, label: "Your business" },
-  { id: 4, label: "Company" },
-  { id: 5, label: "Store URL" },
-  { id: 6, label: "Theme" },
-  { id: 7, label: "Plan" },
+  { id: 1, n: "01", label: "goal" },
+  { id: 2, n: "02", label: "category" },
+  { id: 3, n: "03", label: "business" },
+  { id: 4, n: "04", label: "company" },
+  { id: 5, n: "05", label: "domain" },
+  { id: 6, n: "06", label: "theme" },
+  { id: 7, n: "07", label: "plan" },
 ] as const;
 
 export function getDashboardTip(goal?: string, category?: string): { title: string; body: string; cta: string; href: string } {

@@ -7,8 +7,8 @@ const COLUMNS = [
   {
     title: "platform",
     links: [
-      { name: "layout previews", href: "/templates" },
-      { name: "what's included", href: "/features" },
+      { name: "layout previews", href: "/#themes" },
+      { name: "what's included", href: "/#included" },
       { name: "plans & pricing", href: "/pricing" },
       { name: "domain search", href: "/domains" },
       { name: "merchant console", href: "/app" },
@@ -55,6 +55,8 @@ export function MarketingFooter() {
                     <BookDemoButton className="ssr-foot-link" style={{ background: "none", border: 0, padding: 0, fontSize: 15 }}>
                       {l.name}
                     </BookDemoButton>
+                  ) : l.href.startsWith("/#") ? (
+                    <a href={l.href} className="ssr-foot-link">{l.name}</a>
                   ) : l.href.startsWith("/") ? (
                     <Link href={l.href} className="ssr-foot-link">{l.name}</Link>
                   ) : (

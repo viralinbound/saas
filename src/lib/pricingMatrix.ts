@@ -1,102 +1,106 @@
-// Shared pricing content — used by the marketing /pricing page and the
-// in-app /app/plans page so both stay identical. Mirrors the published
-// SuperShowroom pricing brochure.
+// Shared pricing content — marketing /pricing, homepage, and /app/plans.
+// Copy matches SuperShowroom Site.dc.html#pricing.
 
 export type PaidKey = "essential" | "pro" | "elite" | "plus";
 export const PAID_ORDER: PaidKey[] = ["essential", "pro", "elite", "plus"];
 
 export const PRICING_HEADLINE = {
-  eyebrow: "Compare the plans",
-  title: "pick the one that fits today.",
-  sub: "upgrade any time — we move you up without rebuilding your site.",
-  note: "from ₹15,000 a year plus 2% of what you sell",
+  eyebrow: "05 / pricing",
+  title: "pay once a year.",
+  titleAccent: "then only when it sells.",
+  sub: "no per-app charges, no markup on top of your payment gateway, no surprise at renewal. move up a plan any time and we migrate you without rebuilding the site.",
 };
 
 export const PRICING_DISCLAIMER =
-  "Prices exclude 18% GST. Plans step up 10% each year on renewal — written down from day one. The 2% fee on sales never changes.";
+  "prices exclude 18% GST. plans step up 10% each year on renewal — written down from day one. the 2% fee on sales never changes.";
 
-// The 4 headline bullets shown on each plan card (verbatim from the brochure).
 export const PLAN_CARD_BULLETS: Record<PaidKey, string[]> = {
   essential: [
-    "Free Custom Domain (.in)",
-    "Up to 100 Products",
-    "Advance to start: ₹5,000",
-    "2% Sales Fee (ex GST)",
+    "connect your own domain, free",
+    "up to 100 products",
+    "advance to start: ₹5,000",
+    "2% sales fee (ex GST)",
   ],
   pro: [
-    "Free Domain (.com / .in)",
-    "Unlimited Products & Video",
-    "Advance to start: ₹8,000",
-    "2% Sales Fee (ex GST)",
+    "connect your own domain, free",
+    "unlimited products & video",
+    "advance to start: ₹8,000",
+    "2% sales fee (ex GST)",
   ],
   elite: [
-    "Remove SuperShowroom Branding",
-    "Full Sitewide SEO & Reviews",
-    "Advance to start: ₹12,000",
-    "2% Sales Fee (ex GST)",
+    "remove supershowroom branding",
+    "full sitewide seo & reviews",
+    "advance to start: ₹12,000",
+    "2% sales fee (ex GST)",
   ],
   plus: [
-    "Fully Custom Theme Design",
-    "Reduced 1% Sales Fee",
-    "Advance to start: ₹20,000",
-    "Admin + 15 Logins",
+    "fully custom theme design",
+    "reduced 1% sales fee",
+    "advance to start: ₹20,000",
+    "admin + 15 logins",
   ],
 };
 
 export const PLAN_CTA: Record<PaidKey, string> = {
-  essential: "Pick Essential Plan →",
-  pro: "Pick Pro Plan →",
-  elite: "Pick Elite Plan →",
-  plus: "Pick Plus Plan →",
+  essential: "start essential →",
+  pro: "start pro →",
+  elite: "start elite →",
+  plus: "talk to us →",
 };
 
-// COMPLETE FEATURE MATRIX — order is [essential, pro, elite, plus]
+export const PLAN_WHO: Record<PaidKey, string> = {
+  essential: "for small catalogs & first online stores",
+  pro: "for growing brands ready to scale",
+  elite: "for established high volume sellers",
+  plus: "fully custom build & dedicated manager",
+};
+
 export type MatrixRow = { label: string; values: [string, string, string, string] };
 export type MatrixGroup = { group: string; rows: MatrixRow[] };
 
 export const PRICING_GROUPS: MatrixGroup[] = [
   {
-    group: "Website & hosting",
+    group: "the basics",
     rows: [
-      { label: "Domain, hosting & SSL", values: ["Free", "Free", "Free", "Free"] },
-      { label: "Design layouts", values: ["Premium", "Premium", "Premium", "Fully custom"] },
-      { label: "Extra pages", values: ["—", "Yes", "Yes", "Yes"] },
-      { label: "Remove SuperShowroom branding", values: ["—", "—", "Yes", "Yes"] },
+      { label: "who it's for", values: ["first store", "growing brand", "high volume", "fully custom"] },
+      { label: "advance to start", values: ["₹5,000", "₹8,000", "₹12,000", "₹20,000"] },
+      { label: "fee on sales", values: ["2%", "2%", "2%", "1%"] },
+      { label: "team logins", values: ["1", "3", "8", "admin + 15"] },
     ],
   },
   {
-    group: "Your catalog",
+    group: "your catalog",
     rows: [
-      { label: "Products", values: ["100", "Unlimited", "Unlimited", "Unlimited"] },
-      { label: "Images per product", values: ["4 + 1/variant", "4 + 4/variant + video", "4 + 8/variant + video", "4 + 8/variant + video"] },
-      { label: "Variants", values: ["Basic", "Advanced", "Advanced", "Advanced"] },
-      { label: "Collections, filters & tags", values: ["—", "—", "Yes", "Yes"] },
-      { label: "Customer reviews", values: ["—", "—", "Yes", "Yes"] },
+      { label: "products", values: ["100", "unlimited", "unlimited", "unlimited"] },
+      { label: "images per product", values: ["5", "10 + video", "unlimited", "unlimited"] },
+      { label: "variants", values: ["size, colour", "+ weight", "all + bundles", "custom"] },
+      { label: "reviews", values: ["—", "text", "text + photo", "text + photo"] },
     ],
   },
   {
-    group: "Running the store",
+    group: "running the store",
     rows: [
-      { label: "Order management", values: ["Yes", "Yes", "Yes", "Yes"] },
-      { label: "Stock alerts", values: ["Manual", "Automatic", "Automatic", "Automatic"] },
-      { label: "Order cancellation", values: ["—", "Yes", "Yes", "Yes"] },
-      { label: "Team logins", values: ["Admin only", "Admin + 3", "Admin + 15", "Admin + 15"] },
+      { label: "order management", values: ["✓", "✓", "✓", "✓"] },
+      { label: "low-stock alerts", values: ["—", "✓", "✓", "✓"] },
+      { label: "reports & exports", values: ["basic", "full", "full + exports", "full + exports"] },
+      { label: "supershowroom branding", values: ["shown", "shown", "removed", "removed"] },
     ],
   },
   {
-    group: "Getting customers & marketing",
+    group: "getting customers",
     rows: [
-      { label: "SEO setup", values: ["Homepage", "Homepage", "Full sitewide", "Full sitewide"] },
-      { label: "Google Ads / Shopping", values: ["Yes", "Yes", "Yes", "Yes"] },
-      { label: "CRM", values: ["—", "Yes", "Yes", "Yes"] },
-      { label: "Coupons", values: ["Store / cart", "+ categories", "+ products", "+ products"] },
-      { label: "WhatsApp credits", values: ["Add-on", "Free credits", "Free credits", "Free credits"] },
+      { label: "SEO setup", values: ["pages", "+ schema", "full sitewide", "full sitewide"] },
+      { label: "shopping feed & social kit", values: ["—", "feed", "feed + kit", "feed + kit"] },
+      { label: "whatsapp CRM", values: ["—", "✓", "✓", "✓"] },
+      { label: "whatsapp credits / mo", values: ["—", "500", "2,000", "5,000"] },
     ],
   },
   {
-    group: "Support & onboarding",
+    group: "support",
     rows: [
-      { label: "WhatsApp support", values: ["Yes", "Yes", "Yes", "Yes"] },
+      { label: "whatsapp chat", values: ["✓", "✓", "priority", "priority"] },
+      { label: "scheduled callback", values: ["—", "monthly", "fortnightly", "weekly"] },
+      { label: "dedicated manager", values: ["—", "—", "—", "✓"] },
     ],
   },
 ];

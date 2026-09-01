@@ -129,7 +129,7 @@ export function PlansClient({ currentPlan, companyName }: { currentPlan: string;
       </div>
 
       {/* shared ROI + full feature matrix — same block as the marketing pricing page */}
-      <PricingBlock showHeader={false} showTiers={false} />
+      <PricingBlock showHeader={false} showTiers={false} currentPlan={currentPlan} />
 
       {confirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(20,22,26,0.6)", display: "grid", placeItems: "center", zIndex: 300, padding: 24 }}>

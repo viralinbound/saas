@@ -155,7 +155,7 @@ export function BookDemoModal({ onClose }: { onClose: () => void }) {
         {/* left panel */}
         <div style={{ background: "#14161A", color: "#FAF9F6", padding: 34 }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9FBBE0" }}>20 minutes, no deck</div>
-          <div style={{ fontFamily: SERIF, fontSize: 34, lineHeight: 1.05, letterSpacing: "-0.02em", marginTop: 14 }}>we open a real store on the call.</div>
+          <div style={{ fontSize: 34, fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", marginTop: 14 }}>we open a real store on the call.</div>
           <div style={{ marginTop: 26, borderTop: "1px solid rgba(250,249,246,0.2)" }}>
             {[
               "we open your storefront on a real domain while you watch",
@@ -198,7 +198,7 @@ export function BookDemoModal({ onClose }: { onClose: () => void }) {
 
               <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
                 {SLOTS.map((t, k) => (
-                  <button key={t} onClick={() => setSlotIx(k)} style={{ ...sel(k === slotIx), borderRadius: 999, padding: "9px 15px", fontFamily: MONO, fontSize: 12 }}>
+                  <button key={t} onClick={() => setSlotIx(k)} style={{ ...sel(k === slotIx), padding: "9px 15px", fontFamily: MONO, fontSize: 12 }}>
                     {t}
                   </button>
                 ))}
@@ -213,7 +213,7 @@ export function BookDemoModal({ onClose }: { onClose: () => void }) {
                   <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>what do you sell</div>
                   <div style={{ display: "flex", gap: 7, marginTop: 8, flexWrap: "wrap" }}>
                     {INDUSTRIES.map((n, k) => (
-                      <button key={n} onClick={() => setIndIx(k)} style={{ ...sel(k === indIx), borderRadius: 999, padding: "8px 13px", fontSize: 13, fontWeight: 600 }}>
+                      <button key={n} onClick={() => setIndIx(k)} style={{ ...sel(k === indIx), padding: "8px 13px", fontSize: 13, fontWeight: 600 }}>
                         {n}
                       </button>
                     ))}
@@ -226,7 +226,7 @@ export function BookDemoModal({ onClose }: { onClose: () => void }) {
               <button
                 onClick={submit}
                 disabled={!ready || busy}
-                style={{ marginTop: 24, width: "100%", border: 0, background: ready ? "#24457A" : "#E4E1DA", color: ready ? "#fff" : "#14161A", padding: 15, fontSize: 15, fontWeight: 700, cursor: ready ? "pointer" : "not-allowed" }}
+                style={{ marginTop: 24, width: "100%", border: "1px solid #E4E1DA", background: ready ? "#24457A" : "#E4E1DA", color: ready ? "#fff" : "#14161A", padding: 15, fontSize: 15, fontWeight: 700, cursor: ready ? "pointer" : "not-allowed" }}
               >
                 {busy ? "booking…" : ready ? `confirm ${days[dayIx].label}, ${SLOTS[slotIx]} →` : "add your name and number"}
               </button>

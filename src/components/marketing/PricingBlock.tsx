@@ -1,188 +1,238 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-/* Shared pricing block — the exact design used in the homepage "05 / pricing"
-   section, reused on the /pricing page and (optionally) the console. */
+import { useRef, useState } from "react";
+import { PLANS } from "@/lib/constants";
+import { FeatureMatrix } from "@/components/pricing/FeatureMatrix";
+import {
+  PLAN_CARD_BULLETS,
+  PLAN_CTA,
+  PLAN_WHO,
+  PRICING_HEADLINE,
+  type PaidKey,
+} from "@/lib/pricingMatrix";
 
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
-const SERIF = "'Instrument Serif', Georgia, serif";
+const MIN = 25000;
+const MAX = 500000;
+const SPAN = MAX - MIN;
+const STEP = 25000;
+const PRO_YEAR = PLANS.pro.price;
+const FEE_PCT = PLANS.pro.feePercent;
 
-const inr = (n: number) => {
-  const v = Math.round(n);
-  if (v >= 100000) return "₹" + (v / 100000).toFixed(v % 100000 === 0 ? 0 : 2).replace(/\.00$/, "") + "L";
-  return "₹" + v.toLocaleString("en-IN");
-};
-const full = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN");
+const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN");
 
-const TIERS = [
-  { name: "essential", price: "₹15,000/yr", who: "for small catalogs & first online stores", cta: "start essential →", badge: false,
-    bg: "#FFFFFF", fg: "#14161A", border: "#E4E1DA", rule: "#E4E1DA", tick: "#2F6B4F", priceFg: "#2F6B4F", ctaBg: "#F1EFE9", ctaFg: "#14161A", badgeBg: "#EEF2F8", badgeFg: "#14161A",
-    bullets: ["connect your own domain, free", "up to 100 products", "advance to start ₹5,000", "2% sales fee (ex GST)"] },
-  { name: "pro showroom", price: "₹25,000/yr", who: "for growing brands ready to scale", cta: "start pro →", badge: true,
-    bg: "#24457A", fg: "#FFFFFF", border: "#24457A", rule: "rgba(255,255,255,0.24)", tick: "#9FBBE0", priceFg: "#FFFFFF", ctaBg: "#FFFFFF", ctaFg: "#24457A", badgeBg: "#9FBBE0", badgeFg: "#14161A",
-    bullets: ["unlimited products & video", "whatsapp CRM & shopping feed", "advance to start ₹8,000", "2% sales fee (ex GST)"] },
-  { name: "elite", price: "₹35,000/yr", who: "for established high volume sellers", cta: "start elite →", badge: false,
-    bg: "#FFFFFF", fg: "#14161A", border: "#E4E1DA", rule: "#E4E1DA", tick: "#2F6B4F", priceFg: "#2F6B4F", ctaBg: "#F1EFE9", ctaFg: "#14161A", badgeBg: "#EEF2F8", badgeFg: "#14161A",
-    bullets: ["remove supershowroom branding", "full sitewide SEO & reviews", "advance to start ₹12,000", "2% sales fee (ex GST)"] },
-  { name: "plus", price: "₹50,000+/yr", who: "fully custom build & dedicated manager", cta: "start plus →", badge: false,
-    bg: "#F1EFE9", fg: "#14161A", border: "#E4E1DA", rule: "#E4E1DA", tick: "#2F6B4F", priceFg: "#2F6B4F", ctaBg: "#14161A", ctaFg: "#FFFFFF", badgeBg: "#EEF2F8", badgeFg: "#14161A",
-    bullets: ["fully custom theme", "reduced 1% sales fee", "advance to start ₹20,000", "admin + 15 logins"] },
-];
-
-const PLAN_NAMES = ["essential", "pro showroom", "elite", "plus"];
-
-const MATRIX_GROUPS: [string, [string, string[]][]][] = [
-  ["your catalog", [
-    ["products", ["100", "unlimited", "unlimited", "unlimited"]],
-    ["images per product", ["5", "10 + video", "unlimited", "unlimited"]],
-    ["variants", ["size, colour", "size, colour, weight", "all + bundles", "custom"]],
-    ["collections & filters", ["basic", "advanced", "advanced", "custom"]],
-    ["reviews", ["—", "text", "text + photo", "text + photo"]],
-  ]],
-  ["running the store", [
-    ["order management", ["✓", "✓", "✓", "✓"]],
-    ["low-stock alerts", ["—", "✓", "✓", "✓"]],
-    ["cancellations & reports", ["basic", "full", "full + exports", "full + exports"]],
-    ["team logins", ["1", "3", "8", "admin + 15"]],
-  ]],
-  ["getting customers", [
-    ["SEO setup", ["pages", "pages + schema", "full sitewide", "full sitewide"]],
-    ["ads, shopping & social kit", ["—", "shopping feed", "feed + social kit", "feed + social kit"]],
-    ["whatsapp CRM", ["—", "✓", "✓", "✓"]],
-    ["coupons", ["3", "unlimited", "unlimited", "unlimited"]],
-    ["whatsapp credits / mo", ["—", "500", "2,000", "5,000"]],
-  ]],
-  ["support & onboarding", [
-    ["whatsapp chat", ["✓", "✓", "✓", "priority"]],
-    ["scheduled callback", ["—", "monthly", "fortnightly", "weekly"]],
-    ["sales fee", ["2%", "2%", "2%", "1%"]],
-  ]],
+const TIERS: {
+  key: PaidKey;
+  bg: string;
+  fg: string;
+  nameFg?: string;
+  hover: boolean;
+  featured?: boolean;
+  plus?: boolean;
+}[] = [
+  { key: "essential", bg: "#F1EFE9", fg: "#14161A", hover: true },
+  { key: "pro", bg: "#24457A", fg: "#FFFFFF", nameFg: "#C3D4EA", featured: true, hover: false },
+  { key: "elite", bg: "#F1EFE9", fg: "#14161A", hover: true },
+  { key: "plus", bg: "#2F6B4F", fg: "#FAF9F6", nameFg: "#FFFFFF", plus: true, hover: true },
 ];
 
 export function PricingBlock({
   ctaHref = "/signup",
+  plusHref = "mailto:kevin@viralinbound.com",
   showHeader = true,
   showRoi = true,
   showTiers = true,
   showMatrix = true,
+  kicker,
+  currentPlan,
 }: {
   ctaHref?: string;
+  plusHref?: string;
   showHeader?: boolean;
   showRoi?: boolean;
   showTiers?: boolean;
   showMatrix?: boolean;
+  kicker?: string;
+  currentPlan?: string;
 }) {
   const [sales, setSales] = useState(100000);
-  const fee = sales * 0.02;
-  const year = 25000 + fee * 12;
-  const calcRows = [
-    { label: "platform fee (2%)", value: full(fee) + "/mo", fg: "#FAF9F6" },
-    { label: "total year one", value: inr(year), fg: "#9FBBE0" },
-    { label: "effective per month", value: full(year / 12), fg: "#FAF9F6" },
-    { label: "take rate of revenue", value: ((year / (Math.max(sales, 1) * 12)) * 100).toFixed(2) + "%", fg: "#9FBBE0" },
-  ];
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  const matrixRows = useMemo(() => {
-    const rows: { group?: string; label?: string; cells?: string[] }[] = [];
-    MATRIX_GROUPS.forEach(([title, items]) => {
-      rows.push({ group: title });
-      items.forEach(([label, vals]) => rows.push({ label, cells: vals }));
-    });
-    return rows;
-  }, []);
+  const pct = ((sales - MIN) / SPAN) * 100;
+  const fee = sales * (FEE_PCT / 100);
+  const total = PRO_YEAR + fee * 12;
+
+  function setFromEvent(e: React.PointerEvent | PointerEvent) {
+    const el = trackRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    const raw = MIN + p * SPAN;
+    setSales(Math.round(raw / STEP) * STEP);
+  }
+
+  function onTrack(e: React.PointerEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setFromEvent(e);
+    const move = (ev: PointerEvent) => setFromEvent(ev);
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
 
   return (
     <div style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", color: "#14161A" }}>
+      <style>{`
+        .ssr-plan-hover { transition: transform .18s ease, box-shadow .18s ease; }
+        .ssr-plan-hover:hover { transform: translate(-4px,-4px); box-shadow: 0 12px 28px rgba(20,22,26,0.10); }
+        .ssr-plan-cta { transition: background .15s ease, color .15s ease; }
+        .ssr-plan-cta.cream:hover { background: #14161A; color: #EEF2F8; }
+        .ssr-plan-cta.pro:hover { background: #14161A; color: #FFFFFF; }
+        .ssr-plan-cta.plus:hover { background: #FAF9F6; color: #14161A; }
+      `}</style>
+
       {showHeader && (
         <>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>05 / pricing</div>
-          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(40px, 5.2vw, 80px)", lineHeight: 0.94, letterSpacing: "-0.02em", marginTop: 14, fontWeight: 400 }}>pay once a year. then only when it sells.</h2>
-          <p style={{ fontSize: 17, lineHeight: 1.6, maxWidth: 640, marginTop: 22 }}>no per-app charges, no markup on top of your payment gateway, no surprise at renewal. move up a plan any time and we migrate you without rebuilding the site.</p>
+          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A", marginBottom: 16 }}>
+            {kicker || PRICING_HEADLINE.eyebrow}
+          </div>
+          <h2 style={{ fontSize: "clamp(40px, 5vw, 80px)", lineHeight: 0.88, fontWeight: 700, letterSpacing: "-0.03em", margin: 0 }}>
+            {PRICING_HEADLINE.title} <span style={{ fontWeight: 600, color: "#24457A" }}>{PRICING_HEADLINE.titleAccent}</span>
+          </h2>
+          <p style={{ fontSize: 17, lineHeight: 1.55, maxWidth: 620, marginTop: 20 }}>{PRICING_HEADLINE.sub}</p>
         </>
       )}
 
-      {/* ROI calculator */}
       {showRoi && (
-      <div className="ssr-roi" style={{ border: "1px solid #E4E1DA", borderRadius: 34, background: "#14161A", color: "#FAF9F6", padding: 34, marginTop: showHeader ? 42 : 0 }}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-          <div>
-            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9FBBE0" }}>estimated monthly store sales</div>
-            <div style={{ fontFamily: MONO, fontSize: "clamp(40px, 5vw, 66px)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, marginTop: 10 }}>{full(sales)} / mo</div>
-          </div>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "#9FBBE0" }}>drag to see the maths</div>
-        </div>
-        <input type="range" min={25000} max={500000} step={5000} value={sales} onChange={(e) => setSales(Number(e.target.value))} style={{ width: "100%", marginTop: 26, accentColor: "#9FBBE0" }} />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 190px), 1fr))", borderTop: "1px solid rgba(250,249,246,0.24)", marginTop: 26 }}>
-          {calcRows.map((r) => (
-            <div key={r.label} style={{ padding: "22px 22px 22px 0", borderRight: "1px solid rgba(250,249,246,0.16)" }}>
-              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "#9FBBE0" }}>{r.label}</div>
-              <div style={{ fontFamily: MONO, fontSize: 27, fontWeight: 700, letterSpacing: "-0.02em", marginTop: 9, color: r.fg }}>{r.value}</div>
+        <div style={{ marginTop: showHeader ? 44 : 0, border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", boxShadow: "0 12px 28px rgba(20,22,26,0.10)", padding: 34 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9FBBE0" }}>your real cost · pro plan</div>
+              <h3 style={{ fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 6, marginBottom: 0 }}>
+                what {FEE_PCT}% works out to at your volume
+              </h3>
             </div>
-          ))}
+            <div style={{ fontFamily: MONO, fontSize: 12, opacity: 0.7 }}>drag ⟶</div>
+          </div>
+
+          <div style={{ marginTop: 30 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.75 }}>estimated monthly store sales</div>
+              <div style={{ fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 700, letterSpacing: "-0.025em", color: "#9FBBE0", fontFamily: MONO }}>{inr(sales)}</div>
+            </div>
+            <div
+              ref={trackRef}
+              onPointerDown={onTrack}
+              role="slider"
+              aria-valuemin={MIN}
+              aria-valuemax={MAX}
+              aria-valuenow={sales}
+              aria-label="estimated monthly store sales"
+              style={{ position: "relative", height: 46, marginTop: 14, display: "flex", alignItems: "center", touchAction: "none", cursor: "ew-resize" }}
+            >
+              <div style={{ position: "absolute", left: 0, right: 0, height: 8, background: "rgba(250,249,246,0.2)", border: "1px solid rgba(250,249,246,0.35)" }} />
+              <div style={{ position: "absolute", left: 0, height: 8, background: "#24457A", width: `${pct}%` }} />
+              <div style={{ position: "absolute", left: `${pct}%`, width: 30, height: 30, marginLeft: -15, background: "#EEF2F8", border: "2px solid #FAF9F6", transform: "rotate(45deg)" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 10, opacity: 0.6, letterSpacing: "0.1em" }}>
+              <span>₹25,000</span>
+              <span>₹5,00,000 / mo</span>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 210px), 1fr))", gap: 16, marginTop: 30 }}>
+            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>monthly sales</div>
+              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO }}>{inr(sales)}</div>
+            </div>
+            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>{FEE_PCT}% platform fee</div>
+              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO, color: "#9FBBE0" }}>{inr(fee)} / mo</div>
+            </div>
+            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20, background: "rgba(159,187,224,0.14)" }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>total year one</div>
+              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO, color: "#9FBBE0" }}>{inr(total)}</div>
+              <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, opacity: 0.7 }}>
+                (₹{Math.round(PRO_YEAR / 1000)}k plan + {inr(fee * 12)} sales fee)
+              </div>
+            </div>
+            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>effective per month</div>
+              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO }}>{inr(total / 12)}</div>
+              <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, opacity: 0.7 }}>{((total / (sales * 12)) * 100).toFixed(1)}% of revenue</div>
+            </div>
+          </div>
         </div>
-      </div>
       )}
 
-      {/* tier cards */}
       {showTiers && (
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 18, marginTop: showRoi ? 34 : 0 }}>
-        {TIERS.map((t) => (
-          <div key={t.name} style={{ border: `1px solid ${t.border}`, borderRadius: 34, background: t.bg, color: t.fg, padding: "30px 26px", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, minHeight: 24 }}>
-              <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>{t.name}</span>
-              {t.badge && <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", background: t.badgeBg, color: t.badgeFg, borderRadius: 999, padding: "4px 10px" }}>most picked</span>}
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 16, color: t.priceFg }}>{t.price}</div>
-            <div style={{ fontSize: 14, lineHeight: 1.5, marginTop: 10, opacity: 0.78 }}>{t.who}</div>
-            <div style={{ borderTop: `1px solid ${t.rule}`, marginTop: 20 }}>
-              {t.bullets.map((b) => (
-                <div key={b} style={{ display: "grid", gridTemplateColumns: "18px 1fr", gap: 9, alignItems: "baseline", padding: "10px 0", borderBottom: `1px solid ${t.rule}` }}>
-                  <span style={{ color: t.tick, fontSize: 12 }}>✓</span>
-                  <span style={{ fontSize: 14, lineHeight: 1.4 }}>{b}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 258px), 1fr))", gap: 18, marginTop: 40 }}>
+          {TIERS.map((t) => {
+            const p = PLANS[t.key];
+            const href = t.plus ? plusHref : `${ctaHref}${ctaHref.includes("?") ? "&" : "?"}plan=${t.key}`;
+            const priceLabel = t.plus ? `${p.price.toLocaleString("en-IN")}+` : p.price.toLocaleString("en-IN");
+            return (
+              <div
+                key={t.key}
+                className={t.hover ? "ssr-plan-hover" : undefined}
+                style={{
+                  border: `1px solid ${t.featured ? "#24457A" : "#E4E1DA"}`,
+                  background: t.bg,
+                  color: t.fg,
+                  padding: 26,
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  boxShadow: t.featured ? "0 16px 36px rgba(36,69,122,0.22)" : undefined,
+                }}
+              >
+                {t.featured && (
+                  <div style={{ position: "absolute", top: -13, right: 18, background: "#FFFFFF", color: "#24457A", border: "1px solid #24457A", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", padding: "4px 9px" }}>
+                    most picked
+                  </div>
+                )}
+                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: t.nameFg }}>{p.name.toLowerCase()}</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 14 }}>
+                  <span style={{ fontSize: 22, fontWeight: 800 }}>₹</span>
+                  <span style={{ fontSize: 46, fontWeight: 700, letterSpacing: "-0.03em" }}>{priceLabel}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 13, opacity: t.featured || t.plus ? 1 : 0.7 }}>/yr</span>
                 </div>
-              ))}
-            </div>
-            <a href={ctaHref} style={{ marginTop: "auto", marginBlockStart: 24, textAlign: "center", background: t.ctaBg, color: t.ctaFg, border: `1px solid ${t.ctaBg}`, borderRadius: 34, fontSize: 15, fontWeight: 700, padding: 14, textDecoration: "none" }}>{t.cta}</a>
-          </div>
-        ))}
-      </div>
+                <p style={{ fontSize: 14, lineHeight: 1.5, marginTop: 10, opacity: t.featured || t.plus ? 1 : 0.82 }}>{PLAN_WHO[t.key]}</p>
+                <ul style={{ display: "grid", gap: 8, fontSize: 14, marginTop: 18, flex: 1, listStyle: "none", padding: 0 }}>
+                  {PLAN_CARD_BULLETS[t.key].map((b) => (
+                    <li key={b}>✓ {b}</li>
+                  ))}
+                </ul>
+                <a
+                  href={href}
+                  className={`ssr-plan-cta ${t.featured ? "pro" : t.plus ? "plus" : "cream"}`}
+                  style={{
+                    marginTop: 20,
+                    textAlign: "center",
+                    border: `1px solid ${t.featured ? "#FFFFFF" : "#E4E1DA"}`,
+                    background: t.featured ? "#FFFFFF" : t.plus ? "#EEF2F8" : "#FAF9F6",
+                    color: t.featured ? "#24457A" : "#14161A",
+                    fontSize: 15,
+                    fontWeight: t.featured ? 700 : 800,
+                    padding: 13,
+                    textDecoration: "none",
+                  }}
+                >
+                  {PLAN_CTA[t.key]}
+                </a>
+              </div>
+            );
+          })}
+        </div>
       )}
 
-      {/* matrix */}
       {showMatrix && (
-      <div style={{ marginTop: showRoi || showTiers ? 56 : 0 }}>
-        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "#24457A" }}>line by line, all four plans</div>
-        <div style={{ border: "1px solid #E4E1DA", borderRadius: 26, background: "#fff", overflow: "auto", marginTop: 16 }}>
-          <table style={{ width: "100%", minWidth: 720, fontSize: 14, borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left", padding: "18px 20px", borderBottom: "1px solid #E4E1DA", fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, opacity: 0.6 }}>feature</th>
-                {PLAN_NAMES.map((p) => (
-                  <th key={p} style={{ textAlign: "left", padding: "18px 20px", borderBottom: "1px solid #E4E1DA", fontSize: 15, fontWeight: 700, letterSpacing: "-0.02em" }}>{p}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {matrixRows.map((row, i) =>
-                row.group ? (
-                  <tr key={`g${i}`}>
-                    <td colSpan={5} style={{ padding: "16px 20px", borderBottom: "1px solid #E4E1DA", background: "#F1EFE9", fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A", fontWeight: 500 }}>{row.group}</td>
-                  </tr>
-                ) : (
-                  <tr key={`r${i}`}>
-                    <td style={{ padding: "14px 20px", borderBottom: "1px solid #E4E1DA", fontSize: 14, fontWeight: 600, color: "#14161A" }}>{row.label}</td>
-                    {row.cells!.map((c, ci) => (
-                      <td key={ci} style={{ padding: "14px 20px", borderBottom: "1px solid #E4E1DA", fontFamily: MONO, fontSize: 12, color: c === "—" ? "rgba(20,22,26,0.4)" : c === "✓" ? "#2F6B4F" : "#14161A" }}>{c}</td>
-                    ))}
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+        <div style={{ marginTop: 56 }}>
+          <FeatureMatrix currentPlan={currentPlan} />
         </div>
-        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.8, letterSpacing: "0.06em", marginTop: 16, opacity: 0.62 }}>prices exclude 18% GST. plans step up 10% each year on renewal — written down from day one. the 2% fee on sales never changes.</div>
-      </div>
       )}
     </div>
   );

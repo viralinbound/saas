@@ -90,6 +90,7 @@ html.js-reveal .reveal-blur.in { opacity: 1; transform: none; filter: none; }
 .ssr-nav-link:hover { color: #24457A; }
 .ssr-pill { background: #24457A; color: #fff; font-weight: 700; padding: 12px 22px; border-radius: 34px; text-decoration: none; transition: background .2s ease, transform .2s ease; }
 .ssr-pill:hover { background: #14161A; color: #fff; transform: translateY(-1px); }
+.ssr-demo-nav:hover { background: #14161A; color: #FFFFFF; transform: translate(-2px, -2px); }
 .ssr-foot-link { color: #FAF9F6; text-decoration: none; }
 .ssr-foot-link:hover { color: #9FBBE0; }
 @media (max-width: 900px) {
