@@ -223,6 +223,14 @@ aside a, aside a:hover { text-decoration: none; }
   align-content: start;
 }
 .ssr-editor-note { display: none; }
+
+/* desktop: rail and preview scroll independently (the side panel can be long;
+   the live preview stays put while you scroll the options) */
+@media (min-width: 1025px) {
+  .ssr-editor-shell { height: calc(100vh - 74px); min-height: 0; overflow: hidden; }
+  .ssr-editor-rail { height: 100%; overflow-y: auto; scrollbar-width: thin; }
+  .ssr-editor-canvas { height: 100%; overflow-y: auto; scrollbar-width: thin; }
+}
 @media (max-width: 1024px) {
   .ssr-editor-shell { grid-template-columns: 1fr !important; }
   .ssr-editor-rail { border-right: 0; border-bottom: 1px solid #E4E1DA; }

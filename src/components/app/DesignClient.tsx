@@ -249,6 +249,21 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     } else setMsg(r.error || "Save failed.");
   }
 
+  // Live preview: when an edit stops for ~700ms, quietly save the draft and
+  // refresh the preview iframe so changes show without pressing Save.
+  useEffect(() => {
+    if (!loaded || !dirty) return;
+    const t = setTimeout(async () => {
+      const r = await persist(config, tokens, templateKey);
+      if (r.ok) {
+        setDirty(false);
+        setPreviewNonce((n) => n + 1);
+      }
+    }, 700);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config, tokens, templateKey, dirty, loaded]);
+
   async function publish() {
     setPublishing(true);
     setMsg("");
