@@ -48,6 +48,17 @@ export function LayoutStorefront({
   const [variant, setVariant] = useState<string>(L.products[0].variants[0]);
   const [method, setMethod] = useState<string>(L.cart.methods[0].name);
   const [placed, setPlaced] = useState<string | null>(null);
+  const [cat, setCat] = useState("");
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [galleryPick, setGalleryPick] = useState("");
+  const [pinOK, setPinOK] = useState(false);
+
+  const jumpTo = (id: string) => {
+    if (typeof document === "undefined") return;
+    setScreen("home");
+    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
 
   const v = useMemo(() => {
     const p0 = L.products[0];
@@ -117,7 +128,12 @@ export function LayoutStorefront({
     variant,
     method,
     placed,
-    openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setScreen("product"); scrollTop(); },
+    cat,
+    query,
+    galleryPick,
+    pinOK,
+    searchOpen,
+    openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setGalleryPick(p.img); setPinOK(false); setScreen("product"); scrollTop(); },
     addToCart,
     buyNow: (p) => { addToCart(p, qty, variant); setScreen("cart"); scrollTop(); },
     setQty,
@@ -125,9 +141,17 @@ export function LayoutStorefront({
     setLineQty: (i, n) => setCart((prev) => (n <= 0 ? prev.filter((_, x) => x !== i) : prev.map((c, x) => (x === i ? { ...c, qty: n } : c)))),
     removeLine: (i) => setCart((prev) => prev.filter((_, x) => x !== i)),
     setMethod,
+    setCat: (c) => { setCat(c); setQuery(""); },
+    setQuery: (q) => { setQuery(q); if (q) setCat(""); },
+    setGalleryPick,
+    checkPin: () => setPinOK(true),
+    toggleSearch: () => setSearchOpen((o) => !o),
     goCart: () => { setScreen("cart"); scrollTop(); },
-    goHome: () => { setPlaced(null); setScreen("home"); scrollTop(); },
+    goHome: () => { setPlaced(null); setCat(""); setQuery(""); setSearchOpen(false); setScreen("home"); scrollTop(); },
     placeOrder,
+    toGrid: () => jumpTo("ssr-grid"),
+    toLookbook: () => jumpTo("ssr-lookbook"),
+    whatsapp: () => { if (typeof window !== "undefined") window.open("https://wa.me/918431101466", "_blank", "noopener"); },
   };
 
   const pill = (activeState: boolean): React.CSSProperties => ({

@@ -33,6 +33,11 @@ export type ShopApi = {
   variant: string;
   method: string;
   placed: string | null;
+  cat: string;            // active category filter ("" = all)
+  query: string;          // search text
+  galleryPick: string;    // product-page main image
+  pinOK: boolean;
+  searchOpen: boolean;
   openProduct: (p: P) => void;
   addToCart: (p: P, qty?: number, variant?: string) => void;
   buyNow: (p: P) => void;
@@ -41,10 +46,27 @@ export type ShopApi = {
   setLineQty: (i: number, n: number) => void;
   removeLine: (i: number) => void;
   setMethod: (m: string) => void;
+  setCat: (c: string) => void;
+  setQuery: (q: string) => void;
+  setGalleryPick: (src: string) => void;
+  checkPin: () => void;
+  toggleSearch: () => void;
   goCart: () => void;
   goHome: () => void;
   placeOrder: () => void;
+  toGrid: () => void;
+  toLookbook: () => void;
+  whatsapp: () => void;
 };
+
+const norm = (s: string) => s.toLowerCase().replace(/s\b/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+/** loose match: does a product belong to a category label / search term? */
+function pMatch(p: P, term: string) {
+  const t = norm(term);
+  if (!t) return true;
+  const hay = norm(p.name + " " + p.badge + " " + p.variants.join(" "));
+  return t.split(" ").some((w) => w.length > 1 && hay.includes(w));
+}
 
 export function LayoutStorefrontView({
   L, screen, v, btnFg, onDark, idx, onSlide, shop,
@@ -84,19 +106,38 @@ export function LayoutStorefrontView({
   };
   const pointer: React.CSSProperties = shop ? { cursor: "pointer" } : {};
 
+  // category + search filtering for the product grid (shop mode only)
+  const activeCat = shop && shop.cat && norm(shop.cat) !== norm(L.chips[0]) ? shop.cat : "";
+  let visible = L.products;
+  if (shop) {
+    if (activeCat) { const f = L.products.filter((p) => pMatch(p, activeCat)); if (f.length) visible = f; }
+    if (shop.query.trim()) { const f = visible.filter((p) => pMatch(p, shop.query)); visible = f; }
+  }
+  const filterLabel = shop?.query.trim() ? `“${shop.query.trim()}”` : activeCat;
+  const galleryMain = shop?.galleryPick || pd.img;
+
   return (
             <div style={{ background: L.bg }}>
 <div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>
 <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "15px 24px", borderBottom: `1px solid ${L.line}`, flexWrap: "wrap" }}>
-  <span style={{ fontFamily: L.font, fontSize: 23, fontWeight: 700, letterSpacing: "-0.03em", color: L.fg }}>{L.store}</span>
+  <span onClick={shop?.goHome} style={{ fontFamily: L.font, fontSize: 23, fontWeight: 700, letterSpacing: "-0.03em", color: L.fg, ...pointer }}>{L.store}</span>
   <div style={{ display: "flex", gap: 15, marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
-    {L.cats.map((c, k) => <span key={c} style={{ color: k === 0 ? L.accent : L.fg }}>{c}</span>)}
+    {L.cats.map((c, k) => {
+      const on = shop ? norm(shop.cat || L.cats[0]) === norm(c) : k === 0;
+      return <span key={c} onClick={() => shop?.setCat(c)} style={{ color: on ? L.accent : L.fg, ...pointer }}>{c}</span>;
+    })}
   </div>
   <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 13, fontSize: 13, color: L.fg }}>
-    <span style={{ opacity: 0.6 }}>search</span>
-    <span style={{ opacity: 0.6 }}>account</span>
+    <span onClick={shop?.toggleSearch} style={{ opacity: 0.75, ...pointer }}>search</span>
+    <span onClick={shop?.goCart} style={{ opacity: 0.75, ...pointer }}>account</span>
     <span onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
   </div>
+  {shop?.searchOpen && (
+    <div style={{ flexBasis: "100%", display: "flex", gap: 8, marginTop: 4 }}>
+      <input autoFocus value={shop.query} onChange={(e) => shop.setQuery(e.target.value)} placeholder="search the catalog…" style={{ flex: 1, border: `1px solid ${L.line}`, background: L.card, color: L.fg, padding: "10px 12px", fontFamily: MONO, fontSize: 12 }} />
+      {shop.query && <button type="button" onClick={() => shop.setQuery("")} style={{ border: `1px solid ${L.line}`, background: "transparent", color: L.fg, padding: "0 12px", cursor: "pointer", fontFamily: MONO, fontSize: 11 }}>clear</button>}
+    </div>
+  )}
 </div>
 
 {screen === "home" && (
@@ -114,8 +155,8 @@ export function LayoutStorefrontView({
         <div style={{ fontFamily: L.font, fontSize: "clamp(30px, 3.4vw, 48px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#FFFFFF", lineHeight: 1, marginTop: 10, maxWidth: 720 }}>{slideData.headline}</div>
         <div style={{ fontSize: 15, color: "#FFFFFF", marginTop: 10, maxWidth: 520, lineHeight: 1.5 }}>{slideData.sub}</div>
         <div style={{ display: "flex", gap: 9, marginTop: 16, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ background: L.accent, color: btnFg, padding: "12px 22px", fontSize: 14, fontWeight: 700 }}>{slideData.cta}</span>
-          <span style={{ border: "1px solid #FFFFFF", color: "#FFFFFF", padding: "12px 18px", fontSize: 14, fontWeight: 700 }}>{L.cta2}</span>
+          <span onClick={shop?.toGrid} style={{ background: L.accent, color: btnFg, padding: "12px 22px", fontSize: 14, fontWeight: 700, ...pointer }}>{slideData.cta}</span>
+          <span onClick={shop?.toLookbook} style={{ border: "1px solid #FFFFFF", color: "#FFFFFF", padding: "12px 18px", fontSize: 14, fontWeight: 700, ...pointer }}>{L.cta2}</span>
           <div style={{ display: "flex", gap: 7, marginLeft: 12 }}>
             {v.slides.map((_, k) => (
               <div key={k} onClick={() => setSlide(k)} style={{ width: k === v.si ? 28 : 10, height: 8, background: k === v.si ? "#FFFFFF" : "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.7)", cursor: "pointer" }} />
@@ -126,18 +167,21 @@ export function LayoutStorefrontView({
     </div>
 
     <div style={{ display: "flex", gap: 8, padding: "18px 24px 4px", flexWrap: "wrap" }}>
-      {L.chips.map((c, k) => (
-        <span key={c} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${k === 0 ? L.accent : L.line}`, background: k === 0 ? L.accent : "transparent", color: k === 0 ? btnFg : L.fg, padding: "7px 12px" }}>{c}</span>
-      ))}
+      {L.chips.map((c, k) => {
+        const on = shop ? norm(shop.cat || L.chips[0]) === norm(c) : k === 0;
+        return (
+          <span key={c} onClick={() => shop?.setCat(c)} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "7px 12px", ...pointer }}>{c}</span>
+        );
+      })}
     </div>
 
     <div style={{ padding: "18px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>shop by category</span>
-      <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>all categories →</span>
+      <span onClick={() => { shop?.setCat(L.chips[0]); shop?.toGrid(); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>all categories →</span>
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 150px), 1fr))", gap: 12, padding: "10px 24px 18px" }}>
       {L.tiles.map((t) => (
-        <div key={t.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 118 }}>
+        <div key={t.name} onClick={() => { shop?.setCat(t.name); shop?.toGrid(); }} style={{ border: `1px solid ${shop && norm(shop.cat) === norm(t.name) ? L.accent : L.line}`, background: L.card, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 118, ...pointer }}>
           <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{t.count}</div>
           <div>
             <div style={{ fontFamily: L.font, fontSize: 21, fontWeight: 700, letterSpacing: "-0.02em", color: L.fg, lineHeight: 1.05 }}>{t.name}</div>
@@ -147,12 +191,21 @@ export function LayoutStorefrontView({
       ))}
     </div>
 
-    <div style={{ padding: "8px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
-      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>{L.gridTitle}</span>
-      <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>{L.gridMeta}</span>
+    <div id="ssr-grid" style={{ padding: "8px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap", scrollMarginTop: 60 }}>
+      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>
+        {filterLabel ? `${L.gridTitle} · ${filterLabel}` : L.gridTitle}
+      </span>
+      {filterLabel
+        ? <span onClick={() => { shop?.setCat(L.chips[0]); shop?.setQuery(""); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>clear filter ✕</span>
+        : <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>{L.gridMeta}</span>}
     </div>
+    {shop && visible.length === 0 ? (
+      <div style={{ padding: "24px", textAlign: "center", fontSize: 14, color: L.fg, opacity: 0.7 }}>
+        nothing matches {filterLabel}. <span onClick={() => { shop.setCat(L.chips[0]); shop.setQuery(""); }} style={{ color: L.accent, cursor: "pointer", fontWeight: 700 }}>show everything</span>
+      </div>
+    ) : (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 178px), 1fr))", gap: 13, padding: "12px 24px 20px" }}>
-      {L.products.map((p) => (
+      {visible.map((p) => (
         <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, ...pointer }}>
           <div style={{ position: "relative" }}>
             <div style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
@@ -179,8 +232,9 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
+    )}
 
-    <div style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}` }}>
+    <div id="ssr-lookbook" style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}`, scrollMarginTop: 60 }}>
       <div style={{ aspectRatio: "16 / 10", overflow: "hidden" }}>
         <img src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
@@ -188,7 +242,7 @@ export function LayoutStorefrontView({
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{L.banner.kicker}</div>
         <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.05 }}>{L.banner.headline}</div>
         <p style={{ fontSize: 14, lineHeight: 1.5, marginTop: 9, color: L.fg, opacity: 0.8 }}>{L.banner.sub}</p>
-        <div style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700 }}>{L.banner.cta}</div>
+        <div onClick={shop?.toGrid} style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700, ...pointer }}>{L.banner.cta}</div>
       </div>
     </div>
 
@@ -254,7 +308,7 @@ export function LayoutStorefrontView({
         <div style={{ fontSize: 15, fontWeight: 700, color: L.fg }}>order on whatsapp instead</div>
         <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.75 }}>send a photo of what you want — we reply with a payment link.</div>
       </div>
-      <div style={{ background: L.accent, color: btnFg, padding: "10px 16px", fontSize: 13, fontWeight: 700 }}>message us</div>
+      <div onClick={shop?.whatsapp} style={{ background: L.accent, color: btnFg, padding: "10px 16px", fontSize: 13, fontWeight: 700, ...pointer }}>message us</div>
     </div>
 
     <div style={{ background: L.footBg, color: L.footFg, padding: "26px 24px" }}>
@@ -264,14 +318,25 @@ export function LayoutStorefrontView({
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", opacity: 0.7, marginTop: 6 }}>{L.domain}</div>
         </div>
         {[
-          { title: "shop", links: L.cats },
-          { title: "help", links: ["track my order", "shipping & returns", "whatsapp us", "faqs"] },
-          { title: "about", links: ["our story", "privacy policy", "terms of use", "GST & invoicing"] },
+          { title: "shop", links: L.cats, kind: "cat" as const },
+          { title: "help", links: ["track my order", "shipping & returns", "whatsapp us", "faqs"], kind: "help" as const },
+          { title: "about", links: ["our story", "privacy policy", "terms of use", "GST & invoicing"], kind: "info" as const },
         ].map((col) => (
           <div key={col.title}>
             <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.65 }}>{col.title}</div>
             <div style={{ display: "grid", gap: 6, marginTop: 9 }}>
-              {col.links.map((l) => <span key={l} style={{ fontSize: 12, opacity: 0.85 }}>{l}</span>)}
+              {col.links.map((l) => (
+                <span
+                  key={l}
+                  onClick={() => {
+                    if (!shop) return;
+                    if (col.kind === "cat") { shop.setCat(l); shop.toGrid(); }
+                    else if (l === "track my order" || l === "whatsapp us") shop.goCart();
+                    else shop.whatsapp();
+                  }}
+                  style={{ fontSize: 12, opacity: 0.85, ...pointer }}
+                >{l}</span>
+              ))}
             </div>
           </div>
         ))}
@@ -288,12 +353,12 @@ export function LayoutStorefrontView({
       <div>
         <div style={{ border: `1px solid ${L.line}`, overflow: "hidden" }}>
           <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
-            <img src={pd.img} alt={pd.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={galleryMain} alt={pd.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
           {[pd.img, ...L.extra.slice(0, 3)].map((src, k) => (
-            <div key={k} style={{ aspectRatio: "1 / 1", border: `1px solid ${k === 0 ? L.accent : L.line}`, overflow: "hidden" }}>
+            <div key={k} onClick={() => shop?.setGalleryPick(src)} style={{ aspectRatio: "1 / 1", border: `1px solid ${galleryMain === src ? L.accent : L.line}`, overflow: "hidden", ...pointer }}>
               <img src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
           ))}
@@ -339,9 +404,9 @@ export function LayoutStorefrontView({
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>deliver to</span>
             <span style={{ border: `1px solid ${L.line}`, padding: "7px 10px", fontFamily: MONO, fontSize: 12, color: L.fg }}>560038</span>
-            <span style={{ color: L.accent, fontSize: 12, fontWeight: 700 }}>check</span>
+            <span onClick={shop?.checkPin} style={{ color: L.accent, fontSize: 12, fontWeight: 700, ...pointer }}>{shop?.pinOK ? "✓ serviceable" : "check"}</span>
           </div>
-          <div style={{ fontSize: 13, marginTop: 9, color: L.fg }}>{L.pdp.delivery}</div>
+          <div style={{ fontSize: 13, marginTop: 9, color: L.fg }}>{shop?.pinOK ? `${L.pdp.delivery} · to 560038` : L.pdp.delivery}</div>
           <div style={{ fontSize: 13, marginTop: 4, color: L.fg, opacity: 0.75 }}>{L.pdp.returns}</div>
         </div>
 
