@@ -6,8 +6,9 @@
  * mock) and /preview/template/[key] (full-bleed, the "live preview").
  */
 
-import { MONO, avatarFor, type Layout } from "@/lib/layoutPreviews";
+import { MONO, avatarFor, inr, numOf, type Layout } from "@/lib/layoutPreviews";
 
+type P = Layout["products"][number];
 type Slide = { kicker: string; img: string; headline: string; sub: string; cta: string };
 export type LayoutView = {
   si: number;
@@ -15,7 +16,7 @@ export type LayoutView = {
   gallery: { img: string; alt: string }[];
   galleryTitle: string;
   handle: string;
-  p0: Layout["products"][number];
+  p0: P;
   off: string;
   lines: { name: string; variant: string; qty: string; price: string; img: string }[];
   subtotal: string;
@@ -23,8 +24,30 @@ export type LayoutView = {
   total: string;
 };
 
+/** When present, the storefront is a working shoppable site (the /preview page). */
+export type ShopApi = {
+  cartCount: number;
+  cart: { p: P; qty: number; variant: string }[];
+  active: P;
+  qty: number;
+  variant: string;
+  method: string;
+  placed: string | null;
+  openProduct: (p: P) => void;
+  addToCart: (p: P, qty?: number, variant?: string) => void;
+  buyNow: (p: P) => void;
+  setQty: (n: number) => void;
+  setVariant: (v: string) => void;
+  setLineQty: (i: number, n: number) => void;
+  removeLine: (i: number) => void;
+  setMethod: (m: string) => void;
+  goCart: () => void;
+  goHome: () => void;
+  placeOrder: () => void;
+};
+
 export function LayoutStorefrontView({
-  L, screen, v, btnFg, onDark, idx, onSlide,
+  L, screen, v, btnFg, onDark, idx, onSlide, shop,
 }: {
   L: Layout;
   screen: "home" | "product" | "cart";
@@ -33,10 +56,34 @@ export function LayoutStorefrontView({
   onDark: boolean;
   idx: number;
   onSlide: (n: number) => void;
+  shop?: ShopApi;
 }) {
   const slideData = v.slides[v.si];
   const setSlide = onSlide;
   const i = idx;
+
+  // the product shown on the product screen (falls back to the mock's p0)
+  const pd: P = shop?.active ?? v.p0;
+  const off = L.pdp.badge.indexOf("off") >= 0
+    ? Math.round((1 - numOf(pd.price) / numOf(pd.mrp)) * 100) + "% off"
+    : "save " + inr(numOf(pd.mrp) - numOf(pd.price));
+
+  // cart rows + live totals (shop mode) or the static mock rows
+  const rows = shop
+    ? shop.cart.map((c) => ({ name: c.p.name, variant: c.variant + " · in stock", qty: String(c.qty), price: inr(numOf(c.p.price) * c.qty), img: c.p.img }))
+    : v.lines;
+  const itemCount = shop ? shop.cart.reduce((a, c) => a + c.qty, 0) : 3;
+  const subtotalN = shop ? shop.cart.reduce((a, c) => a + numOf(c.p.price) * c.qty, 0) : numOf(v.subtotal);
+  const discountN = shop ? Math.min(numOf(L.cart.discount), subtotalN) : numOf(L.cart.discount);
+  const gstN = Math.round((subtotalN - discountN) * 0.05);
+  const money = {
+    subtotal: shop ? inr(subtotalN) : v.subtotal,
+    discount: inr(discountN),
+    gst: shop ? inr(gstN) : v.gst,
+    total: shop ? inr(subtotalN - discountN + gstN) : v.total,
+  };
+  const pointer: React.CSSProperties = shop ? { cursor: "pointer" } : {};
+
   return (
             <div style={{ background: L.bg }}>
 <div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>
@@ -48,7 +95,7 @@ export function LayoutStorefrontView({
   <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 13, fontSize: 13, color: L.fg }}>
     <span style={{ opacity: 0.6 }}>search</span>
     <span style={{ opacity: 0.6 }}>account</span>
-    <span style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700 }}>cart · 3</span>
+    <span onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
   </div>
 </div>
 
@@ -106,7 +153,7 @@ export function LayoutStorefrontView({
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 178px), 1fr))", gap: 13, padding: "12px 24px 20px" }}>
       {L.products.map((p) => (
-        <div key={p.name} style={{ border: `1px solid ${L.line}`, background: L.card }}>
+        <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, ...pointer }}>
           <div style={{ position: "relative" }}>
             <div style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
               <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -126,7 +173,7 @@ export function LayoutStorefrontView({
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
               <span style={{ fontFamily: MONO, fontSize: 9, color: L.fg, opacity: 0.6 }}>★ {p.rating}</span>
-              <span style={{ border: `1px solid ${L.accent}`, color: L.accent, fontSize: 11, fontWeight: 700, padding: "6px 10px" }}>add to cart</span>
+              <button type="button" onClick={(e) => { e.stopPropagation(); shop?.addToCart(p); }} style={{ border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", fontSize: 11, fontWeight: 700, padding: "6px 10px", ...pointer }}>add to cart</button>
             </div>
           </div>
         </div>
@@ -241,11 +288,11 @@ export function LayoutStorefrontView({
       <div>
         <div style={{ border: `1px solid ${L.line}`, overflow: "hidden" }}>
           <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
-            <img src={v.p0.img} alt={v.p0.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={pd.img} alt={pd.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
-          {[v.p0.img, ...L.extra.slice(0, 3)].map((src, k) => (
+          {[pd.img, ...L.extra.slice(0, 3)].map((src, k) => (
             <div key={k} style={{ aspectRatio: "1 / 1", border: `1px solid ${k === 0 ? L.accent : L.line}`, overflow: "hidden" }}>
               <img src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
@@ -253,36 +300,39 @@ export function LayoutStorefrontView({
         </div>
       </div>
       <div>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.accent }}>{L.pdp.badge}</div>
-        <h3 style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.1 }}>{v.p0.name}</h3>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.accent }}>{pd.badge}</div>
+        <h3 style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.1 }}>{pd.name}</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 9, fontFamily: MONO, fontSize: 11, color: L.fg }}>
-          <span style={{ color: L.accent }}>★ {v.p0.rating}</span>
+          <span style={{ color: L.accent }}>★ {pd.rating}</span>
           <span style={{ opacity: 0.6 }}>{60 + i * 37} verified reviews</span>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 16 }}>
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: L.fg }}>{v.p0.price}</span>
-          <span style={{ fontFamily: MONO, fontSize: 15, opacity: 0.45, textDecoration: "line-through", color: L.fg }}>{v.p0.mrp}</span>
-          <span style={{ background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 10, padding: "4px 8px" }}>{v.off}</span>
+          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: L.fg }}>{pd.price}</span>
+          <span style={{ fontFamily: MONO, fontSize: 15, opacity: 0.45, textDecoration: "line-through", color: L.fg }}>{pd.mrp}</span>
+          <span style={{ background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 10, padding: "4px 8px" }}>{off}</span>
         </div>
         <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: L.fg, opacity: 0.6 }}>inclusive of GST · {L.pdp.stock}</div>
 
         <div style={{ marginTop: 20 }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>{L.pdp.variantLabel}</div>
           <div style={{ display: "flex", gap: 8, marginTop: 9, flexWrap: "wrap" }}>
-            {v.p0.variants.map((vv, k) => (
-              <span key={vv} style={{ border: `1px solid ${k === 0 ? L.accent : L.line}`, background: k === 0 ? L.accent : "transparent", color: k === 0 ? btnFg : L.fg, padding: "9px 14px", fontSize: 13, fontWeight: 700 }}>{vv}</span>
-            ))}
+            {pd.variants.map((vv, k) => {
+              const on = shop ? vv === shop.variant : k === 0;
+              return (
+                <button key={vv} type="button" onClick={() => shop?.setVariant(vv)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "9px 14px", fontSize: 13, fontWeight: 700, ...pointer }}>{vv}</button>
+              );
+            })}
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", border: `1px solid ${L.line}` }}>
-            <span style={{ padding: "12px 14px", color: L.fg, fontWeight: 700 }}>−</span>
-            <span style={{ padding: "12px 6px", fontFamily: MONO, color: L.fg }}>1</span>
-            <span style={{ padding: "12px 14px", color: L.fg, fontWeight: 700 }}>+</span>
+            <button type="button" onClick={() => shop?.setQty(Math.max(1, shop.qty - 1))} style={{ padding: "12px 14px", color: L.fg, fontWeight: 700, background: "transparent", border: 0, ...pointer }}>−</button>
+            <span style={{ padding: "12px 6px", fontFamily: MONO, color: L.fg }}>{shop ? shop.qty : 1}</span>
+            <button type="button" onClick={() => shop?.setQty(shop.qty + 1)} style={{ padding: "12px 14px", color: L.fg, fontWeight: 700, background: "transparent", border: 0, ...pointer }}>+</button>
           </div>
-          <div style={{ flex: 1, minWidth: 150, background: L.accent, color: btnFg, textAlign: "center", padding: 13, fontSize: 15, fontWeight: 700 }}>add to cart</div>
-          <div style={{ border: `1px solid ${L.fg}`, color: L.fg, padding: "13px 18px", fontSize: 15, fontWeight: 700 }}>buy now</div>
+          <button type="button" onClick={() => shop?.addToCart(pd, shop.qty, shop.variant)} style={{ flex: 1, minWidth: 150, background: L.accent, color: btnFg, textAlign: "center", padding: 13, fontSize: 15, fontWeight: 700, border: 0, ...pointer }}>add to cart</button>
+          <button type="button" onClick={() => shop?.buyNow(pd)} style={{ border: `1px solid ${L.fg}`, color: L.fg, background: "transparent", padding: "13px 18px", fontSize: 15, fontWeight: 700, ...pointer }}>buy now</button>
         </div>
 
         <div style={{ marginTop: 18, border: `1px solid ${L.line}`, background: L.card, padding: 14 }}>
@@ -323,7 +373,7 @@ export function LayoutStorefrontView({
     <div style={{ padding: "0 24px 8px", fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>goes well with</div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 170px), 1fr))", gap: 12, padding: "10px 24px 26px" }}>
       {L.products.slice(1, 4).map((p) => (
-        <div key={p.name} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10 }}>
+        <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10, ...pointer }}>
           <div style={{ width: 66, height: 66, border: `1px solid ${L.line}`, overflow: "hidden" }}>
             <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
@@ -337,24 +387,44 @@ export function LayoutStorefrontView({
   </div>
 )}
 
-{screen === "cart" && (
+{screen === "cart" && shop && shop.placed && (
+  <div style={{ padding: "60px 24px", textAlign: "center" }}>
+    <div style={{ width: 54, height: 54, borderRadius: "50%", background: L.accent, color: btnFg, display: "grid", placeItems: "center", fontSize: 26, margin: "0 auto" }}>✓</div>
+    <div style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, color: L.fg, marginTop: 16 }}>order placed</div>
+    <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.1em", color: L.fg, opacity: 0.7, marginTop: 8 }}>{shop.placed} · GST invoice emailed · updates on whatsapp</div>
+    <button type="button" onClick={shop.goHome} style={{ marginTop: 22, background: L.accent, color: btnFg, border: 0, padding: "12px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>continue shopping</button>
+  </div>
+)}
+
+{screen === "cart" && shop && !shop.placed && shop.cart.length === 0 && (
+  <div style={{ padding: "60px 24px", textAlign: "center" }}>
+    <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, color: L.fg }}>your cart is empty</div>
+    <div style={{ fontSize: 14, color: L.fg, opacity: 0.7, marginTop: 8 }}>add a few pieces from the storefront to see the checkout.</div>
+    <button type="button" onClick={shop.goHome} style={{ marginTop: 20, border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", padding: "11px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>browse the store</button>
+  </div>
+)}
+
+{screen === "cart" && !(shop && (shop.placed || shop.cart.length === 0)) && (
   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 24, padding: 24 }}>
     <div>
       <div style={{ fontFamily: L.font, fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>your cart</div>
-      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 5, color: L.fg, opacity: 0.6 }}>3 items · free shipping applied</div>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 5, color: L.fg, opacity: 0.6 }}>{itemCount} item{itemCount === 1 ? "" : "s"} · free shipping applied</div>
       <div style={{ display: "grid", gap: 12, marginTop: 18 }}>
-        {v.lines.map((l) => (
-          <div key={l.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 12, display: "grid", gridTemplateColumns: "76px 1fr auto", gap: 13, alignItems: "center" }}>
+        {rows.map((l, ri) => (
+          <div key={l.name + ri} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 12, display: "grid", gridTemplateColumns: "76px 1fr auto", gap: 13, alignItems: "center" }}>
             <div style={{ width: 76, height: 76, border: `1px solid ${L.line}`, overflow: "hidden" }}>
               <img src={l.img} alt={l.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: L.fg }}>{l.name}</div>
               <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 4, color: L.fg, opacity: 0.65 }}>{l.variant}</div>
-              <div style={{ display: "flex", alignItems: "center", border: `1px solid ${L.line}`, width: "max-content", marginTop: 8 }}>
-                <span style={{ padding: "5px 10px", color: L.fg, fontWeight: 700 }}>−</span>
-                <span style={{ padding: "5px 4px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{l.qty}</span>
-                <span style={{ padding: "5px 10px", color: L.fg, fontWeight: 700 }}>+</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", border: `1px solid ${L.line}`, width: "max-content" }}>
+                  <button type="button" onClick={() => shop?.setLineQty(ri, Number(l.qty) - 1)} style={{ padding: "5px 10px", color: L.fg, fontWeight: 700, background: "transparent", border: 0, ...pointer }}>−</button>
+                  <span style={{ padding: "5px 4px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{l.qty}</span>
+                  <button type="button" onClick={() => shop?.setLineQty(ri, Number(l.qty) + 1)} style={{ padding: "5px 10px", color: L.fg, fontWeight: 700, background: "transparent", border: 0, ...pointer }}>+</button>
+                </div>
+                {shop && <button type="button" onClick={() => shop.removeLine(ri)} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: L.fg, opacity: 0.55, background: "transparent", border: 0, cursor: "pointer" }}>remove</button>}
               </div>
             </div>
             <div style={{ fontFamily: MONO, fontSize: 15, fontWeight: 700, color: L.fg }}>{l.price}</div>
@@ -365,7 +435,7 @@ export function LayoutStorefrontView({
       <div style={{ marginTop: 16, border: `1px dashed ${L.line}`, padding: 14, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>coupon</span>
         <span style={{ border: `1px solid ${L.line}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{L.cart.coupon}</span>
-        <span style={{ color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {L.cart.discount} off</span>
+        <span style={{ color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {money.discount} off</span>
       </div>
 
       <div style={{ marginTop: 16, border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
@@ -380,27 +450,30 @@ export function LayoutStorefrontView({
       <div style={{ border: `1px solid ${L.line}`, background: L.card, padding: 20 }}>
         <div style={{ fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>order summary</div>
         <div style={{ display: "grid", gap: 9, marginTop: 15, fontFamily: MONO, fontSize: 13, color: L.fg }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>subtotal</span><span>{v.subtotal}</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>discount</span><span style={{ color: L.accent }}>− {L.cart.discount}</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>GST</span><span>{v.gst}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>subtotal</span><span>{money.subtotal}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>discount</span><span style={{ color: L.accent }}>− {money.discount}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>GST</span><span>{money.gst}</span></div>
           <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>shipping</span><span>free</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${L.line}`, paddingTop: 10, marginTop: 4, fontSize: 17, fontWeight: 700 }}><span>to pay</span><span>{v.total}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${L.line}`, paddingTop: 10, marginTop: 4, fontSize: 17, fontWeight: 700 }}><span>to pay</span><span>{money.total}</span></div>
         </div>
 
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 20, color: L.fg, opacity: 0.7 }}>payment method</div>
         <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
-          {L.cart.methods.map((m) => (
-            <div key={m.name} style={{ border: `1px solid ${m.on ? L.accent : L.line}`, background: m.on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{m.name}</div>
-                <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
+          {L.cart.methods.map((m) => {
+            const on = shop ? (shop.method || L.cart.methods[0].name) === m.name : m.on;
+            return (
+              <div key={m.name} onClick={() => shop?.setMethod(m.name)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, ...pointer }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{m.name}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
+                </div>
+                <span style={{ fontFamily: MONO, fontSize: 10, color: L.accent }}>{on ? "selected" : ""}</span>
               </div>
-              <span style={{ fontFamily: MONO, fontSize: 10, color: L.accent }}>{m.on ? "selected" : ""}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div style={{ background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18 }}>place order · {v.total}</div>
+        <button type="button" onClick={shop?.placeOrder} style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}>place order · {money.total}</button>
         <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
       </div>
     </div>

@@ -2,21 +2,28 @@
 
 /*
  * Full-page "live preview" of a redesigned store layout — opened from the
- * "live preview ↗" button on /templates. Shows the exact storefront design
- * from the showcase (promo bar, nav, hero carousel, category tiles, product
- * grid, signature features, gallery, reviews, checkout) full-bleed, with a
- * thin SuperShowroom bar on top to switch screen and start a setup.
+ * "live preview ↗" button on /templates. The redesigned storefront here is a
+ * WORKING shoppable site: tap a product to open it, add to cart, change qty,
+ * pick a payment method and place an order (kept in the browser via
+ * orderHistory, same as the storefront demo). A thin SuperShowroom bar on top
+ * switches screen and starts a real setup.
  *
  * `shoppable` (optional) is the real StorefrontClient element, built on the
- * server — a toggle flips to it so buyers can actually add to cart / order.
+ * server — the "shoppable demo" toggle flips to it (the actual backend path).
  */
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { LAYOUTS, MONO, inr, numOf, type Layout } from "@/lib/layoutPreviews";
-import { LayoutStorefrontView } from "@/components/marketing/LayoutStorefrontView";
+import { LayoutStorefrontView, type ShopApi } from "@/components/marketing/LayoutStorefrontView";
+import { saveOrder } from "@/lib/orderHistory";
 
 type Screen = "home" | "product" | "cart";
+type P = Layout["products"][number];
+type Line = { p: P; qty: number; variant: string };
+
+const scrollTop = () => { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
+const ref6 = () => "SSR-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
 export function LayoutStorefront({
   layoutKey,
@@ -33,6 +40,14 @@ export function LayoutStorefront({
   const [mode, setMode] = useState<"design" | "shop">("design");
   const [screen, setScreen] = useState<Screen>("home");
   const [slide, setSlide] = useState(0);
+
+  // shoppable state for the redesigned storefront
+  const [cart, setCart] = useState<Line[]>([]);
+  const [active, setActive] = useState<P>(L.products[0]);
+  const [qty, setQty] = useState(1);
+  const [variant, setVariant] = useState<string>(L.products[0].variants[0]);
+  const [method, setMethod] = useState<string>(L.cart.methods[0].name);
+  const [placed, setPlaced] = useState<string | null>(null);
 
   const v = useMemo(() => {
     const p0 = L.products[0];
@@ -60,17 +75,71 @@ export function LayoutStorefront({
     };
   }, [L, slide]);
 
-  const pill = (active: boolean): React.CSSProperties => ({
-    border: `1px solid ${active ? "#FAF9F6" : "rgba(250,249,246,0.35)"}`,
-    background: active ? "#FAF9F6" : "transparent",
-    color: active ? "#14161A" : "#FAF9F6",
+  const addToCart = (p: P, q = 1, vr = p.variants[0]) => {
+    setCart((prev) => {
+      const at = prev.findIndex((c) => c.p.name === p.name && c.variant === vr);
+      if (at >= 0) {
+        const next = [...prev];
+        next[at] = { ...next[at], qty: next[at].qty + q };
+        return next;
+      }
+      return [...prev, { p, qty: q, variant: vr }];
+    });
+  };
+
+  const placeOrder = () => {
+    if (!cart.length) return;
+    const subtotalN = cart.reduce((a, c) => a + numOf(c.p.price) * c.qty, 0);
+    const discountN = Math.min(numOf(L.cart.discount), subtotalN);
+    const gstN = Math.round((subtotalN - discountN) * 0.05);
+    const r = ref6();
+    saveOrder(`demo-${L.key}`, {
+      orderNumber: r,
+      placedAt: new Date().toISOString(),
+      storeName: L.store,
+      customerName: L.cart.name,
+      city: L.cart.address.split(",").slice(-1)[0]?.trim(),
+      paymentMethod: method || L.cart.methods[0].name,
+      total: subtotalN - discountN + gstN,
+      currency: "INR",
+      items: cart.map((c) => ({ name: c.p.name, quantity: c.qty, price: numOf(c.p.price), variant: c.variant })),
+      preview: true,
+    });
+    setPlaced(r);
+    setCart([]);
+  };
+
+  const shop: ShopApi = {
+    cartCount: cart.reduce((a, c) => a + c.qty, 0),
+    cart,
+    active,
+    qty,
+    variant,
+    method,
+    placed,
+    openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setScreen("product"); scrollTop(); },
+    addToCart,
+    buyNow: (p) => { addToCart(p, qty, variant); setScreen("cart"); scrollTop(); },
+    setQty,
+    setVariant,
+    setLineQty: (i, n) => setCart((prev) => (n <= 0 ? prev.filter((_, x) => x !== i) : prev.map((c, x) => (x === i ? { ...c, qty: n } : c)))),
+    removeLine: (i) => setCart((prev) => prev.filter((_, x) => x !== i)),
+    setMethod,
+    goCart: () => { setScreen("cart"); scrollTop(); },
+    goHome: () => { setPlaced(null); setScreen("home"); scrollTop(); },
+    placeOrder,
+  };
+
+  const pill = (activeState: boolean): React.CSSProperties => ({
+    border: `1px solid ${activeState ? "#FAF9F6" : "rgba(250,249,246,0.35)"}`,
+    background: activeState ? "#FAF9F6" : "transparent",
+    color: activeState ? "#14161A" : "#FAF9F6",
     padding: "6px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em",
     textTransform: "uppercase", fontWeight: 700, cursor: "pointer",
   });
 
   return (
     <div style={{ minHeight: "100vh", background: L.bg }}>
-      {/* thin control bar */}
       <div style={{ position: "sticky", top: 0, zIndex: 80, background: "#14161A", color: "#FAF9F6", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "10px 16px" }}>
         <Link href="/templates" style={{ color: "#9FBBE0", fontFamily: MONO, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>← all layouts</Link>
         <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.08em", opacity: 0.7 }}>{L.name} · live preview</span>
@@ -84,7 +153,9 @@ export function LayoutStorefront({
             </>
           )}
           {mode === "design" && (["home", "product", "cart"] as Screen[]).map((s) => (
-            <div key={s} onClick={() => setScreen(s)} style={pill(screen === s)}>{s === "cart" ? "checkout" : s}</div>
+            <div key={s} onClick={() => { setScreen(s); scrollTop(); }} style={pill(screen === s)}>
+              {s === "cart" ? `checkout${shop.cartCount ? ` (${shop.cartCount})` : ""}` : s}
+            </div>
           ))}
           <Link href={`/onboarding?theme=${L.key}`} style={{ background: "#24457A", color: "#FFFFFF", padding: "7px 14px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>use this layout →</Link>
         </div>
@@ -102,6 +173,7 @@ export function LayoutStorefront({
             onDark={onDark}
             idx={idx}
             onSlide={setSlide}
+            shop={shop}
           />
         </div>
       )}
