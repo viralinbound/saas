@@ -314,8 +314,21 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     setSaving(false);
     if (r.ok) {
       setDirty(false);
+      // Fill an empty catalogue with this template's products (never touches a
+      // catalogue that already has products — use "load sample products" for that).
+      let seeded = 0;
+      try {
+        const sc = await fetch("/api/design/seed-catalog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: t.key }),
+        }).then((x) => x.json());
+        seeded = sc.added ?? 0;
+      } catch {}
       setPreviewNonce((n) => n + 1);
-      setMsg(`"${starterTemplateName(t.key)}" applied & saved — customise every part below, then Publish.`);
+      setMsg(
+        `"${starterTemplateName(t.key)}" applied${seeded ? ` with ${seeded} sample products` : ""} — customise every part below, then Publish.`
+      );
     } else {
       setDirty(true);
       setMsg(
@@ -327,10 +340,23 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   }
 
   async function loadSampleProducts() {
+    const replace = confirm(
+      "Replace the whole catalogue with this template's sample products? Any products you added will be removed."
+    );
     setMsg("Loading sample products…");
-    const res = await fetch("/api/design/seed-catalog", { method: "POST" });
+    const res = await fetch("/api/design/seed-catalog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: templateKey, replace }),
+    });
     const d = await res.json().catch(() => ({}));
-    setMsg(res.ok ? `${d.added ?? 0} sample products added to your catalogue.` : d.error || "Could not load samples.");
+    setMsg(
+      res.ok
+        ? d.replaced
+          ? `Catalogue replaced with ${d.added} products from this template.`
+          : `${d.added ?? 0} sample products added to your catalogue.`
+        : d.error || "Could not load samples."
+    );
     if (res.ok) setPreviewNonce((n) => n + 1);
   }
 

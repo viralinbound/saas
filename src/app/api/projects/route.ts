@@ -196,3 +196,42 @@ export async function PATCH(req: Request) {
   if (error || !data) return NextResponse.json({ error: error?.message || "Not found" }, { status: 400 });
   return NextResponse.json({ ok: true, project: shape(data, c.org.slug) });
 }
+
+// delete a project (store) and everything under it
+export async function DELETE(req: Request) {
+  const c = await base();
+  if (!c) return NextResponse.json({ error: "No company" }, { status: 404 });
+
+  const id = new URL(req.url).searchParams.get("id") || "";
+  if (!/^[0-9a-f-]{36}$/.test(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+
+  // Scope to the caller's company. Never delete the company's last store.
+  const { data: rows } = await c.supabase
+    .from("stores")
+    .select("id")
+    .eq("organization_id", c.org.id);
+  const owned = new Set((rows || []).map((r) => r.id as string));
+  if (!owned.has(id)) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (owned.size <= 1) return NextResponse.json({ error: "You need at least one project." }, { status: 400 });
+
+  // Child rows without ON DELETE CASCADE — clear them first, then the store.
+  await c.supabase.from("orders").delete().eq("store_id", id);
+  await c.supabase.from("products").delete().eq("store_id", id);
+  await c.supabase.from("store_customizations").delete().eq("store_id", id);
+  const { error } = await c.supabase
+    .from("stores")
+    .delete()
+    .eq("id", id)
+    .eq("organization_id", c.org.id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  // If the deleted store was active, point the cookie at another one.
+  const jar = await cookies();
+  if (jar.get(ACTIVE_STORE_COOKIE)?.value === id) {
+    const next = [...owned].find((x) => x !== id);
+    if (next) jar.set(ACTIVE_STORE_COOKIE, next, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+    else jar.delete(ACTIVE_STORE_COOKIE);
+  }
+
+  return NextResponse.json({ ok: true, deleted: id });
+}

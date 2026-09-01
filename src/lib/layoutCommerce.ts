@@ -35,6 +35,9 @@ export type LayoutBlockId = (typeof LAYOUT_BLOCKS)[number]["id"];
 export type LayoutBlocks = Record<LayoutBlockId, boolean>;
 
 export type LayoutPatch = {
+  /** which of the six .dc layouts this config is built on — the source of
+   *  truth for the base layout (survives even if stores.theme drifts). */
+  _key?: string;
   store?: string;
   domain?: string;
   promo?: string;
@@ -91,6 +94,7 @@ export function starterLayout(key: string | null | undefined): Layout {
 
 export function seedLayoutPatch(L: Layout, storeName: string): LayoutPatch {
   return {
+    _key: L.key,
     store: storeName || L.store,
     domain: L.domain,
     promo: L.promo,
@@ -201,15 +205,21 @@ function overlayFromSections(config: StoreConfig, base: Layout): Partial<Layout>
   return out;
 }
 
+/** The .dc layout a config is really built on: its own `_key`, else the arg. */
+export function resolveTemplateKey(config: StoreConfig, templateKey?: string | null): string {
+  const k = (config.layout as LayoutPatch | undefined)?._key;
+  return isStarterTemplate(k) ? k : isStarterTemplate(templateKey) ? templateKey : "fashion";
+}
+
 export function mergeMerchantLayout(
   templateKey: string,
   storeName: string,
   config: StoreConfig,
   tokens?: ThemeTokens
 ): Layout {
-  const base = starterLayout(templateKey);
-  const fromSections = overlayFromSections(config, base);
   const p = (config.layout || {}) as LayoutPatch;
+  const base = starterLayout(resolveTemplateKey(config, templateKey));
+  const fromSections = overlayFromSections(config, base);
   const banner = { ...base.banner, ...fromSections.banner, ...p.banner };
   return {
     ...base,

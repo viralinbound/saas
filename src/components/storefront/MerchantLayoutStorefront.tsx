@@ -10,7 +10,7 @@
 import { useMemo } from "react";
 import type { Product } from "@/lib/types";
 import type { StoreConfig, ThemeTokens } from "@/lib/customization";
-import { starterLayout, mergeMerchantLayout, coerceBlocks, catalogToLayoutProducts } from "@/lib/layoutCommerce";
+import { starterLayout, mergeMerchantLayout, coerceBlocks, catalogToLayoutProducts, resolveTemplateKey } from "@/lib/layoutCommerce";
 import { ShoppableLayout } from "@/components/storefront/ShoppableLayout";
 
 export function MerchantLayoutStorefront({
@@ -31,8 +31,9 @@ export function MerchantLayoutStorefront({
   demo: boolean;
 }) {
   const layout = useMemo(() => {
-    const base = starterLayout(templateKey);
-    const merged = mergeMerchantLayout(templateKey, storeName, config, tokens);
+    const key = resolveTemplateKey(config, templateKey);
+    const base = starterLayout(key);
+    const merged = mergeMerchantLayout(key, storeName, config, tokens);
     return { ...merged, products: catalogToLayoutProducts(products, base.products) };
   }, [templateKey, storeName, config, tokens, products]);
 

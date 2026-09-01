@@ -130,6 +130,19 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
     load();
   }
 
+  async function remove(id: string, name: string) {
+    if (projects.length <= 1) { setMsg("You need at least one project — create another before deleting this one."); return; }
+    if (!confirm(`Delete "${name}"? Its storefront, products, orders and media are permanently removed. This cannot be undone.`)) return;
+    setBusyId(id);
+    setMsg("");
+    const res = await fetch(`/api/projects?id=${id}`, { method: "DELETE" });
+    const d = await res.json().catch(() => ({}));
+    setBusyId(null);
+    if (!res.ok) { setMsg(d.error || "Could not delete project."); return; }
+    setMsg(`"${name}" deleted.`);
+    load();
+  }
+
   if (loading) return <p style={{ opacity: 0.6, fontSize: 13 }}>Loading projects…</p>;
 
   return (
@@ -218,6 +231,15 @@ export function ProjectGrid({ compact = false }: { compact?: boolean }) {
                       unpublish
                     </button>
                   )}
+                  <button
+                    type="button"
+                    disabled={busyId === p.id || projects.length <= 1}
+                    onClick={() => remove(p.id, p.name)}
+                    title={projects.length <= 1 ? "Keep at least one project" : "Delete this project"}
+                    style={{ ...mini, marginLeft: "auto", color: "#B91C1C", borderColor: "#FCA5A5", background: "#FFFFFF", opacity: projects.length <= 1 ? 0.45 : 1 }}
+                  >
+                    {busyId === p.id ? "…" : "delete"}
+                  </button>
                 </div>
               </div>
             </div>

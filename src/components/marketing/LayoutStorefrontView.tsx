@@ -8,6 +8,7 @@
 
 import { MONO, avatarFor, inr, numOf, type Layout } from "@/lib/layoutPreviews";
 import { DEFAULT_LAYOUT_BLOCKS, type LayoutBlocks } from "@/lib/layoutCommerce";
+import { Img } from "@/components/storefront/Img";
 
 type P = Layout["products"][number];
 type Slide = { kicker: string; img: string; headline: string; sub: string; cta: string };
@@ -149,7 +150,7 @@ export function LayoutStorefrontView({
     {b.hero && (
     <div style={{ position: "relative" }}>
       <div style={{ aspectRatio: "24 / 9", minHeight: 320, maxHeight: 520, overflow: "hidden" }}>
-        <img src={slideData.img} alt={slideData.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <Img fallback={L.hero} src={slideData.img} alt={slideData.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.5) 34%, rgba(0,0,0,0.1) 66%, rgba(0,0,0,0) 88%)" }} />
       <div onClick={() => setSlide((v.si - 1 + v.slides.length) % v.slides.length)} style={arrow("left")}>‹</div>
@@ -220,7 +221,7 @@ export function LayoutStorefrontView({
         <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, ...pointer }}>
           <div style={{ position: "relative" }}>
             <div style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
-              <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Img fallback={L.hero} src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div style={{ position: "absolute", top: 8, left: 8, background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 7px" }}>{p.badge}</div>
           </div>
@@ -249,7 +250,7 @@ export function LayoutStorefrontView({
     {b.lookbook && (
     <div id="ssr-lookbook" style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}`, scrollMarginTop: 60 }}>
       <div style={{ aspectRatio: "16 / 10", overflow: "hidden" }}>
-        <img src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <Img fallback={L.hero} src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
       <div style={{ background: L.card, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{L.banner.kicker}</div>
@@ -282,7 +283,7 @@ export function LayoutStorefrontView({
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(33%, 118px), 1fr))", gap: 8, padding: "10px 24px 24px" }}>
       {v.gallery.map((g) => (
         <div key={g.img} style={{ aspectRatio: "1 / 1", border: `1px solid ${L.line}`, overflow: "hidden" }}>
-          <img src={g.img} alt={g.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <Img fallback={L.hero} src={g.img} alt={g.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
       ))}
     </div>
@@ -296,7 +297,7 @@ export function LayoutStorefrontView({
         <div key={r.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", border: `1px solid ${L.line}` }}>
-              <img src={avatarFor(r.name)} alt={r.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Img fallback={L.hero} src={avatarFor(r.name)} alt={r.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, color: L.fg }}>{r.name}</div>
@@ -371,13 +372,13 @@ export function LayoutStorefrontView({
       <div>
         <div style={{ border: `1px solid ${L.line}`, overflow: "hidden" }}>
           <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
-            <img src={galleryMain} alt={pd.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <Img fallback={L.hero} src={galleryMain} alt={pd.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
           {[pd.img, ...L.extra.slice(0, 3)].map((src, k) => (
             <div key={k} onClick={() => shop?.setGalleryPick(src)} style={{ aspectRatio: "1 / 1", border: `1px solid ${galleryMain === src ? L.accent : L.line}`, overflow: "hidden", ...pointer }}>
-              <img src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Img fallback={L.hero} src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
           ))}
         </div>
@@ -458,7 +459,7 @@ export function LayoutStorefrontView({
       {L.products.slice(1, 4).map((p) => (
         <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10, ...pointer }}>
           <div style={{ width: 66, height: 66, border: `1px solid ${L.line}`, overflow: "hidden" }}>
-            <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <Img fallback={L.hero} src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.25, color: L.fg }}>{p.name}</div>
@@ -496,7 +497,7 @@ export function LayoutStorefrontView({
         {rows.map((l, ri) => (
           <div key={l.name + ri} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 12, display: "grid", gridTemplateColumns: "76px 1fr auto", gap: 13, alignItems: "center" }}>
             <div style={{ width: 76, height: 76, border: `1px solid ${L.line}`, overflow: "hidden" }}>
-              <img src={l.img} alt={l.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Img fallback={L.hero} src={l.img} alt={l.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: L.fg }}>{l.name}</div>
