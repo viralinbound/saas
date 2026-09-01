@@ -3,9 +3,11 @@ import { getStorefront } from "@/lib/stores";
 import { StorefrontClient } from "@/components/storefront/StorefrontClient";
 import { V2Storefront } from "@/components/builder/V2Storefront";
 import { coerceSite, isV2 } from "@/lib/builder";
+import { isStarterLayoutConfig, isStarterTemplate, seedStarterConfig } from "@/lib/layoutCommerce";
+import { MerchantLayoutStorefront } from "@/components/storefront/MerchantLayoutStorefront";
 
 /**
- * Temporary hosted URL. Accepts both shapes:
+ * Hosted URL. Accepts both shapes:
  *   /h/<company>/<project>   (current)
  *   /h/<brand>               (legacy — brand slug / subdomain)
  * get_storefront() resolves by slug OR subdomain OR the "company/project" host_path.
@@ -21,6 +23,25 @@ export default async function HostedPage({
 
   const front = await getStorefront(key);
   if (!front) notFound();
+
+  // A store on one of the six .dc template keys renders the .dc layout —
+  // its saved edits if it has them, otherwise a fresh copy of the template.
+  const starterKey = front.store.theme || "fashion";
+  if (isStarterLayoutConfig(front.rawConfig) || isStarterTemplate(starterKey)) {
+    const useSaved = isStarterLayoutConfig(front.rawConfig);
+    const seeded = seedStarterConfig(starterKey, front.store.name);
+    return (
+      <MerchantLayoutStorefront
+        templateKey={starterKey}
+        storeName={front.store.name}
+        storeSlug={front.store.slug}
+        config={useSaved ? front.config : seeded.config}
+        tokens={useSaved ? front.tokens : seeded.tokens}
+        products={front.store.products}
+        demo={front.demo}
+      />
+    );
+  }
 
   if (isV2(front.rawConfig)) {
     return (
