@@ -1,0 +1,422 @@
+"use client";
+
+/*
+ * The redesigned storefront body for one layout — promo bar + nav + the
+ * home / product / cart screen. Shared by /templates (inside the browser
+ * mock) and /preview/template/[key] (full-bleed, the "live preview").
+ */
+
+import { MONO, avatarFor, type Layout } from "@/lib/layoutPreviews";
+
+type Slide = { kicker: string; img: string; headline: string; sub: string; cta: string };
+export type LayoutView = {
+  si: number;
+  slides: Slide[];
+  gallery: { img: string; alt: string }[];
+  galleryTitle: string;
+  handle: string;
+  p0: Layout["products"][number];
+  off: string;
+  lines: { name: string; variant: string; qty: string; price: string; img: string }[];
+  subtotal: string;
+  gst: string;
+  total: string;
+};
+
+export function LayoutStorefrontView({
+  L, screen, v, btnFg, onDark, idx, onSlide,
+}: {
+  L: Layout;
+  screen: "home" | "product" | "cart";
+  v: LayoutView;
+  btnFg: string;
+  onDark: boolean;
+  idx: number;
+  onSlide: (n: number) => void;
+}) {
+  const slideData = v.slides[v.si];
+  const setSlide = onSlide;
+  const i = idx;
+  return (
+            <div style={{ background: L.bg }}>
+<div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>
+<div style={{ display: "flex", alignItems: "center", gap: 20, padding: "15px 24px", borderBottom: `1px solid ${L.line}`, flexWrap: "wrap" }}>
+  <span style={{ fontFamily: L.font, fontSize: 23, fontWeight: 700, letterSpacing: "-0.03em", color: L.fg }}>{L.store}</span>
+  <div style={{ display: "flex", gap: 15, marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
+    {L.cats.map((c, k) => <span key={c} style={{ color: k === 0 ? L.accent : L.fg }}>{c}</span>)}
+  </div>
+  <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 13, fontSize: 13, color: L.fg }}>
+    <span style={{ opacity: 0.6 }}>search</span>
+    <span style={{ opacity: 0.6 }}>account</span>
+    <span style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700 }}>cart · 3</span>
+  </div>
+</div>
+
+{screen === "home" && (
+  <div>
+    <div style={{ position: "relative" }}>
+      <div style={{ aspectRatio: "24 / 9", minHeight: 320, maxHeight: 520, overflow: "hidden" }}>
+        <img src={slideData.img} alt={slideData.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      </div>
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.5) 34%, rgba(0,0,0,0.1) 66%, rgba(0,0,0,0) 88%)" }} />
+      <div onClick={() => setSlide((v.si - 1 + v.slides.length) % v.slides.length)} style={arrow("left")}>‹</div>
+      <div onClick={() => setSlide((v.si + 1) % v.slides.length)} style={arrow("right")}>›</div>
+      <div style={{ position: "absolute", top: 18, right: 18, fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", background: "rgba(0,0,0,0.42)", border: "1px solid rgba(255,255,255,0.4)", color: "#FFFFFF", padding: "5px 9px" }}>{"0" + (v.si + 1)} / {"0" + v.slides.length}</div>
+      <div style={{ position: "absolute", left: 34, right: 34, bottom: 30 }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#FFFFFF", opacity: 0.9 }}>{slideData.kicker}</div>
+        <div style={{ fontFamily: L.font, fontSize: "clamp(30px, 3.4vw, 48px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#FFFFFF", lineHeight: 1, marginTop: 10, maxWidth: 720 }}>{slideData.headline}</div>
+        <div style={{ fontSize: 15, color: "#FFFFFF", marginTop: 10, maxWidth: 520, lineHeight: 1.5 }}>{slideData.sub}</div>
+        <div style={{ display: "flex", gap: 9, marginTop: 16, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ background: L.accent, color: btnFg, padding: "12px 22px", fontSize: 14, fontWeight: 700 }}>{slideData.cta}</span>
+          <span style={{ border: "1px solid #FFFFFF", color: "#FFFFFF", padding: "12px 18px", fontSize: 14, fontWeight: 700 }}>{L.cta2}</span>
+          <div style={{ display: "flex", gap: 7, marginLeft: 12 }}>
+            {v.slides.map((_, k) => (
+              <div key={k} onClick={() => setSlide(k)} style={{ width: k === v.si ? 28 : 10, height: 8, background: k === v.si ? "#FFFFFF" : "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.7)", cursor: "pointer" }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style={{ display: "flex", gap: 8, padding: "18px 24px 4px", flexWrap: "wrap" }}>
+      {L.chips.map((c, k) => (
+        <span key={c} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${k === 0 ? L.accent : L.line}`, background: k === 0 ? L.accent : "transparent", color: k === 0 ? btnFg : L.fg, padding: "7px 12px" }}>{c}</span>
+      ))}
+    </div>
+
+    <div style={{ padding: "18px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
+      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>shop by category</span>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>all categories →</span>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 150px), 1fr))", gap: 12, padding: "10px 24px 18px" }}>
+      {L.tiles.map((t) => (
+        <div key={t.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 118 }}>
+          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{t.count}</div>
+          <div>
+            <div style={{ fontFamily: L.font, fontSize: 21, fontWeight: 700, letterSpacing: "-0.02em", color: L.fg, lineHeight: 1.05 }}>{t.name}</div>
+            <div style={{ width: 26, height: 2, background: L.accent, marginTop: 11 }} />
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div style={{ padding: "8px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
+      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>{L.gridTitle}</span>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>{L.gridMeta}</span>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 178px), 1fr))", gap: 13, padding: "12px 24px 20px" }}>
+      {L.products.map((p) => (
+        <div key={p.name} style={{ border: `1px solid ${L.line}`, background: L.card }}>
+          <div style={{ position: "relative" }}>
+            <div style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
+              <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <div style={{ position: "absolute", top: 8, left: 8, background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 7px" }}>{p.badge}</div>
+          </div>
+          <div style={{ padding: 11 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: L.fg }}>{p.name}</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 7 }}>
+              <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: L.accent }}>{p.price}</span>
+              <span style={{ fontFamily: MONO, fontSize: 11, color: L.fg, opacity: 0.45, textDecoration: "line-through" }}>{p.mrp}</span>
+            </div>
+            <div style={{ display: "flex", gap: 5, marginTop: 9, flexWrap: "wrap" }}>
+              {p.variants.map((vv) => (
+                <span key={vv} style={{ border: `1px solid ${L.line}`, color: L.fg, fontFamily: MONO, fontSize: 9, padding: "4px 6px" }}>{vv}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
+              <span style={{ fontFamily: MONO, fontSize: 9, color: L.fg, opacity: 0.6 }}>★ {p.rating}</span>
+              <span style={{ border: `1px solid ${L.accent}`, color: L.accent, fontSize: 11, fontWeight: 700, padding: "6px 10px" }}>add to cart</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}` }}>
+      <div style={{ aspectRatio: "16 / 10", overflow: "hidden" }}>
+        <img src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      </div>
+      <div style={{ background: L.card, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{L.banner.kicker}</div>
+        <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.05 }}>{L.banner.headline}</div>
+        <p style={{ fontSize: 14, lineHeight: 1.5, marginTop: 9, color: L.fg, opacity: 0.8 }}>{L.banner.sub}</p>
+        <div style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700 }}>{L.banner.cta}</div>
+      </div>
+    </div>
+
+    <div style={{ margin: "0 24px 22px", border: `1px solid ${L.line}`, background: L.card }}>
+      <div style={{ padding: "14px 16px", borderBottom: `1px solid ${L.line}`, display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: L.font, fontSize: 18, fontWeight: 700, color: L.fg, letterSpacing: "-0.02em" }}>{L.signature.title}</span>
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.accent }}>built into this layout</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))" }}>
+        {L.signature.rows.map((r) => (
+          <div key={r.label} style={{ padding: "14px 16px", borderRight: `1px solid ${L.line}` }}>
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.6 }}>{r.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, marginTop: 6, color: L.fg }}>{r.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div style={{ padding: "4px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>{v.galleryTitle}</span>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>{v.handle}</span>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(33%, 118px), 1fr))", gap: 8, padding: "10px 24px 24px" }}>
+      {v.gallery.map((g) => (
+        <div key={g.img} style={{ aspectRatio: "1 / 1", border: `1px solid ${L.line}`, overflow: "hidden" }}>
+          <img src={g.img} alt={g.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </div>
+      ))}
+    </div>
+
+    <div style={{ padding: "0 24px 6px" }}>
+      <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>what buyers say</span>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))", gap: 13, padding: "12px 24px 22px" }}>
+      {L.reviews.map((r) => (
+        <div key={r.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", border: `1px solid ${L.line}` }}>
+              <img src={avatarFor(r.name)} alt={r.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: L.fg }}>{r.name}</div>
+              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.6, marginTop: 2 }}>verified buyer · {r.city}</div>
+            </div>
+          </div>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: L.accent }}>★★★★★</div>
+          <p style={{ fontSize: 13, lineHeight: 1.5, marginTop: 9, color: L.fg }}>{r.text}</p>
+        </div>
+      ))}
+    </div>
+
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 180px), 1fr))", gap: 12, padding: "0 24px 20px" }}>
+      {L.trust.map((t) => (
+        <div key={t.title} style={{ borderTop: `1px solid ${L.line}`, paddingTop: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: L.fg }}>{t.title}</div>
+          <div style={{ fontSize: 12, marginTop: 3, color: L.fg, opacity: 0.7 }}>{t.sub}</div>
+        </div>
+      ))}
+    </div>
+
+    <div style={{ margin: "0 24px 24px", border: `1px solid ${L.accent}`, background: L.card, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+      <div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: L.fg }}>order on whatsapp instead</div>
+        <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.75 }}>send a photo of what you want — we reply with a payment link.</div>
+      </div>
+      <div style={{ background: L.accent, color: btnFg, padding: "10px 16px", fontSize: 13, fontWeight: 700 }}>message us</div>
+    </div>
+
+    <div style={{ background: L.footBg, color: L.footFg, padding: "26px 24px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 170px), 1fr))", gap: 22 }}>
+        <div>
+          <div style={{ fontFamily: L.font, fontSize: 19, fontWeight: 700 }}>{L.store}</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", opacity: 0.7, marginTop: 6 }}>{L.domain}</div>
+        </div>
+        {[
+          { title: "shop", links: L.cats },
+          { title: "help", links: ["track my order", "shipping & returns", "whatsapp us", "faqs"] },
+          { title: "about", links: ["our story", "privacy policy", "terms of use", "GST & invoicing"] },
+        ].map((col) => (
+          <div key={col.title}>
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.65 }}>{col.title}</div>
+            <div style={{ display: "grid", gap: 6, marginTop: 9 }}>
+              {col.links.map((l) => <span key={l} style={{ fontSize: 12, opacity: 0.85 }}>{l}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.18)", marginTop: 20, paddingTop: 14, fontFamily: MONO, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.65 }}>powered by supershowroom ✦ GST invoice on every order</div>
+    </div>
+  </div>
+)}
+
+{screen === "product" && (
+  <div>
+    <div style={{ padding: "13px 24px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", color: L.fg, opacity: 0.6, borderBottom: `1px solid ${L.line}` }}>{L.pdp.crumb}</div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 26, padding: "22px 24px" }}>
+      <div>
+        <div style={{ border: `1px solid ${L.line}`, overflow: "hidden" }}>
+          <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
+            <img src={v.p0.img} alt={v.p0.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
+          {[v.p0.img, ...L.extra.slice(0, 3)].map((src, k) => (
+            <div key={k} style={{ aspectRatio: "1 / 1", border: `1px solid ${k === 0 ? L.accent : L.line}`, overflow: "hidden" }}>
+              <img src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.accent }}>{L.pdp.badge}</div>
+        <h3 style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.1 }}>{v.p0.name}</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 9, fontFamily: MONO, fontSize: 11, color: L.fg }}>
+          <span style={{ color: L.accent }}>★ {v.p0.rating}</span>
+          <span style={{ opacity: 0.6 }}>{60 + i * 37} verified reviews</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 16 }}>
+          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: L.fg }}>{v.p0.price}</span>
+          <span style={{ fontFamily: MONO, fontSize: 15, opacity: 0.45, textDecoration: "line-through", color: L.fg }}>{v.p0.mrp}</span>
+          <span style={{ background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 10, padding: "4px 8px" }}>{v.off}</span>
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: L.fg, opacity: 0.6 }}>inclusive of GST · {L.pdp.stock}</div>
+
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>{L.pdp.variantLabel}</div>
+          <div style={{ display: "flex", gap: 8, marginTop: 9, flexWrap: "wrap" }}>
+            {v.p0.variants.map((vv, k) => (
+              <span key={vv} style={{ border: `1px solid ${k === 0 ? L.accent : L.line}`, background: k === 0 ? L.accent : "transparent", color: k === 0 ? btnFg : L.fg, padding: "9px 14px", fontSize: 13, fontWeight: 700 }}>{vv}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", border: `1px solid ${L.line}` }}>
+            <span style={{ padding: "12px 14px", color: L.fg, fontWeight: 700 }}>−</span>
+            <span style={{ padding: "12px 6px", fontFamily: MONO, color: L.fg }}>1</span>
+            <span style={{ padding: "12px 14px", color: L.fg, fontWeight: 700 }}>+</span>
+          </div>
+          <div style={{ flex: 1, minWidth: 150, background: L.accent, color: btnFg, textAlign: "center", padding: 13, fontSize: 15, fontWeight: 700 }}>add to cart</div>
+          <div style={{ border: `1px solid ${L.fg}`, color: L.fg, padding: "13px 18px", fontSize: 15, fontWeight: 700 }}>buy now</div>
+        </div>
+
+        <div style={{ marginTop: 18, border: `1px solid ${L.line}`, background: L.card, padding: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>deliver to</span>
+            <span style={{ border: `1px solid ${L.line}`, padding: "7px 10px", fontFamily: MONO, fontSize: 12, color: L.fg }}>560038</span>
+            <span style={{ color: L.accent, fontSize: 12, fontWeight: 700 }}>check</span>
+          </div>
+          <div style={{ fontSize: 13, marginTop: 9, color: L.fg }}>{L.pdp.delivery}</div>
+          <div style={{ fontSize: 13, marginTop: 4, color: L.fg, opacity: 0.75 }}>{L.pdp.returns}</div>
+        </div>
+
+        <div style={{ display: "grid", gap: 7, marginTop: 18 }}>
+          {L.pdp.bullets.map((b) => (
+            <div key={b} style={{ display: "grid", gridTemplateColumns: "16px 1fr", gap: 9, alignItems: "baseline" }}>
+              <span style={{ color: L.accent, fontSize: 13 }}>✓</span>
+              <span style={{ fontSize: 13, lineHeight: 1.45, color: L.fg }}>{b}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div style={{ margin: "0 24px 22px", border: `1px solid ${L.line}`, background: L.card }}>
+      <div style={{ padding: "13px 16px", borderBottom: `1px solid ${L.line}`, fontFamily: L.font, fontSize: 17, fontWeight: 700, color: L.fg }}>{L.pdp.specTitle}</div>
+      <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+        <tbody>
+          {L.pdp.specs.map((r) => (
+            <tr key={r.label}>
+              <td style={{ padding: "11px 16px", borderTop: `1px solid ${L.line}`, width: "34%", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.65 }}>{r.label}</td>
+              <td style={{ padding: "11px 16px", borderTop: `1px solid ${L.line}`, fontWeight: 700, color: L.fg }}>{r.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div style={{ padding: "0 24px 8px", fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>goes well with</div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 170px), 1fr))", gap: 12, padding: "10px 24px 26px" }}>
+      {L.products.slice(1, 4).map((p) => (
+        <div key={p.name} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10 }}>
+          <div style={{ width: 66, height: 66, border: `1px solid ${L.line}`, overflow: "hidden" }}>
+            <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.25, color: L.fg }}>{p.name}</div>
+            <div style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: L.accent, marginTop: 5 }}>{p.price}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{screen === "cart" && (
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 24, padding: 24 }}>
+    <div>
+      <div style={{ fontFamily: L.font, fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>your cart</div>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 5, color: L.fg, opacity: 0.6 }}>3 items · free shipping applied</div>
+      <div style={{ display: "grid", gap: 12, marginTop: 18 }}>
+        {v.lines.map((l) => (
+          <div key={l.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 12, display: "grid", gridTemplateColumns: "76px 1fr auto", gap: 13, alignItems: "center" }}>
+            <div style={{ width: 76, height: 76, border: `1px solid ${L.line}`, overflow: "hidden" }}>
+              <img src={l.img} alt={l.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: L.fg }}>{l.name}</div>
+              <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 4, color: L.fg, opacity: 0.65 }}>{l.variant}</div>
+              <div style={{ display: "flex", alignItems: "center", border: `1px solid ${L.line}`, width: "max-content", marginTop: 8 }}>
+                <span style={{ padding: "5px 10px", color: L.fg, fontWeight: 700 }}>−</span>
+                <span style={{ padding: "5px 4px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{l.qty}</span>
+                <span style={{ padding: "5px 10px", color: L.fg, fontWeight: 700 }}>+</span>
+              </div>
+            </div>
+            <div style={{ fontFamily: MONO, fontSize: 15, fontWeight: 700, color: L.fg }}>{l.price}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 16, border: `1px dashed ${L.line}`, padding: 14, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>coupon</span>
+        <span style={{ border: `1px solid ${L.line}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{L.cart.coupon}</span>
+        <span style={{ color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {L.cart.discount} off</span>
+      </div>
+
+      <div style={{ marginTop: 16, border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>delivering to</div>
+        <div style={{ fontSize: 14, fontWeight: 700, marginTop: 7, color: L.fg }}>{L.cart.name}</div>
+        <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.78 }}>{L.cart.address}</div>
+        <div style={{ fontFamily: MONO, fontSize: 11, marginTop: 8, color: L.accent }}>change address</div>
+      </div>
+    </div>
+
+    <div>
+      <div style={{ border: `1px solid ${L.line}`, background: L.card, padding: 20 }}>
+        <div style={{ fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>order summary</div>
+        <div style={{ display: "grid", gap: 9, marginTop: 15, fontFamily: MONO, fontSize: 13, color: L.fg }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>subtotal</span><span>{v.subtotal}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>discount</span><span style={{ color: L.accent }}>− {L.cart.discount}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>GST</span><span>{v.gst}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>shipping</span><span>free</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${L.line}`, paddingTop: 10, marginTop: 4, fontSize: 17, fontWeight: 700 }}><span>to pay</span><span>{v.total}</span></div>
+        </div>
+
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 20, color: L.fg, opacity: 0.7 }}>payment method</div>
+        <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+          {L.cart.methods.map((m) => (
+            <div key={m.name} style={{ border: `1px solid ${m.on ? L.accent : L.line}`, background: m.on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{m.name}</div>
+                <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
+              </div>
+              <span style={{ fontFamily: MONO, fontSize: 10, color: L.accent }}>{m.on ? "selected" : ""}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18 }}>place order · {v.total}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
+      </div>
+    </div>
+  </div>
+)}
+            </div>
+  );
+}
+
+function arrow(side: "left" | "right"): React.CSSProperties {
+  return {
+    position: "absolute", top: "50%",
+    left: side === "left" ? 18 : undefined,
+    right: side === "right" ? 18 : undefined,
+    marginTop: -22, width: 44, height: 44,
+    border: "1px solid rgba(255,255,255,0.55)", background: "rgba(0,0,0,0.3)", color: "#FFFFFF",
+    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, cursor: "pointer",
+  };
+}

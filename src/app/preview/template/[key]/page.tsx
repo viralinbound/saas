@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { StorefrontClient } from "@/components/storefront/StorefrontClient";
+import { LayoutStorefront } from "@/components/marketing/LayoutStorefront";
 import { buildTemplateConfig, TEMPLATE_PRESETS } from "@/lib/templatePresets";
 import { demoProductsFor } from "@/lib/demoProducts";
 import { getTheme } from "@/lib/constants";
@@ -41,6 +42,9 @@ export default async function TemplatePreviewPage({ params }: { params: Promise<
   };
 
   return (
-    <StorefrontClient store={store} config={built.config} tokens={built.tokens} demo previewOnly />
+    <LayoutStorefront
+      layoutKey={key}
+      shoppable={<StorefrontClient store={store} config={built.config} tokens={built.tokens} demo previewOnly />}
+    />
   );
 }
