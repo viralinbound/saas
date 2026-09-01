@@ -84,6 +84,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [touched, setTouched] = useState(false); // "add product" pressed once → show which blanks
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -104,6 +105,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
 
   function openNew() {
     setError("");
+    setTouched(false);
     const d = emptyDraft();
     if (activeCat !== "all") d.category = activeCat;
     setDraft(d);
@@ -111,8 +113,25 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
 
   async function save() {
     if (!draft) return;
-    setBusy(true);
+    setTouched(true);
     setError("");
+
+    // validate BEFORE touching `busy` so the button never sticks on "saving…"
+    const nameOk = draft.name.trim().length > 0;
+    const priceNum = parseFloat(draft.price || "");
+    const priceOk = Number.isFinite(priceNum) && priceNum > 0;
+    if (!nameOk || !priceOk) {
+      setError(
+        !nameOk && !priceOk
+          ? "Add a product name and a price to continue."
+          : !nameOk
+          ? "Give the product a name."
+          : "Enter a price greater than ₹0."
+      );
+      return;
+    }
+
+    setBusy(true);
     const payload = {
       name: draft.name.trim(),
       description: draft.description.trim() || null,
@@ -126,32 +145,32 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
       image: serializeMedia({ images: draft.images, videos: draft.videos }),
     };
 
-    if (!payload.name || !payload.price) {
+    try {
+      const res = await fetch(draft.id ? `/api/products/${draft.id}` : "/api/products", {
+        method: draft.id ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Could not save the product.");
+        return;
+      }
+      const saved: Product = data.product;
+      setProducts((prev) => {
+        const i = prev.findIndex((p) => p.id === saved.id);
+        if (i === -1) return [saved, ...prev];
+        const copy = prev.slice();
+        copy[i] = saved;
+        return copy;
+      });
+      setDraft(null);
+      setTouched(false);
+    } catch {
+      setError("Network error — check your connection and try again.");
+    } finally {
       setBusy(false);
-      setError("Name and price are required.");
-      return;
     }
-
-    const res = await fetch(draft.id ? `/api/products/${draft.id}` : "/api/products", {
-      method: draft.id ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    setBusy(false);
-    if (!res.ok) {
-      setError(data.error || "Could not save the product.");
-      return;
-    }
-    const saved: Product = data.product;
-    setProducts((prev) => {
-      const i = prev.findIndex((p) => p.id === saved.id);
-      if (i === -1) return [saved, ...prev];
-      const copy = prev.slice();
-      copy[i] = saved;
-      return copy;
-    });
-    setDraft(null);
   }
 
   async function del() {
@@ -232,7 +251,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
                 return (
                   <tr
                     key={p.id}
-                    onClick={() => { setError(""); setDraft(draftFromProduct(p)); }}
+                    onClick={() => { setError(""); setTouched(false); setDraft(draftFromProduct(p)); }}
                     style={{ borderTop: "1px solid #E4E1DA", background: selected ? "#EEF2F8" : "transparent", cursor: "pointer" }}
                   >
                     <td className="rt-wide" data-label="product" style={{ padding: "11px 20px" }}>
@@ -278,7 +297,7 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
             <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase" }}>
               {draft.id ? "editing product" : "new product"}
             </div>
-            <button onClick={() => setDraft(null)} style={{ border: 0, background: "none", cursor: "pointer", fontFamily: MONO, fontSize: 11, color: "#24457A" }}>close ✕</button>
+            <button onClick={() => { setDraft(null); setTouched(false); setError(""); }} style={{ border: 0, background: "none", cursor: "pointer", fontFamily: MONO, fontSize: 11, color: "#24457A" }}>close ✕</button>
           </div>
 
           <div style={{ padding: 16, display: "grid", gap: 14, maxHeight: "calc(100vh - 160px)", overflowY: "auto" }}>
@@ -286,7 +305,12 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
 
             <div>
               <label style={microLabel}>title</label>
-              <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} style={{ ...field, fontWeight: 700 }} />
+              <input
+                value={draft.name}
+                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                placeholder="e.g. Handloom Cotton Kurta"
+                style={{ ...field, fontWeight: 700, border: touched && !draft.name.trim() ? "1px solid #DC2626" : field.border }}
+              />
             </div>
 
             <div>
@@ -303,7 +327,13 @@ export function CatalogClient({ initialProducts }: { initialProducts: Product[] 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div>
                 <label style={microLabel}>price ₹</label>
-                <input value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} inputMode="decimal" style={{ ...field, fontFamily: MONO }} />
+                <input
+                  value={draft.price}
+                  onChange={(e) => setDraft({ ...draft, price: e.target.value })}
+                  inputMode="decimal"
+                  placeholder="0"
+                  style={{ ...field, fontFamily: MONO, border: touched && !(parseFloat(draft.price || "") > 0) ? "1px solid #DC2626" : field.border }}
+                />
               </div>
               <div>
                 <label style={microLabel}>mrp ₹</label>

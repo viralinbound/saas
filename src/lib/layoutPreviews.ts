@@ -366,7 +366,7 @@ export const LAYOUTS: Layout[] = [
       { name: "18k diamond", count: "64 pieces", img: U("1605100804763-247f67b3557e") },
       { name: "22k gold", count: "88 pieces", img: U("1599643478518-a784e5dc4c8f") },
       { name: "silver", count: "112 pieces", img: U("1535632066927-ab7c9ab60908") },
-      { name: "bridal", count: "26 sets", img: U("1611591475155-4286fa7c2e7f") },
+      { name: "bridal", count: "26 sets", img: U("1611085583191-a3b181a88401") },
     ],
     banner: { kicker: "try at home", headline: "three pieces, one appointment", sub: "buyers pick a slot, we send a verified courier with the pieces and an id check. the sale closes in the living room.", cta: "book a viewing", img: U("1599643478518-a784e5dc4c8f", 900) },
     checkout: "part-payment + insured delivery or store pickup",
@@ -375,7 +375,7 @@ export const LAYOUTS: Layout[] = [
       { name: "18k solitaire diamond ring", price: "₹24,999", mrp: "₹32,000", rating: "5.0", badge: "vvs1 · igi", variants: ["12", "14", "16"], img: U("1605100804763-247f67b3557e") },
       { name: "22k kundan choker set", price: "₹48,500", mrp: "₹60,000", rating: "5.0", badge: "1 left", variants: ["standard"], img: U("1599643478518-a784e5dc4c8f") },
       { name: "sterling emerald earrings", price: "₹3,200", mrp: "₹4,500", rating: "4.9", badge: "925 silver", variants: ["emerald", "sapphire"], img: U("1535632066927-ab7c9ab60908") },
-      { name: "rose gold infinity bracelet", price: "₹8,900", mrp: "₹11,500", rating: "4.9", badge: "adjustable", variants: ["adjustable"], img: U("1611591475155-4286fa7c2e7f") },
+      { name: "rose gold infinity bracelet", price: "₹8,900", mrp: "₹11,500", rating: "4.9", badge: "adjustable", variants: ["adjustable"], img: U("1611085583191-a3b181a88401") },
     ],
     signature: { title: "certification & appointment", rows: [
       { label: "purity", value: "bis hallmarked 22k" }, { label: "certificate", value: "igi, packed with the piece" },
