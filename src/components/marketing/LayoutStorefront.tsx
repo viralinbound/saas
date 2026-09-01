@@ -2,14 +2,11 @@
 
 /*
  * Full-page "live preview" of a redesigned store layout — opened from the
- * "live preview ↗" button on /templates. The redesigned storefront here is a
- * WORKING shoppable site: tap a product to open it, add to cart, change qty,
- * pick a payment method and place an order (kept in the browser via
- * orderHistory, same as the storefront demo). A thin SuperShowroom bar on top
- * switches screen and starts a real setup.
- *
- * `shoppable` (optional) is the real StorefrontClient element, built on the
- * server — the "shoppable demo" toggle flips to it (the actual backend path).
+ * "live preview ↗" button on /templates. The storefront here is a WORKING
+ * shoppable site: tap a product to open it, filter by category, search, add
+ * to cart, change qty, pick a payment method and place an order (kept in the
+ * browser via orderHistory). A thin SuperShowroom bar on top switches screen
+ * and starts a real setup.
  */
 
 import Link from "next/link";
@@ -25,19 +22,12 @@ type Line = { p: P; qty: number; variant: string };
 const scrollTop = () => { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
 const ref6 = () => "SSR-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 
-export function LayoutStorefront({
-  layoutKey,
-  shoppable,
-}: {
-  layoutKey: string;
-  shoppable?: React.ReactNode;
-}) {
+export function LayoutStorefront({ layoutKey }: { layoutKey: string }) {
   const L: Layout = LAYOUTS.find((d) => d.key === layoutKey) ?? LAYOUTS[0];
   const idx = LAYOUTS.indexOf(L);
   const onDark = L.bg === "#0E1116";
   const btnFg = onDark ? "#0E1116" : "#FFFFFF";
 
-  const [mode, setMode] = useState<"design" | "shop">("design");
   const [screen, setScreen] = useState<Screen>("home");
   const [slide, setSlide] = useState(0);
 
@@ -169,14 +159,7 @@ export function LayoutStorefront({
         <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.08em", opacity: 0.7 }}>{L.name} · live preview</span>
 
         <div style={{ display: "flex", gap: 6, marginLeft: "auto", flexWrap: "wrap" }}>
-          {shoppable && (
-            <>
-              <div onClick={() => setMode("design")} style={pill(mode === "design")}>design</div>
-              <div onClick={() => setMode("shop")} style={pill(mode === "shop")}>shoppable demo</div>
-              <span style={{ width: 1, background: "rgba(250,249,246,0.25)", margin: "0 4px" }} />
-            </>
-          )}
-          {mode === "design" && (["home", "product", "cart"] as Screen[]).map((s) => (
+          {(["home", "product", "cart"] as Screen[]).map((s) => (
             <div key={s} onClick={() => { setScreen(s); scrollTop(); }} style={pill(screen === s)}>
               {s === "cart" ? `checkout${shop.cartCount ? ` (${shop.cartCount})` : ""}` : s}
             </div>
@@ -185,22 +168,18 @@ export function LayoutStorefront({
         </div>
       </div>
 
-      {mode === "shop" && shoppable ? (
-        <div>{shoppable}</div>
-      ) : (
-        <div style={{ margin: "0 auto", maxWidth: 1440, boxShadow: "0 18px 40px rgba(20,22,26,0.12)" }}>
-          <LayoutStorefrontView
-            L={L}
-            screen={screen}
-            v={v}
-            btnFg={btnFg}
-            onDark={onDark}
-            idx={idx}
-            onSlide={setSlide}
-            shop={shop}
-          />
-        </div>
-      )}
+      <div style={{ margin: "0 auto", maxWidth: 1440, boxShadow: "0 18px 40px rgba(20,22,26,0.12)" }}>
+        <LayoutStorefrontView
+          L={L}
+          screen={screen}
+          v={v}
+          btnFg={btnFg}
+          onDark={onDark}
+          idx={idx}
+          onSlide={setSlide}
+          shop={shop}
+        />
+      </div>
     </div>
   );
 }
