@@ -73,7 +73,7 @@ function pMatch(p: P, term: string) {
 }
 
 export function LayoutStorefrontView({
-  L, screen, v, btnFg, onDark, idx, onSlide, shop, blocks, showBranding = true,
+  L, screen, v, btnFg, onDark, idx, onSlide, shop, blocks, showBranding = true, editable = false, onEditPart,
 }: {
   L: Layout;
   screen: "home" | "product" | "cart";
@@ -85,11 +85,29 @@ export function LayoutStorefrontView({
   shop?: ShopApi;
   blocks?: Partial<LayoutBlocks>;
   showBranding?: boolean;
+  /** click-to-edit: outline sections on hover, report the clicked part */
+  editable?: boolean;
+  onEditPart?: (part: string) => void;
 }) {
   const b: LayoutBlocks = { ...DEFAULT_LAYOUT_BLOCKS, ...blocks };
   const slideData = v.slides[v.si];
   const setSlide = onSlide;
   const i = idx;
+
+  // wraps a storefront section so a click in the editor jumps the side panel
+  const Edit = ({ part, children, style }: { part: string; children: React.ReactNode; style?: React.CSSProperties }) =>
+    editable ? (
+      <div
+        className="ssr-edit-part"
+        onClick={(e) => { e.stopPropagation(); onEditPart?.(part); }}
+        style={{ position: "relative", cursor: "pointer", ...style }}
+      >
+        <span className="ssr-edit-tag">{part}</span>
+        {children}
+      </div>
+    ) : (
+      <>{children}</>
+    );
 
   // the product shown on the product screen (falls back to the mock's p0)
   const pd: P = shop?.active ?? v.p0;
@@ -125,8 +143,22 @@ export function LayoutStorefrontView({
 
   return (
             <div style={{ background: L.bg }}>
-{b.promo && <div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>}
-<div style={{ display: "flex", alignItems: "center", gap: 20, padding: "15px 24px", borderBottom: `1px solid ${L.line}`, flexWrap: "wrap" }}>
+{editable && (
+  <style dangerouslySetInnerHTML={{ __html: `
+    .ssr-edit-part { outline: 1px dashed rgba(36,69,122,0.35); outline-offset: -1px; transition: outline-color .12s; }
+    .ssr-edit-part:hover { outline: 2px solid #24457A; outline-offset: -2px; z-index: 5; }
+    .ssr-edit-tag { position: absolute; top: 0; left: 0; z-index: 6; background: #24457A; color: #fff;
+      font: 700 9px/1 'JetBrains Mono', monospace; letter-spacing: .12em; text-transform: uppercase;
+      padding: 3px 6px; opacity: 0; pointer-events: none; }
+    .ssr-edit-part:hover > .ssr-edit-tag { opacity: 1; }
+  ` }} />
+)}
+{b.promo && (
+  <Edit part="promo">
+    <div style={{ background: L.accent, color: btnFg, padding: "8px 16px", textAlign: "center", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{L.promo}</div>
+  </Edit>
+)}
+<Edit part="content"><div style={{ display: "flex", alignItems: "center", gap: 20, padding: "15px 24px", borderBottom: `1px solid ${L.line}`, flexWrap: "wrap" }}>
   <span onClick={shop?.goHome} style={{ fontFamily: L.font, fontSize: 23, fontWeight: 700, letterSpacing: "-0.03em", color: L.fg, ...pointer }}>{L.store}</span>
   <div style={{ display: "flex", gap: 15, marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
     {L.cats.map((c, k) => {
@@ -147,12 +179,12 @@ export function LayoutStorefrontView({
       {shop.query && <button type="button" onClick={() => shop.setQuery("")} style={{ border: `1px solid ${L.line}`, background: "transparent", color: L.fg, padding: "0 12px", cursor: "pointer", fontFamily: MONO, fontSize: 11 }}>clear</button>}
     </div>
   )}
-</div>
+</div></Edit>
 
 {screen === "home" && (
   <div>
     {b.hero && (
-    <div style={{ position: "relative" }}>
+    <Edit part="content"><div style={{ position: "relative" }}>
       <div style={{ aspectRatio: "24 / 9", minHeight: 320, maxHeight: 520, overflow: "hidden" }}>
         <Img fallback={L.hero} src={slideData.img} alt={slideData.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
@@ -174,21 +206,22 @@ export function LayoutStorefrontView({
           </div>
         </div>
       </div>
-    </div>
+    </div></Edit>
     )}
 
     {b.chips && (
-    <div style={{ display: "flex", gap: 8, padding: "18px 24px 4px", flexWrap: "wrap" }}>
+    <Edit part="content"><div style={{ display: "flex", gap: 8, padding: "18px 24px 4px", flexWrap: "wrap" }}>
       {L.chips.map((c, k) => {
         const on = shop ? norm(shop.cat || L.chips[0]) === norm(c) : k === 0;
         return (
           <span key={c} onClick={() => shop?.setCat(c)} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "7px 12px", ...pointer }}>{c}</span>
         );
       })}
-    </div>
+    </div></Edit>
     )}
 
-    {b.tiles && (<>
+    {b.tiles && (
+    <Edit part="tiles">
     <div style={{ padding: "18px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>shop by category</span>
       <span onClick={() => { shop?.setCat(L.chips[0]); shop?.toGrid(); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>all categories →</span>
@@ -204,9 +237,11 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
-    </>)}
+    </Edit>
+    )}
 
-    {b.products && (<>
+    {b.products && (
+    <Edit part="content">
     <div id="ssr-grid" style={{ padding: "8px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap", scrollMarginTop: 60 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>
         {filterLabel ? `${L.gridTitle} · ${filterLabel}` : L.gridTitle}
@@ -249,10 +284,11 @@ export function LayoutStorefrontView({
       ))}
     </div>
     )}
-    </>)}
+    </Edit>
+    )}
 
     {b.lookbook && (
-    <div id="ssr-lookbook" style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}`, scrollMarginTop: 60 }}>
+    <Edit part="banner"><div id="ssr-lookbook" style={{ margin: "0 24px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", border: `1px solid ${L.line}`, scrollMarginTop: 60 }}>
       <div style={{ aspectRatio: "16 / 10", overflow: "hidden" }}>
         <Img fallback={L.hero} src={L.banner.img} alt={L.banner.headline} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
@@ -262,10 +298,10 @@ export function LayoutStorefrontView({
         <p style={{ fontSize: 14, lineHeight: 1.5, marginTop: 9, color: L.fg, opacity: 0.8 }}>{L.banner.sub}</p>
         <div onClick={shop?.toGrid} style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700, ...pointer }}>{L.banner.cta}</div>
       </div>
-    </div>
+    </div></Edit>
     )}
 
-    <div style={{ margin: "0 24px 22px", border: `1px solid ${L.line}`, background: L.card }}>
+    <Edit part="signature"><div style={{ margin: "0 24px 22px", border: `1px solid ${L.line}`, background: L.card }}>
       <div style={{ padding: "14px 16px", borderBottom: `1px solid ${L.line}`, display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
         <span style={{ fontFamily: L.font, fontSize: 18, fontWeight: 700, color: L.fg, letterSpacing: "-0.02em" }}>{L.signature.title}</span>
         <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.accent }}>built into this layout</span>
@@ -278,7 +314,7 @@ export function LayoutStorefrontView({
           </div>
         ))}
       </div>
-    </div>
+    </div></Edit>
 
     <div style={{ padding: "4px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>{v.galleryTitle}</span>
@@ -292,7 +328,7 @@ export function LayoutStorefrontView({
       ))}
     </div>
 
-    {b.reviews && (<>
+    {b.reviews && (<Edit part="reviews">
     <div style={{ padding: "0 24px 6px" }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>what buyers say</span>
     </div>
@@ -313,17 +349,17 @@ export function LayoutStorefrontView({
         </div>
       ))}
     </div>
-    </>)}
+    </Edit>)}
 
     {b.trust && (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 180px), 1fr))", gap: 12, padding: "0 24px 20px" }}>
+    <Edit part="trust"><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 180px), 1fr))", gap: 12, padding: "0 24px 20px" }}>
       {L.trust.map((t) => (
         <div key={t.title} style={{ borderTop: `1px solid ${L.line}`, paddingTop: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: L.fg }}>{t.title}</div>
           <div style={{ fontSize: 12, marginTop: 3, color: L.fg, opacity: 0.7 }}>{t.sub}</div>
         </div>
       ))}
-    </div>
+    </div></Edit>
     )}
 
     <div style={{ margin: "0 24px 24px", border: `1px solid ${L.accent}`, background: L.card, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>

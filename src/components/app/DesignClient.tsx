@@ -264,6 +264,32 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, tokens, templateKey, dirty, loaded]);
 
+  // Click-to-edit: the preview iframe (loaded with ?edit=1) posts
+  // {type:"ssr-edit", part} when a section is clicked. Jump the side panel to
+  // that section's controls and flash it.
+  useEffect(() => {
+    const groupFor: Record<string, string> = {
+      promo: "content",
+      content: "content",
+      tiles: "tiles",
+      banner: "banner",
+      signature: "signature",
+      reviews: "reviews",
+      trust: "trust",
+    };
+    function onMsg(e: MessageEvent) {
+      const d = e.data as { type?: string; part?: string } | null;
+      if (!d || d.type !== "ssr-edit" || !d.part) return;
+      const g = document.querySelector<HTMLElement>(`[data-edit-group="${groupFor[d.part] || d.part}"]`);
+      if (!g) return;
+      g.scrollIntoView({ behavior: "smooth", block: "start" });
+      g.classList.add("ssr-rail-flash");
+      window.setTimeout(() => g.classList.remove("ssr-rail-flash"), 1200);
+    }
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
   async function publish() {
     setPublishing(true);
     setMsg("");
@@ -534,7 +560,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
 
         {isStarter ? (
           <>
-            <div>
+            <div data-edit-group="content">
               <div style={label}>homepage content</div>
               <div style={{ display: "grid", gap: 10 }}>
                 {([
@@ -567,7 +593,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="banner">
               <div style={label}>feature banner</div>
               <div style={{ display: "grid", gap: 10 }}>
                 {([
@@ -589,7 +615,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="colours">
               <div style={label}>colours</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {([
@@ -613,7 +639,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="tiles">
               <div style={label}>category tiles</div>
               <div style={{ display: "grid", gap: 8 }}>
                 {(patch.tiles ?? []).map((t, i) => (
@@ -627,7 +653,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="signature">
               <div style={label}>signature features</div>
               <input style={{ ...inp, marginBottom: 8 }} value={patch.signature?.title ?? ""} placeholder="panel title" onChange={(e) => patchLayout({ signature: { title: e.target.value, rows: patch.signature?.rows ?? [] } })} />
               <div style={{ display: "grid", gap: 8 }}>
@@ -640,7 +666,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="reviews">
               <div style={label}>customer reviews</div>
               <div style={{ display: "grid", gap: 10 }}>
                 {(patch.reviews ?? []).map((r, i) => (
@@ -657,7 +683,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               </div>
             </div>
 
-            <div>
+            <div data-edit-group="trust">
               <div style={label}>trust badges</div>
               <div style={{ display: "grid", gap: 6 }}>
                 {(patch.trust ?? []).map((t, i) => (
@@ -884,7 +910,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           >
             <iframe
               key={previewNonce}
-              src={`/preview/${storeSlug}?n=${previewNonce}`}
+              src={`/preview/${storeSlug}?edit=1&n=${previewNonce}`}
               title="Storefront preview"
               style={{
                 display: "block",

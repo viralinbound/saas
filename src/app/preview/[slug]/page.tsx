@@ -13,10 +13,14 @@ import type { Product, Store } from "@/lib/types";
 // Live DRAFT preview — only the store's own company members can see it.
 export default async function DraftPreviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ edit?: string }>;
 }) {
   const { slug } = await params;
+  const { edit } = await searchParams;
+  const editable = edit === "1";
   const supabase = await createClient();
 
   const {
@@ -84,6 +88,7 @@ export default async function DraftPreviewPage({
         tokens={useSaved ? coerceTokens(cust?.theme_tokens) : seeded.tokens}
         products={real}
         demo={storeRow.plan === "free"}
+        editable={editable}
       />
     );
   }

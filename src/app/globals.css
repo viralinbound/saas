@@ -224,6 +224,16 @@ aside a, aside a:hover { text-decoration: none; }
 }
 .ssr-editor-note { display: none; }
 
+/* click-to-edit: flash the side-panel group the preview jumped us to */
+[data-edit-group] { scroll-margin-top: 12px; border-radius: 4px; }
+.ssr-rail-flash {
+  animation: ssrRailFlash 1.2s ease-out;
+}
+@keyframes ssrRailFlash {
+  0%, 40% { box-shadow: 0 0 0 3px rgba(36,69,122,0.55); background: rgba(36,69,122,0.06); }
+  100% { box-shadow: 0 0 0 0 rgba(36,69,122,0); background: transparent; }
+}
+
 /* desktop: rail and preview scroll independently (the side panel can be long;
    the live preview stays put while you scroll the options) */
 @media (min-width: 1025px) {

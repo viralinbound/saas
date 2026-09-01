@@ -21,6 +21,7 @@ export function MerchantLayoutStorefront({
   tokens,
   products,
   demo,
+  editable = false,
 }: {
   templateKey: string;
   storeName: string;
@@ -29,6 +30,9 @@ export function MerchantLayoutStorefront({
   tokens?: ThemeTokens;
   products: Product[];
   demo: boolean;
+  /** when embedded in the Design & Publish editor with ?edit=1 — clicking a
+   *  section posts {type:"ssr-edit", part} to the parent so its side panel jumps */
+  editable?: boolean;
 }) {
   const layout = useMemo(() => {
     const key = resolveTemplateKey(config, templateKey);
@@ -48,6 +52,18 @@ export function MerchantLayoutStorefront({
       orderSlug={storeSlug}
       whatsappNumber={wa}
       accountSlug={storeSlug}
+      editable={editable}
+      onEditPart={
+        editable
+          ? (part) => {
+              try {
+                window.parent?.postMessage({ type: "ssr-edit", part }, "*");
+              } catch {
+                /* cross-origin parent — ignore */
+              }
+            }
+          : undefined
+      }
     />
   );
 }

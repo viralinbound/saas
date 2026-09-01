@@ -34,6 +34,8 @@ export function ShoppableLayout({
   onScreen,
   idx = 0,
   accountSlug,
+  editable = false,
+  onEditPart,
 }: {
   layout: Layout;
   blocks?: Partial<LayoutBlocks>;
@@ -48,6 +50,9 @@ export function ShoppableLayout({
   /** real store slug — enables customer sign-in/up on this store. Omitted on the
    *  marketing template preview (no real store to hold accounts). */
   accountSlug?: string;
+  /** click-to-edit mode: outline sections, report the clicked part to the editor */
+  editable?: boolean;
+  onEditPart?: (part: string) => void;
 }) {
   const L = layout;
   const onDark = L.bg === "#0E1116";
@@ -157,6 +162,8 @@ export function ShoppableLayout({
         shop={shop}
         blocks={blocks}
         showBranding={showBranding}
+        editable={editable}
+        onEditPart={onEditPart}
       />
       {acctOpen && accountSlug && (
         <StorefrontAccountPanel
