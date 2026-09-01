@@ -140,8 +140,11 @@ export function coerceConfig(raw: unknown, storeName: string): StoreConfig {
   if (raw && typeof raw === "object") {
     const r = raw as StoreConfig;
     const extras = { layout: r.layout, blocks: r.blocks };
+    // A .dc starter layout carries `layout` and no sections — keep it that way.
+    if (r.layout && typeof r.layout === "object" && Object.keys(r.layout).length) {
+      return { sections: Array.isArray(r.sections) ? r.sections : [], ...extras };
+    }
     if (Array.isArray(r.sections) && r.sections.length) return { sections: r.sections, ...extras };
-    if (r.layout) return { ...defaultConfigFor(storeName), ...extras };
   }
   return defaultConfigFor(storeName);
 }
