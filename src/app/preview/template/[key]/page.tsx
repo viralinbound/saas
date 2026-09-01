@@ -1,17 +1,17 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { LayoutStorefront } from "@/components/marketing/LayoutStorefront";
-import { TEMPLATE_PRESETS } from "@/lib/templatePresets";
 import { LAYOUTS } from "@/lib/layoutPreviews";
+import { starterTemplateName } from "@/lib/layoutCommerce";
 
 export function generateStaticParams() {
-  return Object.keys(TEMPLATE_PRESETS).map((key) => ({ key }));
+  return LAYOUTS.map((l) => ({ key: l.key }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ key: string }> }): Promise<Metadata> {
   const { key } = await params;
-  const p = TEMPLATE_PRESETS[key];
-  return { title: p ? `${p.label} — template preview` : "Template preview" };
+  const l = LAYOUTS.find((x) => x.key === key);
+  return { title: l ? `${starterTemplateName(key)} — template preview` : "Template preview" };
 }
 
 // Full-page, working preview of a starter layout — shoppable, no account, no real orders.

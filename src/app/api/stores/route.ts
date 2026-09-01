@@ -5,8 +5,7 @@ import { slugify, getTheme } from "@/lib/constants";
 import { seedStoreDefaults } from "@/lib/store-setup";
 import { mapStore, toStoreInsert } from "@/lib/db-mapper";
 import { getCurrentOrg, mapOrg } from "@/lib/org";
-import { defaultConfigFor } from "@/lib/customization";
-import { buildTemplateConfig } from "@/lib/templatePresets";
+import { seedStarterConfig } from "@/lib/layoutCommerce";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -89,17 +88,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error?.message || "Could not create store" }, { status: 400 });
     }
 
-    await seedStoreDefaults(storeRow.id, data.theme);
+    // Fill the new store's catalogue with the chosen .dc layout's products
+    // (saved to Supabase) so the storefront isn't empty on day one.
+    await seedStoreDefaults(storeRow.id, data.theme, { withSamples: true });
 
-    // Seed the storefront draft from the chosen template's full preset — copy,
-    // palette and fonts — so /app/design opens with that template already
-    // applied (same as clicking it in the picker).
-    const theme = getTheme(data.theme);
-    const preset = buildTemplateConfig(data.theme, data.name);
+    // Seed the storefront draft from the chosen .dc layout — patch, blocks,
+    // palette and fonts — so /app/design opens with it already applied.
+    const { config, tokens } = seedStarterConfig(data.theme, data.name);
     await supabase.rpc("save_store_draft", {
       p_store_id: storeRow.id,
-      p_draft_config: preset?.config ?? defaultConfigFor(data.name, theme.announcement, theme.hero),
-      p_theme_tokens: preset?.tokens ?? { accent: theme.accent },
+      p_draft_config: config,
+      p_theme_tokens: tokens,
       p_template_key: data.theme,
     });
 

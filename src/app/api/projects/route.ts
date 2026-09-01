@@ -6,7 +6,7 @@ import { getCurrentOrg } from "@/lib/org";
 import { slugify, getTheme } from "@/lib/constants";
 import { seedStoreDefaults } from "@/lib/store-setup";
 import { toStoreInsert } from "@/lib/db-mapper";
-import { buildTemplateConfig } from "@/lib/templatePresets";
+import { seedStarterConfig } from "@/lib/layoutCommerce";
 import { ACTIVE_STORE_COOKIE } from "@/lib/activeStore";
 import { brandedHost } from "@/lib/domains";
 
@@ -121,12 +121,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error?.message || "Could not create project" }, { status: 400 });
   }
 
-  await seedStoreDefaults(storeRow.id, body.theme);
-  const built = buildTemplateConfig(body.theme, body.name);
+  await seedStoreDefaults(storeRow.id, body.theme, { withSamples: true });
+  const { config, tokens } = seedStarterConfig(body.theme, body.name);
   await c.supabase.rpc("save_store_draft", {
     p_store_id: storeRow.id,
-    p_draft_config: built?.config ?? { sections: [] },
-    p_theme_tokens: built?.tokens ?? { accent: theme.accent },
+    p_draft_config: config,
+    p_theme_tokens: tokens,
     p_template_key: body.theme,
   });
 

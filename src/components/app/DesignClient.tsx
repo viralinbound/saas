@@ -12,14 +12,13 @@ import {
   type ThemeTokens,
   DEFAULT_TOKENS,
 } from "@/lib/customization";
-import { buildTemplateConfig } from "@/lib/templatePresets";
 import { ROOT_DOMAIN } from "@/lib/domains";
 import { THEMES } from "@/lib/constants";
 import {
   isStarterTemplate,
   starterLayout,
   seedLayoutPatch,
-  tokensFromLayout,
+  seedStarterConfig,
   starterTemplateName,
   STARTER_TEMPLATE_KEYS,
   DEFAULT_LAYOUT_BLOCKS,
@@ -288,70 +287,41 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
 
   async function applyTemplate(t: TemplateRow) {
     if (t.locked) {
-      setMsg(`"${t.name}" is a ${t.tierLabel || "premium"} template — choose a plan to unlock it.`);
+      setMsg(`"${starterTemplateName(t.key)}" needs a higher plan — choose one to unlock it.`);
       router.push("/app/plans");
       return;
     }
     setTemplateKey(t.key);
 
-    // The six redesigned .dc layouts — seed a layout patch + block toggles,
-    // then reuse the same cloud-save path as every other template.
-    if (isStarterTemplate(t.key)) {
-      const L = starterLayout(t.key);
-      const starterCfg: StoreConfig = {
-        sections: [],
-        layout: seedLayoutPatch(L, storeName || "Your Store"),
-        blocks: { ...DEFAULT_LAYOUT_BLOCKS },
-      };
-      const starterTokens = tokensFromLayout(L);
-      setConfig(starterCfg);
-      setTokens(starterTokens);
-      setSaving(true);
-      const r = await persist(starterCfg, starterTokens, t.key);
-      setSaving(false);
-      if (r.ok) {
-        setDirty(false);
-        setPreviewNonce((n) => n + 1);
-        setMsg(`"${t.name}" applied & saved — customise every part below, then Publish.`);
-      } else {
-        setDirty(true);
-        setMsg(
-          r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
-            ? "That template needs a higher plan — choose a plan to unlock it."
-            : `"${t.name}" applied (not saved: ${r.error || "error"}). Click Save.`
-        );
-      }
-      return;
-    }
-
-    const preset = buildTemplateConfig(t.key, storeName || "Your Store");
-    if (preset) {
-      setConfig(preset.config);
-      setTokens(preset.tokens);
-      setSaving(true);
-      const r = await persist(preset.config, preset.tokens, t.key);
-      setSaving(false);
-      if (r.ok) {
-        setDirty(false);
-        setPreviewNonce((n) => n + 1);
-        setMsg(`"${t.name}" applied & saved — the preview now matches the template demo. Edit anything, then Publish.`);
-      } else {
-        setDirty(true);
-        setMsg(
-          r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
-            ? "That template needs a higher plan — choose a plan to unlock it."
-            : `"${t.name}" applied (not saved: ${r.error || "error"}). Click Save.`
-        );
-      }
+    // Every template is one of the six redesigned .dc layouts: seed its full
+    // patch + block toggles + tokens, save through the same RPC, then offer to
+    // load its sample catalogue.
+    const { config: starterCfg, tokens: starterTokens } = seedStarterConfig(t.key, storeName || "Your Store");
+    setConfig(starterCfg);
+    setTokens(starterTokens);
+    setSaving(true);
+    const r = await persist(starterCfg, starterTokens, t.key);
+    setSaving(false);
+    if (r.ok) {
+      setDirty(false);
+      setPreviewNonce((n) => n + 1);
+      setMsg(`"${starterTemplateName(t.key)}" applied & saved — customise every part below, then Publish.`);
     } else {
-      setTokens((tk) => ({ ...tk, accent: t.accent_color || tk.accent }));
-      mutate((c) => {
-        const ann = c.sections.find((s) => s.type === "announcement");
-        if (ann && t.announcement) ann.settings.text = t.announcement;
-        return c;
-      });
-      setMsg(`Template "${t.name}" applied — Save & Publish to go live.`);
+      setDirty(true);
+      setMsg(
+        r.error?.includes("TEMPLATE_LOCKED") || r.status === 403
+          ? "That template needs a higher plan — choose a plan to unlock it."
+          : `Template applied (not saved: ${r.error || "error"}). Click Save.`
+      );
     }
+  }
+
+  async function loadSampleProducts() {
+    setMsg("Loading sample products…");
+    const res = await fetch("/api/design/seed-catalog", { method: "POST" });
+    const d = await res.json().catch(() => ({}));
+    setMsg(res.ok ? `${d.added ?? 0} sample products added to your catalogue.` : d.error || "Could not load samples.");
+    if (res.ok) setPreviewNonce((n) => n + 1);
   }
 
   const swatches = useMemo(() => {
@@ -876,6 +846,16 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
             />
           </div>
         </div>
+
+        {isStarter && (
+          <button
+            type="button"
+            onClick={loadSampleProducts}
+            style={{ border: "1px dashed #14161A", background: "#FAF9F6", padding: "10px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, cursor: "pointer", textAlign: "left" }}
+          >
+            load this template&apos;s sample products →
+          </button>
+        )}
 
         {!isStarter && (
         <button

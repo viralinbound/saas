@@ -129,6 +129,38 @@ export function tokensFromLayout(L: Layout): ThemeTokens {
   };
 }
 
+/** The full starter-config a store gets when it adopts one of the six .dc layouts. */
+export function seedStarterConfig(
+  key: string | null | undefined,
+  storeName: string
+): { config: StoreConfig; tokens: ThemeTokens } {
+  const L = starterLayout(key);
+  return {
+    config: { sections: [], layout: seedLayoutPatch(L, storeName), blocks: { ...DEFAULT_LAYOUT_BLOCKS } },
+    tokens: tokensFromLayout(L),
+  };
+}
+
+const num = (s: string) => parseInt(String(s).replace(/[^0-9]/g, ""), 10) || 0;
+
+/** A .dc layout's demo products as rows ready to INSERT into `products`
+ *  (prices in paise, variants as a "a / b / c" string, published). */
+export function layoutSampleProductRows(key: string | null | undefined, storeId: string) {
+  const L = starterLayout(key);
+  return L.products.map((p) => ({
+    store_id: storeId,
+    name: p.name,
+    description: `${p.name} — ${L.bestFor}`,
+    price: num(p.price) * 100,
+    mrp: p.mrp ? num(p.mrp) * 100 : null,
+    image: p.img,
+    category: (p.badge || L.chips[1] || "all").toLowerCase().replace(/[^a-z0-9 ]+/g, "").trim() || "all",
+    variants: p.variants.join(" / "),
+    stock: 100,
+    published: true,
+  }));
+}
+
 function csv(list: string[] | undefined, fallback: string[]): string[] {
   if (!list?.length) return fallback;
   return list.map((s) => String(s).trim()).filter(Boolean);
