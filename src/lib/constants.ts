@@ -48,13 +48,15 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS;
 
+// Kept in lock-step with the six .dc layouts (src/lib/layoutPreviews.ts) and
+// the public.templates rows (migration 20260901120000_dc_templates).
 export const THEMES = [
-  { key: "fashion", name: "Luxe Apparel & Fashion", industry: "apparel", hero: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&auto=format&fit=crop", accent: "#0052FF", announcement: "✨ GET FLAT 15% OFF WITH CODE: LAUNCH15" },
-  { key: "bakery", name: "Artisan Bakery & Café", industry: "bakery", hero: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop", accent: "#B45309", announcement: "🥐 FRESH BATCH OUT OF OVEN — SAME DAY DELIVERY" },
-  { key: "skincare", name: "Glow Organic Skincare", industry: "skincare", hero: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&auto=format&fit=crop", accent: "#059669", announcement: "🌿 100% DERMATOLOGIST-FORMULATED · TOXIN-FREE" },
-  { key: "kirana", name: "Fresh Mart & Kirana", industry: "grocery", hero: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop", accent: "#16A34A", announcement: "🥦 FARM TO TABLE · 3-HOUR DELIVERY" },
-  { key: "tech", name: "Cyber Tech & Gadgets", industry: "electronics", hero: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop", accent: "#7C3AED", announcement: "⚡ OFFICIAL WARRANTY · NO COST EMI" },
-  { key: "jewels", name: "Royal Gold & Jewellery", industry: "jewellery", hero: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&auto=format&fit=crop", accent: "#B8860B", announcement: "💎 BIS HALLMARKED GOLD · INSURED TRANSIT" },
+  { key: "fashion", name: "apparel & fashion", industry: "apparel", hero: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&auto=format&fit=crop", accent: "#98502F", announcement: "festive drop · 30% off ethnic" },
+  { key: "bakery", name: "bakery & café", industry: "bakery", hero: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop", accent: "#C2410C", announcement: "order by 9pm for morning delivery" },
+  { key: "skincare", name: "organic skincare", industry: "skincare", hero: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&auto=format&fit=crop", accent: "#2F6B4F", announcement: "routine builder · save 15% on any 3" },
+  { key: "kirana", name: "kirana & grocery", industry: "grocery", hero: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop", accent: "#3F8F29", announcement: "order before 2pm · same-day delivery" },
+  { key: "tech", name: "tech & gadgets", industry: "electronics", hero: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop", accent: "#4F7BFF", announcement: "launch week · flat ₹500 off + no-cost emi" },
+  { key: "jewels", name: "gold & jewellery", industry: "jewellery", hero: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&auto=format&fit=crop", accent: "#8A6A17", announcement: "bis hallmarked · insured delivery · try at home" },
 ] as const;
 
 export type ThemeKey = (typeof THEMES)[number]["key"];
