@@ -220,7 +220,7 @@ const SCOPE = [
 
 const GUARANTEES = [
   { n: "01", name: "not a builder", line: "we do the building. you never have to learn a page editor." },
-  { n: "02", name: "not a ticket queue", line: "whatsapp a human, usually the one who built your store." },
+  { n: "02", name: "not a ticket queue", line: "whatsapp a human, usually the one who built your store. no bots, no queue number." },
   { n: "03", name: "not a template farm", line: "every layout has 350+ shipped stores of evidence behind it." },
 ];
 
@@ -627,34 +627,44 @@ export function MarketingHome() {
         </div>
       </section>
 
-      {/* ============ STUDIO ============ */}
-      <section id="studio" style={{ borderBottom: "1px solid #E4E1DA", background: "#FAF9F6", scrollMarginTop: 150 }}>
+      {/* ============ STUDIO (06 — faithful to SuperShowroom Site.dc.html) ============ */}
+      <section id="studio" style={{ borderBottom: "1px solid #E4E1DA", background: "#F1EFE9", scrollMarginTop: 150 }}>
         <div style={{ maxWidth: 1360, margin: "0 auto", padding: "96px 28px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: 64, alignItems: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", gap: "48px 64px", alignItems: "start" }}>
             <div className="reveal-l">
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>06 / the studio</div>
-              <h2 style={{ fontFamily: SERIF, fontSize: "clamp(36px, 4.6vw, 68px)", lineHeight: 0.96, letterSpacing: "-0.02em", marginTop: 14 }}>you don&apos;t lose to competitors. you lose months to vendors.</h2>
-              <p style={{ fontSize: 17, lineHeight: 1.6, marginTop: 24 }}>supershowroom is built and run by viral inbound, a founder-led studio in bengaluru with 350+ shipped projects behind it. the person who answers your whatsapp is the person who built your store.</p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 28 }}>
+              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A", marginBottom: 16 }}>06 / the studio</div>
+              <h2 style={{ fontSize: "clamp(38px, 4.6vw, 72px)", lineHeight: 0.9, fontWeight: 700, letterSpacing: "-0.03em" }}>
+                you don&apos;t lose to competitors. you lose <span style={{ fontWeight: 600, color: "#24457A" }}>months to vendors.</span>
+              </h2>
+              <p style={{ fontSize: 17, lineHeight: 1.6, marginTop: 24, maxWidth: 620 }}>supershowroom is built and run by viral inbound, a founder-led studio in bengaluru with 350+ shipped projects behind it. the person who answers your whatsapp is the person who built your store.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 120px), 1fr))", border: "1px solid #E4E1DA", marginTop: 32, background: "#FAF9F6" }}>
                 {[
                   { value: "350+", label: "shipped", fg: "#14161A" },
                   { value: "4", label: "plans", fg: "#14161A" },
                   { value: "1:1", label: "founder support", fg: "#24457A" },
-                  { value: "0", label: "lock-in", fg: "#2F6B4F" },
-                ].map((s) => (
-                  <div key={s.label} style={{ border: "1px solid #E4E1DA", borderRadius: 999, background: "#F1EFE9", padding: "11px 20px" }}>
-                    <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 700, color: s.fg }}>{s.value}</span>
-                    <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", marginLeft: 8, opacity: 0.7 }}>{s.label}</span>
+                  { value: "0", label: "lock-in", fg: "#14161A" },
+                ].map((s, k, arr) => (
+                  <div key={s.label} style={{ padding: "20px 14px", borderRight: k < arr.length - 1 ? "1px solid #E4E1DA" : undefined }}>
+                    <div style={{ fontFamily: MONO, fontSize: 28, fontWeight: 700, color: s.fg }}>{s.value}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 4 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
             </div>
             <div style={{ display: "grid", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="reveal-r" style={{ aspectRatio: "4 / 5", border: "1px solid #E4E1DA", overflow: "hidden" }}>
+                  <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=700&auto=format&fit=crop" alt="herbal essence catalog shot" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div className="reveal-r" style={{ aspectRatio: "4 / 5", border: "1px solid #E4E1DA", overflow: "hidden" }}>
+                  <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&auto=format&fit=crop" alt="royal gems product shot" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              </div>
               {GUARANTEES.map((g) => (
-                <div key={g.n} className="reveal-r" style={{ border: "1px solid #E4E1DA", borderRadius: 26, background: "#F1EFE9", padding: "26px 28px" }}>
+                <div key={g.n} className="reveal-r" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 26, boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#24457A" }}>guarantee {g.n}</div>
-                  <h3 style={{ fontFamily: SERIF, fontSize: 30, letterSpacing: "-0.02em", marginTop: 8 }}>{g.name}</h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.55, marginTop: 8, opacity: 0.76 }}>{g.line}</p>
+                  <h3 style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 6 }}>{g.name}</h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.55, marginTop: 8 }}>{g.line}</p>
                 </div>
               ))}
             </div>
