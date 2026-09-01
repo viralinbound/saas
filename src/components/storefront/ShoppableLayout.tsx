@@ -8,12 +8,14 @@
  * chrome: callers wrap it (marketing preview bar, or the merchant console).
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { numOf, type Layout } from "@/lib/layoutPreviews";
 import { buildLayoutView } from "@/lib/layoutView";
 import { LayoutStorefrontView, type ShopApi } from "@/components/marketing/LayoutStorefrontView";
 import type { LayoutBlocks } from "@/lib/layoutCommerce";
 import { saveOrder } from "@/lib/orderHistory";
+import { StorefrontAccountPanel } from "@/components/storefront/StorefrontAccountPanel";
+import { loadCustomer, saveCustomer, clearCustomer, type CustomerSession } from "@/lib/customerSession";
 
 type P = Layout["products"][number];
 type Line = { p: P; qty: number; variant: string };
@@ -31,6 +33,7 @@ export function ShoppableLayout({
   screen,
   onScreen,
   idx = 0,
+  accountSlug,
 }: {
   layout: Layout;
   blocks?: Partial<LayoutBlocks>;
@@ -42,6 +45,9 @@ export function ShoppableLayout({
   screen?: Screen;
   onScreen?: (s: Screen) => void;
   idx?: number;
+  /** real store slug — enables customer sign-in/up on this store. Omitted on the
+   *  marketing template preview (no real store to hold accounts). */
+  accountSlug?: string;
 }) {
   const L = layout;
   const onDark = L.bg === "#0E1116";
@@ -63,6 +69,13 @@ export function ShoppableLayout({
   const [searchOpen, setSearchOpen] = useState(false);
   const [galleryPick, setGalleryPick] = useState("");
   const [pinOK, setPinOK] = useState(false);
+
+  // storefront customer session (per store) — only when accountSlug is set
+  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const [acctOpen, setAcctOpen] = useState(false);
+  useEffect(() => {
+    if (accountSlug) setCustomer(loadCustomer(accountSlug));
+  }, [accountSlug]);
 
   const jumpTo = (id: string) => {
     if (typeof document === "undefined") return;
@@ -121,6 +134,8 @@ export function ShoppableLayout({
     setGalleryPick,
     checkPin: () => setPinOK(true),
     toggleSearch: () => setSearchOpen((o) => !o),
+    openAccount: () => { if (accountSlug) setAcctOpen(true); },
+    account: customer ? { name: customer.customer.name } : null,
     goCart: () => { setScreen("cart"); scrollTop(); },
     goHome: () => { setPlaced(null); setCat(""); setQuery(""); setSearchOpen(false); setScreen("home"); scrollTop(); },
     placeOrder,
@@ -130,17 +145,33 @@ export function ShoppableLayout({
   };
 
   return (
-    <LayoutStorefrontView
-      L={L}
-      screen={scr}
-      v={v}
-      btnFg={btnFg}
-      onDark={onDark}
-      idx={idx}
-      onSlide={setSlide}
-      shop={shop}
-      blocks={blocks}
-      showBranding={showBranding}
-    />
+    <>
+      <LayoutStorefrontView
+        L={L}
+        screen={scr}
+        v={v}
+        btnFg={btnFg}
+        onDark={onDark}
+        idx={idx}
+        onSlide={setSlide}
+        shop={shop}
+        blocks={blocks}
+        showBranding={showBranding}
+      />
+      {acctOpen && accountSlug && (
+        <StorefrontAccountPanel
+          storeSlug={accountSlug}
+          accent={L.accent}
+          fg={L.fg}
+          card={L.card}
+          line={L.line}
+          btnFg={btnFg}
+          session={customer}
+          onAuthed={(s) => { saveCustomer(accountSlug, s); setCustomer(s); setAcctOpen(false); }}
+          onLogout={() => { clearCustomer(accountSlug); setCustomer(null); setAcctOpen(false); }}
+          onClose={() => setAcctOpen(false)}
+        />
+      )}
+    </>
   );
 }

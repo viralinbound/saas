@@ -47,6 +47,7 @@ export function MerchantLayoutStorefront({
       showBranding={demo}
       orderSlug={storeSlug}
       whatsappNumber={wa}
+      accountSlug={storeSlug}
     />
   );
 }

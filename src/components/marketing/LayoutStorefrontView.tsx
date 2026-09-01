@@ -53,6 +53,8 @@ export type ShopApi = {
   setGalleryPick: (src: string) => void;
   checkPin: () => void;
   toggleSearch: () => void;
+  openAccount: () => void;
+  account: { name: string | null } | null;
   goCart: () => void;
   goHome: () => void;
   placeOrder: () => void;
@@ -134,7 +136,9 @@ export function LayoutStorefrontView({
   </div>
   <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 13, fontSize: 13, color: L.fg }}>
     <span onClick={shop?.toggleSearch} style={{ opacity: 0.75, ...pointer }}>search</span>
-    <span onClick={shop?.goCart} style={{ opacity: 0.75, ...pointer }}>account</span>
+    <span onClick={shop?.openAccount} style={{ opacity: 0.75, fontWeight: shop?.account ? 700 : 400, color: shop?.account ? L.accent : undefined, ...pointer }}>
+      {shop?.account ? (shop.account.name ? shop.account.name.split(" ")[0].toLowerCase() : "account") : "account"}
+    </span>
     <span onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
   </div>
   {shop?.searchOpen && (
