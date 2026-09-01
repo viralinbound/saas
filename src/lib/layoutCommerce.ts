@@ -6,6 +6,20 @@ import { mediaCover } from "./media";
 export const STARTER_TEMPLATE_KEYS = ["fashion", "bakery", "skincare", "kirana", "tech", "jewels"] as const;
 export type StarterKey = (typeof STARTER_TEMPLATE_KEYS)[number];
 
+/** Short display names for the six starter templates (industry-preset list). */
+export const STARTER_TEMPLATE_NAMES: Record<StarterKey, string> = {
+  fashion: "apparel & fashion",
+  bakery: "bakery & café",
+  skincare: "organic skincare",
+  kirana: "kirana & grocery",
+  tech: "tech & gadgets",
+  jewels: "gold & jewellery",
+};
+
+export function starterTemplateName(key: string): string {
+  return STARTER_TEMPLATE_NAMES[key as StarterKey] ?? key;
+}
+
 export const LAYOUT_BLOCKS = [
   { id: "promo", label: "promo bar" },
   { id: "hero", label: "hero" },
@@ -34,9 +48,17 @@ export type LayoutPatch = {
   gridTitle?: string;
   gridMeta?: string;
   banner?: Partial<Layout["banner"]>;
+  tiles?: Layout["tiles"];
+  signature?: Layout["signature"];
+  reviews?: Layout["reviews"];
+  trust?: Layout["trust"];
+  whatsapp?: string;
   bg?: string;
   card?: string;
   fg?: string;
+  line?: string;
+  footBg?: string;
+  footFg?: string;
   accent?: string;
   font?: string;
 };
@@ -82,9 +104,17 @@ export function seedLayoutPatch(L: Layout, storeName: string): LayoutPatch {
     gridTitle: L.gridTitle,
     gridMeta: L.gridMeta,
     banner: { ...L.banner },
+    tiles: L.tiles.map((t) => ({ ...t })),
+    signature: { title: L.signature.title, rows: L.signature.rows.map((r) => ({ ...r })) },
+    reviews: L.reviews.map((r) => ({ ...r })),
+    trust: L.trust.map((t) => ({ ...t })),
+    whatsapp: "918431101466",
     bg: L.bg,
     card: L.card,
     fg: L.fg,
+    line: L.line,
+    footBg: L.footBg,
+    footFg: L.footFg,
     accent: L.accent,
     font: L.font,
   };
@@ -164,10 +194,16 @@ export function mergeMerchantLayout(
     gridTitle: p.gridTitle ?? fromSections.gridTitle ?? base.gridTitle,
     gridMeta: p.gridMeta || base.gridMeta,
     banner,
-    trust: fromSections.trust?.length ? fromSections.trust : base.trust,
+    tiles: p.tiles?.length ? p.tiles : base.tiles,
+    signature: p.signature?.rows?.length ? p.signature : base.signature,
+    reviews: p.reviews?.length ? p.reviews : base.reviews,
+    trust: p.trust?.length ? p.trust : fromSections.trust?.length ? fromSections.trust : base.trust,
     bg: p.bg || base.bg,
     card: p.card || base.card,
     fg: p.fg || base.fg,
+    line: p.line || base.line,
+    footBg: p.footBg || base.footBg,
+    footFg: p.footFg || base.footFg,
     accent: tokens?.accent || p.accent || base.accent,
     font: tokens?.headingFont || p.font || base.font,
   };

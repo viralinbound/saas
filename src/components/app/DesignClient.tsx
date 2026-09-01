@@ -20,6 +20,8 @@ import {
   starterLayout,
   seedLayoutPatch,
   tokensFromLayout,
+  starterTemplateName,
+  STARTER_TEMPLATE_KEYS,
   DEFAULT_LAYOUT_BLOCKS,
   LAYOUT_BLOCKS,
   type LayoutPatch,
@@ -177,11 +179,35 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
 
   // ── starter (.dc) layout editing ─────────────────────────────────────
   const isStarter = !!(config.layout && Object.keys(config.layout).length > 0);
-  const patch = (config.layout || {}) as LayoutPatch;
+  const savedPatch = (config.layout || {}) as LayoutPatch;
+  // Show every field the .dc layout offers: fall back to the base layout for
+  // anything the merchant hasn't touched yet (e.g. stores seeded before a
+  // field was added). Edits still write only to config.layout.
+  const patch: LayoutPatch = isStarter
+    ? { ...seedLayoutPatch(starterLayout(templateKey), storeName || "Your Store"), ...savedPatch }
+    : savedPatch;
   const blockState: Record<string, boolean> = { ...DEFAULT_LAYOUT_BLOCKS, ...(config.blocks || {}) };
 
   function patchLayout(p: Partial<LayoutPatch>) {
     mutate((c) => ({ ...c, layout: { ...(c.layout as LayoutPatch), ...p } }));
+  }
+  // repeatable-row list editing on a LayoutPatch array field
+  function patchRow<K extends "tiles" | "reviews" | "trust">(field: K, i: number, row: Partial<NonNullable<LayoutPatch[K]>[number]>) {
+    const list = [...((patch[field] as unknown[]) ?? [])] as Record<string, unknown>[];
+    list[i] = { ...list[i], ...row };
+    patchLayout({ [field]: list } as Partial<LayoutPatch>);
+  }
+  function addRow<K extends "tiles" | "reviews" | "trust">(field: K, blank: Record<string, unknown>) {
+    patchLayout({ [field]: [...((patch[field] as unknown[]) ?? []), blank] } as Partial<LayoutPatch>);
+  }
+  function delRow<K extends "tiles" | "reviews" | "trust">(field: K, i: number) {
+    patchLayout({ [field]: ((patch[field] as unknown[]) ?? []).filter((_, x) => x !== i) } as Partial<LayoutPatch>);
+  }
+  function patchSig(row: number, r: { label?: string; value?: string }) {
+    const sig = patch.signature ?? { title: "", rows: [] };
+    const rows = [...sig.rows];
+    rows[row] = { ...rows[row], ...r };
+    patchLayout({ signature: { ...sig, rows } });
   }
   function toggleBlock(id: string) {
     mutate((c) => {
@@ -356,7 +382,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
         <div>
           <div style={label}>industry preset</div>
           <div style={{ display: "grid", gap: 6 }}>
-            {(templates.length ? templates : THEMES.map((t) => ({ key: t.key, name: t.name, locked: false, tierLabel: null }))).map((t) => {
+            {(templates.length ? templates : STARTER_TEMPLATE_KEYS.map((k) => ({ key: k, name: starterTemplateName(k), locked: false, tierLabel: null }))).map((t) => {
               const selected = templateKey === t.key;
               return (
                 <button
@@ -378,9 +404,9 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
                     opacity: t.locked ? 0.72 : 1,
                   }}
                 >
-                  <span>{t.key}</span>
+                  <span>{isStarterTemplate(t.key) ? starterTemplateName(t.key) : (t.name || t.key)}</span>
                   <span style={{ fontFamily: MONO, fontSize: 9 }}>
-                    {t.locked ? "lock" : selected ? "on" : ""}
+                    {t.locked ? "lock" : selected ? "✦" : ""}
                   </span>
                 </button>
               );
@@ -540,6 +566,93 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
                   </label>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <div style={label}>colours</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {([
+                  ["bg", "page"],
+                  ["card", "card"],
+                  ["fg", "text"],
+                  ["line", "lines"],
+                  ["footBg", "footer bg"],
+                  ["footFg", "footer text"],
+                ] as [keyof LayoutPatch, string][]).map(([k, lbl]) => (
+                  <label key={k} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 700 }}>
+                    <input
+                      type="color"
+                      value={String((patch[k] as string) || "#ffffff")}
+                      onChange={(e) => patchLayout({ [k]: e.target.value } as Partial<LayoutPatch>)}
+                      style={{ width: 34, height: 30, border: "1px solid #E4E1DA", background: "#fff", padding: 2 }}
+                    />
+                    {lbl}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>category tiles</div>
+              <div style={{ display: "grid", gap: 8 }}>
+                {(patch.tiles ?? []).map((t, i) => (
+                  <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6 }}>
+                    <input style={inp} value={t.name} placeholder="name" onChange={(e) => patchRow("tiles", i, { name: e.target.value })} />
+                    <input style={inp} value={t.count} placeholder="count" onChange={(e) => patchRow("tiles", i, { count: e.target.value })} />
+                    <button type="button" onClick={() => delRow("tiles", i)} style={{ border: "1px solid #E4E1DA", background: "#fff", padding: "0 10px", cursor: "pointer", fontFamily: MONO }}>×</button>
+                  </div>
+                ))}
+                <button type="button" onClick={() => addRow("tiles", { name: "new", count: "0 items", img: (patch.tiles ?? [])[0]?.img || "" })} style={{ border: "1px dashed #E4E1DA", background: "#fff", padding: "6px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>+ tile</button>
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>signature features</div>
+              <input style={{ ...inp, marginBottom: 8 }} value={patch.signature?.title ?? ""} placeholder="panel title" onChange={(e) => patchLayout({ signature: { title: e.target.value, rows: patch.signature?.rows ?? [] } })} />
+              <div style={{ display: "grid", gap: 8 }}>
+                {(patch.signature?.rows ?? []).map((r, i) => (
+                  <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    <input style={inp} value={r.label} placeholder="label" onChange={(e) => patchSig(i, { label: e.target.value })} />
+                    <input style={inp} value={r.value} placeholder="value" onChange={(e) => patchSig(i, { value: e.target.value })} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>customer reviews</div>
+              <div style={{ display: "grid", gap: 10 }}>
+                {(patch.reviews ?? []).map((r, i) => (
+                  <div key={i} style={{ border: "1px solid #E4E1DA", padding: 8, display: "grid", gap: 6 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6 }}>
+                      <input style={inp} value={r.name} placeholder="name" onChange={(e) => patchRow("reviews", i, { name: e.target.value })} />
+                      <input style={inp} value={r.city} placeholder="city" onChange={(e) => patchRow("reviews", i, { city: e.target.value })} />
+                      <button type="button" onClick={() => delRow("reviews", i)} style={{ border: "1px solid #E4E1DA", background: "#fff", padding: "0 10px", cursor: "pointer", fontFamily: MONO }}>×</button>
+                    </div>
+                    <textarea style={{ ...inp, minHeight: 54, resize: "vertical" }} value={r.text} placeholder="review" onChange={(e) => patchRow("reviews", i, { text: e.target.value })} />
+                  </div>
+                ))}
+                <button type="button" onClick={() => addRow("reviews", { name: "", city: "", text: "" })} style={{ border: "1px dashed #E4E1DA", background: "#fff", padding: "6px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>+ review</button>
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>trust badges</div>
+              <div style={{ display: "grid", gap: 6 }}>
+                {(patch.trust ?? []).map((t, i) => (
+                  <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6 }}>
+                    <input style={inp} value={t.title} placeholder="title" onChange={(e) => patchRow("trust", i, { title: e.target.value })} />
+                    <input style={inp} value={t.sub} placeholder="sub" onChange={(e) => patchRow("trust", i, { sub: e.target.value })} />
+                    <button type="button" onClick={() => delRow("trust", i)} style={{ border: "1px solid #E4E1DA", background: "#fff", padding: "0 10px", cursor: "pointer", fontFamily: MONO }}>×</button>
+                  </div>
+                ))}
+                <button type="button" onClick={() => addRow("trust", { title: "new badge", sub: "" })} style={{ border: "1px dashed #E4E1DA", background: "#fff", padding: "6px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>+ badge</button>
+              </div>
+            </div>
+
+            <div>
+              <div style={label}>whatsapp number</div>
+              <input style={inp} value={patch.whatsapp ?? ""} placeholder="9199…" onChange={(e) => patchLayout({ whatsapp: e.target.value })} />
             </div>
 
             <div>

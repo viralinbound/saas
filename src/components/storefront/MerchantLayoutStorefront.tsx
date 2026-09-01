@@ -37,6 +37,7 @@ export function MerchantLayoutStorefront({
   }, [templateKey, storeName, config, tokens, products]);
 
   const blocks = useMemo(() => coerceBlocks(config.blocks), [config.blocks]);
+  const wa = ((config.layout as { whatsapp?: string } | undefined)?.whatsapp || "918431101466").replace(/[^0-9]/g, "");
 
   return (
     <ShoppableLayout
@@ -44,6 +45,7 @@ export function MerchantLayoutStorefront({
       blocks={blocks}
       showBranding={demo}
       orderSlug={storeSlug}
+      whatsappNumber={wa}
     />
   );
 }
