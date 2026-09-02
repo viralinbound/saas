@@ -8,16 +8,31 @@ import { storefrontTag } from "@/lib/stores";
 
 /** Drop every cached copy of a store's public storefront so a publish /
  *  unpublish shows up on the live site within a second, across all the
- *  addresses a visitor can arrive on (slug, subdomain, clean host path). */
+ *  addresses a visitor can arrive on (slug, subdomain, clean host path).
+ *
+ *  Best-effort only: a cache-revalidation failure must NEVER fail the publish
+ *  itself, so every call is guarded. */
 function revalidateStorefront(keys: (string | null | undefined)[], hostPath?: string | null) {
-  for (const k of new Set(keys.filter(Boolean) as string[])) revalidateTag(storefrontTag(k));
-  const slug = keys.find(Boolean);
-  if (slug) revalidatePath(`/s/${slug}`);
-  if (hostPath) {
-    revalidateTag(storefrontTag(hostPath));
-    revalidatePath(`/h/${hostPath}`);
-    revalidatePath(`/${hostPath}`);
-  }
+  const safe = (fn: () => void) => {
+    try {
+      fn();
+    } catch {
+      /* cache revalidation is an optimisation, not a requirement */
+    }
+  };
+
+  // Tag-based invalidation covers every address (slug, subdomain, clean host
+  // path) — getStorefrontRaw() tags each cache entry with `store:<the key the
+  // visitor arrived on>`.
+  const all = [...keys, hostPath].filter((k): k is string => typeof k === "string" && k.length > 0);
+  for (const k of new Set(all)) safe(() => revalidateTag(storefrontTag(k)));
+  safe(() => revalidateTag("storefronts"));
+
+  // Also drop the full-route cache for the plain /s/<slug> page (a simple,
+  // single-segment path — safe to pass concretely). The /h/[...slug] catch-all
+  // is handled by the tag above, not revalidatePath.
+  const slug = keys.find((k): k is string => typeof k === "string" && k.length > 0);
+  if (slug) safe(() => revalidatePath(`/s/${slug}`));
 }
 
 async function currentStore(_supabase: Awaited<ReturnType<typeof createClient>>) {
