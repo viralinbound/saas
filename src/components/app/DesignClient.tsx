@@ -852,59 +852,61 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: 8 }}>
+        <div className="ssr-editor-toolbar">
+          <div className="ssr-device-group">
             {(["mobile", "tablet", "desktop"] as const).map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setPreviewDevice(d)}
                 style={{
-                  border: "1px solid #E4E1DA",
+                  border: `1px solid ${previewDevice === d ? "#24457A" : "#E4E1DA"}`,
                   background: previewDevice === d ? "#EEF2F8" : "#FAF9F6",
-                  padding: "9px 14px",
+                  color: previewDevice === d ? "#24457A" : "#14161A",
+                  padding: "8px 13px",
                   fontFamily: MONO,
                   fontSize: 10,
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   fontWeight: 700,
                   cursor: "pointer",
+                  borderRadius: 4,
                 }}
               >
-                {d}
+                {d === "mobile" ? "📱 mobile" : d === "tablet" ? "📟 tablet" : "💻 desktop"}
               </button>
             ))}
             <button
               type="button"
               onClick={() => setPreviewNonce((n) => n + 1)}
-              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "9px 14px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, cursor: "pointer" }}
+              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "8px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, cursor: "pointer", borderRadius: 4 }}
             >
-              refresh
+              ↻ refresh
             </button>
             <a
               href={`/preview/${storeSlug}`}
               target="_blank"
               rel="noreferrer"
-              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "9px 14px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", color: "#14161A" }}
+              style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "8px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", color: "#14161A", borderRadius: 4, display: "inline-flex", alignItems: "center" }}
             >
               open ↗
             </a>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "#24457A" }}>{changeLabel}</span>
-            <button type="button" onClick={save} disabled={saving || !dirty} style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "10px 14px", fontSize: 13, fontWeight: 700, cursor: dirty ? "pointer" : "default", opacity: dirty ? 1 : 0.45 }}>
+          <div className="ssr-action-group">
+            <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: dirty ? "#B45309" : "#24457A", fontWeight: 700 }}>{changeLabel}</span>
+            <button type="button" onClick={save} disabled={saving || !dirty} style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: dirty ? "pointer" : "default", opacity: dirty ? 1 : 0.45, borderRadius: 4 }}>
               {saving ? "saving…" : "save draft"}
             </button>
             <button
               type="button"
               onClick={publish}
               disabled={publishing}
-              style={{ border: "1px solid #E4E1DA", background: "#24457A", color: "#FFFFFF", padding: "10px 18px", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}
+              style={{ border: "1px solid #24457A", background: "#24457A", color: "#FFFFFF", padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 18px rgba(36,69,122,0.18)", borderRadius: 4 }}
             >
-              {publishing ? "publishing…" : "publish theme"}
+              {publishing ? "publishing…" : "publish theme ✦"}
             </button>
             {(status === "live" || status === "preview") && (
-              <button type="button" onClick={unpublish} disabled={publishing} style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#fff", padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+              <button type="button" onClick={unpublish} disabled={publishing} style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#fff", padding: "9px 13px", fontWeight: 700, cursor: "pointer", fontSize: 12, borderRadius: 4 }}>
                 unpublish
               </button>
             )}
@@ -915,27 +917,41 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
           <div style={{ ...box, background: status === "live" ? "#EAF4EC" : "#EEF2F8", fontWeight: 600, fontSize: 14 }}>{msg}</div>
         )}
 
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B" }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B", wordBreak: "break-all" }}>
           {status === "live" ? "live" : status === "preview" ? "demo preview" : "will publish to"} ·{" "}
-          <a href={hostedFull} target="_blank" rel="noreferrer" style={{ color: "#24457A", fontWeight: 700, wordBreak: "break-all" }}>
+          <a href={hostedFull} target="_blank" rel="noreferrer" style={{ color: "#24457A", fontWeight: 700 }}>
             {hostedFull}
           </a>
           {liveUrl ? ` · ${liveUrl}` : ""}
           {publishedAt ? ` · ${new Date(publishedAt).toLocaleDateString()}` : ""}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 8px" }}>
+        <div style={{ display: "flex", justifyContent: "center", padding: "6px 0 12px", width: "100%", overflowX: "auto" }}>
           <div
             style={{
               border: "1px solid #E4E1DA",
               background: "#14161A",
-              padding: 9,
-              borderRadius: mobile ? 34 : 0,
-              boxShadow: "0 12px 28px rgba(20,22,26,0.10)",
-              width: mobile ? 380 : tablet ? 820 : "100%",
+              padding: mobile ? "12px 10px 14px" : tablet ? "14px 14px 16px" : "10px",
+              borderRadius: mobile ? 36 : tablet ? 22 : 8,
+              boxShadow: "0 18px 48px rgba(20,22,26,0.14)",
+              width: mobile ? "min(380px, 100%)" : tablet ? "min(768px, 100%)" : "100%",
               maxWidth: "100%",
+              transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
+            {!mobile && !tablet && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px 10px", opacity: 0.7 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444", display: "inline-block" }} />
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F59E0B", display: "inline-block" }} />
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", display: "inline-block" }} />
+                <span style={{ fontFamily: MONO, fontSize: 9, color: "#9FBBE0", marginLeft: 8, letterSpacing: "0.08em" }}>
+                  {storeSlug}.supershowroom.com
+                </span>
+              </div>
+            )}
+            {mobile && (
+              <div style={{ width: 44, height: 4, background: "rgba(255,255,255,0.22)", borderRadius: 2, margin: "0 auto 8px" }} />
+            )}
             <iframe
               key={previewNonce}
               src={`/preview/${storeSlug}?edit=1&n=${previewNonce}`}
@@ -943,10 +959,10 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               style={{
                 display: "block",
                 width: "100%",
-                height: mobile ? 640 : tablet ? 920 : 720,
+                height: mobile ? "clamp(520px, 70vh, 660px)" : tablet ? "clamp(620px, 75vh, 840px)" : "740px",
                 border: 0,
                 background: "#fff",
-                borderRadius: mobile ? 26 : tablet ? 16 : 0,
+                borderRadius: mobile ? 26 : tablet ? 14 : 4,
               }}
             />
           </div>

@@ -53,13 +53,15 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
               <span><span style={{ display: "inline-block", width: 9, height: 9, background: "#24457A", marginRight: 5 }} />orders</span>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 210, marginTop: 26, borderBottom: "1px solid #E4E1DA", paddingBottom: 2 }}>
-            {days.map((d, i) => (
-              <div key={i} title={`${d.label} · ${formatMoney(d.rev, currency)} · ${d.ord} orders`} style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 3, height: "100%" }}>
-                <div style={{ flex: 1, height: `${Math.max(2, (d.rev / maxRev) * 100)}%`, background: "#14161A", transformOrigin: "50% 100%", animation: `growY .5s cubic-bezier(.2,.8,.2,1) ${i * 0.03}s both` }} />
-                <div style={{ width: 6, height: `${Math.max(2, (d.ord / maxOrd) * 100)}%`, background: "#24457A", transformOrigin: "50% 100%", animation: `growY .7s cubic-bezier(.2,.8,.2,1) ${i * 0.03}s both` }} />
-              </div>
-            ))}
+          <div style={{ overflowX: "auto", paddingBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 210, marginTop: 24, borderBottom: "1px solid #E4E1DA", paddingBottom: 2, minWidth: 260 }}>
+              {days.map((d, i) => (
+                <div key={i} title={`${d.label} · ${formatMoney(d.rev, currency)} · ${d.ord} orders`} style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 2, height: "100%" }}>
+                  <div style={{ flex: 1, height: `${Math.max(2, (d.rev / maxRev) * 100)}%`, background: "#14161A", transformOrigin: "50% 100%", animation: `growY .5s cubic-bezier(.2,.8,.2,1) ${i * 0.03}s both`, borderRadius: "2px 2px 0 0" }} />
+                  <div style={{ width: 5, height: `${Math.max(2, (d.ord / maxOrd) * 100)}%`, background: "#24457A", transformOrigin: "50% 100%", animation: `growY .7s cubic-bezier(.2,.8,.2,1) ${i * 0.03}s both`, borderRadius: "2px 2px 0 0" }} />
+                </div>
+              ))}
+            </div>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 9, opacity: 0.6, marginTop: 8 }}>
             <span>{days[0].label}</span><span>{days[7].label}</span><span>{days[13].label}</span>
@@ -134,10 +136,10 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
 
 function NeedCard({ title, body, cta, href, tint }: { title: string; body: string; cta: string; href: string; tint?: boolean }) {
   return (
-    <div style={{ border: "1px solid rgba(250,249,246,0.25)", padding: 14, background: tint ? "rgba(36,69,122,0.16)" : "transparent" }}>
+    <div style={{ border: "1px solid rgba(250,249,246,0.25)", padding: 14, background: tint ? "rgba(36,69,122,0.16)" : "transparent", borderRadius: 4 }}>
       <div style={{ fontSize: 15, fontWeight: 800 }}>{title}</div>
       <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{body}</div>
-      <a href={href} style={{ display: "inline-block", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#9FBBE0", marginTop: 10, textDecoration: "none" }}>{cta}</a>
+      <a href={href} style={{ display: "inline-block", fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#9FBBE0", marginTop: 10, textDecoration: "none", fontWeight: 700 }}>{cta}</a>
     </div>
   );
 }

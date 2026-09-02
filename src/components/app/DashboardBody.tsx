@@ -86,9 +86,9 @@ function Stat({
       boxShadow: lead ? "0 12px 28px rgba(20,22,26,0.10)" : "none",
     }}>
       <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>{label}</div>
-      <div style={{ fontSize: "clamp(1.7rem, 4.6vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, fontFamily: MONO }}>{value}</div>
+      <div style={{ fontSize: "clamp(1.4rem, 3.8vw, 2.2rem)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, fontFamily: MONO, wordBreak: "break-word" }}>{value}</div>
       {sub && (
-        <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: tone === "accent" ? "#24457A" : undefined, opacity: tone === "accent" ? 1 : 0.7 }}>{sub}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: tone === "accent" ? "#24457A" : undefined, opacity: tone === "accent" ? 1 : 0.7, wordBreak: "break-word" }}>{sub}</div>
       )}
     </div>
   );

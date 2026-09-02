@@ -115,8 +115,8 @@ aside a, aside a:hover { text-decoration: none; }
     top: 0 !important;
     left: 0 !important;
     bottom: 0;
-    width: 264px;
-    max-width: 82vw;
+    width: 270px;
+    max-width: 84vw;
     height: 100dvh !important;
     transform: translateX(-102%);
     transition: transform .26s cubic-bezier(.2,.8,.2,1);
@@ -134,24 +134,30 @@ aside a, aside a:hover { text-decoration: none; }
   .console-burger {
     display: inline-grid !important;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     flex: none;
     border: 1px solid #E4E1DA;
     background: #fff;
     color: #14161A;
-    font-size: 18px;
+    font-size: 19px;
     cursor: pointer;
+    border-radius: 4px;
   }
-  .console-header { padding: 12px 16px !important; gap: 12px !important; }
+  .console-header { padding: 14px 20px !important; gap: 14px !important; }
   .console-title { font-size: 21px !important; }
-  .console-body { padding: 18px 16px 56px !important; overflow-x: clip; }
+  .console-body { padding: 22px 20px 60px !important; overflow-x: clip; }
   /* any console table scrolls inside its own box, never the page */
   .console-body table { display: block; overflow-x: auto; white-space: nowrap; }
 }
+@media (max-width: 768px) {
+  .console-header { padding: 12px 16px !important; gap: 12px !important; }
+  .console-body { padding: 16px 16px 56px !important; }
+  .console-title { font-size: 19px !important; }
+}
 @media (max-width: 560px) {
   .console-datepill { display: none !important; }
-  .console-title { font-size: 18px !important; }
+  .console-title { font-size: 17px !important; }
 }
 /* stack the catalog list + editor drawer on smaller screens */
 @media (max-width: 900px) {
@@ -160,15 +166,17 @@ aside a, aside a:hover { text-decoration: none; }
 }
 
 /* ── Console data tables → stacked cards on phones (home-page-style) ──── */
-@media (max-width: 620px) {
+@media (max-width: 640px) {
   .rtable table { display: block; white-space: normal; overflow: visible; min-width: 0; }
   .rtable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .rtable tbody, .rtable tr, .rtable td { display: block; }
   .rtable tr {
     border: 1px solid #E4E1DA !important;
     background: #FAF9F6;
-    padding: 10px 14px;
-    margin-bottom: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(20,22,26,0.04);
   }
   .rtable td {
     display: flex;
@@ -176,19 +184,20 @@ aside a, aside a:hover { text-decoration: none; }
     align-items: baseline;
     gap: 12px;
     border: 0 !important;
-    padding: 5px 0 !important;
+    padding: 6px 0 !important;
     font-size: 13px;
     text-align: right;
   }
   .rtable td::before {
     content: attr(data-label);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 8px;
+    font-size: 8.5px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #24457A;
     text-align: left;
     flex: none;
+    font-weight: 700;
   }
   .rtable td.rt-wide { display: block; text-align: left; }
   .rtable td.rt-wide::before { display: block; margin-bottom: 4px; }
@@ -196,12 +205,38 @@ aside a, aside a:hover { text-decoration: none; }
 }
 
 /* dashboard cards and panels keep breathable spacing on tablets/phones */
-@media (max-width: 900px) {
-  .ssr-dash-panel { padding: 18px !important; }
+.ssr-dash-panel {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(20,22,26,0.04);
 }
-@media (max-width: 560px) {
-  .ssr-dash-stat { padding: 16px !important; }
-  .ssr-dash-stats { gap: 10px !important; }
+.ssr-dash-stat {
+  border-radius: 4px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.ssr-dash-stat:hover {
+  box-shadow: 0 4px 14px rgba(20,22,26,0.06);
+}
+
+@media (max-width: 1024px) {
+  .ssr-dash-split { grid-template-columns: 1fr !important; gap: 18px !important; }
+}
+@media (max-width: 900px) {
+  .ssr-dash-panel { padding: 20px !important; }
+}
+@media (max-width: 768px) {
+  .ssr-dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .ssr-dash-panel { padding: 16px !important; }
+  .ssr-dash-stat { padding: 16px 14px !important; }
+}
+@media (max-width: 480px) {
+  .ssr-dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .ssr-dash-stat { padding: 14px 12px !important; }
 }
 
 /* project-card stat tiles: 2×2 on the narrowest screens */
@@ -212,25 +247,46 @@ aside a, aside a:hover { text-decoration: none; }
 /* ── Visual editors (design & publish / website builder) on tablet + phone ── */
 .ssr-editor-shell {
   display: grid;
-  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
   min-height: calc(100vh - 74px);
 }
 .ssr-editor-rail {
   border-right: 1px solid #E4E1DA;
   background: #FAF9F6;
-  padding: 22px;
+  padding: 24px 22px;
   display: grid;
   gap: 22px;
   align-content: start;
 }
 .ssr-editor-canvas {
   background: #F1EFE9;
-  padding: 26px 30px 40px;
+  padding: 24px 28px 48px;
   display: grid;
   gap: 18px;
   align-content: start;
 }
 .ssr-editor-note { display: none; }
+
+.ssr-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ssr-device-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ssr-action-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 /* click-to-edit: flash the side-panel group the preview jumped us to */
 [data-edit-group] { scroll-margin-top: 12px; border-radius: 4px; }
@@ -251,7 +307,14 @@ aside a, aside a:hover { text-decoration: none; }
 }
 @media (max-width: 1024px) {
   .ssr-editor-shell { grid-template-columns: 1fr !important; }
-  .ssr-editor-rail { border-right: 0; border-bottom: 1px solid #E4E1DA; }
+  .ssr-editor-rail {
+    border-right: 0;
+    border-bottom: 1px solid #E4E1DA;
+    padding: 22px 20px !important;
+  }
+  .ssr-editor-canvas {
+    padding: 22px 20px 48px !important;
+  }
   .ssr-editor-2col { grid-template-columns: 1fr !important; }
   .ssr-editor-side { position: static !important; }
 
@@ -273,14 +336,19 @@ aside a, aside a:hover { text-decoration: none; }
     padding: 16px !important;
   }
   .ssr-builder-pane { max-height: 44vh; overflow-y: auto !important; overflow-x: hidden !important; }
-  /* the live preview can be wider than the phone — let it scroll inside the card
-     instead of spilling past the rounded border */
   .ssr-builder-canvas { padding: 16px !important; overflow: auto !important; }
   .ssr-builder-cols > :last-child { border-bottom: 0 !important; }
   .ssr-builder-host { display: none !important; }
-
 }
-@media (max-width: 760px) {
+@media (max-width: 768px) {
+  .ssr-editor-rail {
+    padding: 18px 16px !important;
+    gap: 18px !important;
+  }
+  .ssr-editor-canvas {
+    padding: 16px 16px 40px !important;
+    gap: 14px !important;
+  }
   .ssr-editor-note {
     display: block;
     background: #EEF2F8;
@@ -289,10 +357,27 @@ aside a, aside a:hover { text-decoration: none; }
     font-size: 12px;
     line-height: 1.5;
     color: #24457A;
-    margin-bottom: 12px;
+    border-radius: 4px;
+  }
+  .ssr-editor-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+  .ssr-device-group {
+    justify-content: flex-start;
+  }
+  .ssr-action-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .ssr-editor-rail {
+    padding: 16px 14px !important;
   }
   .ssr-editor-canvas {
-    padding: 18px 14px 28px !important;
+    padding: 14px 14px 36px !important;
   }
 }
 /* pricing / plans ROI card + more breathing room on phones */
