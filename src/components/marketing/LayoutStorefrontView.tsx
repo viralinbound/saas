@@ -6,6 +6,7 @@
  * mock) and /preview/template/[key] (full-bleed, the "live preview").
  */
 
+import { useState } from "react";
 import { MONO, avatarFor, inr, numOf, type Layout } from "@/lib/layoutPreviews";
 import { DEFAULT_LAYOUT_BLOCKS, type LayoutBlocks } from "@/lib/layoutCommerce";
 import { Img } from "@/components/storefront/Img";
@@ -29,6 +30,7 @@ export type LayoutView = {
 /** When present, the storefront is a working shoppable site (the /preview page). */
 export type ShopApi = {
   cartCount: number;
+  cartPulse: number;      // increments each add-to-cart — drives the nav pill bump
   cart: { p: P; qty: number; variant: string }[];
   active: P;
   qty: number;
@@ -92,6 +94,13 @@ export function LayoutStorefrontView({
   onEditPart?: (part: string) => void;
 }) {
   const b: LayoutBlocks = { ...DEFAULT_LAYOUT_BLOCKS, ...blocks };
+
+  // checkout micro-interactions (coupon + address are demo-only, animated)
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
+  const [couponNonce, setCouponNonce] = useState(0);
+  const [addrOpen, setAddrOpen] = useState(false);
+
   const slideData = v.slides[v.si];
   const setSlide = onSlide;
   const i = idx;
@@ -160,10 +169,31 @@ export function LayoutStorefrontView({
   .ssr-h-btn:active { transform: translateY(0); filter: brightness(0.94); }
   .ssr-h-link { text-underline-offset: 3px; }
   .ssr-h-link:hover { opacity: 1; text-decoration: underline; }
+
+  /* screen change (home / product / cart) slides up + fades in */
+  @keyframes ssrScreenIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .ssr-screen-in { animation: ssrScreenIn .34s cubic-bezier(.2,.7,.2,1) both; }
+
+  /* checkout blocks (coupon, address, payment rows) stagger in */
+  @keyframes ssrInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .ssr-anim-in { animation: ssrInUp .42s cubic-bezier(.2,.7,.2,1) both; }
+
+  /* nav cart pill bump on add-to-cart / buy-now */
+  @keyframes ssrCartBump { 0% { transform: scale(1); } 28% { transform: scale(1.22); } 55% { transform: scale(.94); } 100% { transform: scale(1); } }
+  .ssr-cart-bump { animation: ssrCartBump .5s ease; }
+
+  /* radio dot / success tick pop */
+  @keyframes ssrPop { 0% { transform: scale(0); } 68% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  .ssr-pop { animation: ssrPop .32s cubic-bezier(.2,.8,.2,1) both; }
+
+  .ssr-pay-row { transition: border-color .18s ease, background-color .18s ease, transform .12s ease; }
+  .ssr-pay-row:active { transform: scale(.99); }
+
   @media (prefers-reduced-motion: reduce) {
-    .ssr-h-card, .ssr-h-tile, .ssr-h-lift, .ssr-h-btn, .ssr-h-thumb img, .ssr-h-link { transition: none; }
+    .ssr-h-card, .ssr-h-tile, .ssr-h-lift, .ssr-h-btn, .ssr-h-thumb img, .ssr-h-link, .ssr-pay-row { transition: none; }
     .ssr-h-card:hover, .ssr-h-tile:hover, .ssr-h-lift:hover, .ssr-h-btn:hover { transform: none; }
     .ssr-h-card:hover .ssr-h-thumb img { transform: none; }
+    .ssr-screen-in, .ssr-anim-in, .ssr-cart-bump, .ssr-pop { animation: none; }
   }
 ` }} />
 {editable && (
@@ -194,7 +224,12 @@ export function LayoutStorefrontView({
     <span className="ssr-h-link" onClick={shop?.openAccount} style={{ opacity: 0.75, fontWeight: shop?.account ? 700 : 400, color: shop?.account ? L.accent : undefined, ...pointer }}>
       {shop?.account ? (shop.account.name ? shop.account.name.split(" ")[0].toLowerCase() : "account") : "account"}
     </span>
-    <span className="ssr-h-btn" onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
+    <span
+      key={`cartpill-${shop?.cartPulse ?? 0}`}
+      className={`ssr-h-btn${shop?.cartPulse ? " ssr-cart-bump" : ""}`}
+      onClick={shop?.goCart}
+      style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, display: "inline-block", ...pointer }}
+    >cart · {shop ? shop.cartCount : 3}</span>
   </div>
   {shop?.searchOpen && (
     <div style={{ flexBasis: "100%", display: "flex", gap: 8, marginTop: 4 }}>
@@ -205,7 +240,7 @@ export function LayoutStorefrontView({
 </div></Edit>
 
 {screen === "home" && (
-  <div>
+  <div className="ssr-screen-in">
     {b.hero && (
     <Edit part="content"><div style={{ position: "relative" }}>
       <div style={{ aspectRatio: "24 / 9", minHeight: 320, maxHeight: 520, overflow: "hidden" }}>
@@ -430,7 +465,7 @@ export function LayoutStorefrontView({
 )}
 
 {screen === "product" && (
-  <div>
+  <div className="ssr-screen-in">
     <div style={{ padding: "13px 24px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", color: L.fg, opacity: 0.6, borderBottom: `1px solid ${L.line}` }}>{L.pdp.crumb}</div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 26, padding: "22px 24px" }}>
       <div>
@@ -558,8 +593,8 @@ export function LayoutStorefrontView({
 )}
 
 {screen === "cart" && shop && shop.placed && (
-  <div style={{ padding: "60px 24px", textAlign: "center" }}>
-    <div style={{ width: 54, height: 54, borderRadius: "50%", background: L.accent, color: btnFg, display: "grid", placeItems: "center", fontSize: 26, margin: "0 auto" }}>✓</div>
+  <div className="ssr-screen-in" style={{ padding: "60px 24px", textAlign: "center" }}>
+    <div className="ssr-pop" style={{ width: 54, height: 54, borderRadius: "50%", background: L.accent, color: btnFg, display: "grid", placeItems: "center", fontSize: 26, margin: "0 auto" }}>✓</div>
     <div style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, color: L.fg, marginTop: 16 }}>order placed</div>
     <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.1em", color: L.fg, opacity: 0.7, marginTop: 8 }}>{shop.placed} · GST invoice emailed · updates on whatsapp</div>
     <button type="button" className="ssr-h-btn" onClick={shop.goHome} style={{ marginTop: 22, background: L.accent, color: btnFg, border: 0, padding: "12px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>continue shopping</button>
@@ -567,7 +602,7 @@ export function LayoutStorefrontView({
 )}
 
 {screen === "cart" && shop && !shop.placed && shop.cart.length === 0 && (
-  <div style={{ padding: "60px 24px", textAlign: "center" }}>
+  <div className="ssr-screen-in" style={{ padding: "60px 24px", textAlign: "center" }}>
     <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, color: L.fg }}>your cart is empty</div>
     <div style={{ fontSize: 14, color: L.fg, opacity: 0.7, marginTop: 8 }}>add a few pieces from the storefront to see the checkout.</div>
     <button type="button" className="ssr-h-btn" onClick={shop.goHome} style={{ marginTop: 20, border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", padding: "11px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>browse the store</button>
@@ -575,7 +610,7 @@ export function LayoutStorefrontView({
 )}
 
 {screen === "cart" && !(shop && (shop.placed || shop.cart.length === 0)) && (
-  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 24, padding: 24 }}>
+  <div className="ssr-screen-in" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 24, padding: 24 }}>
     <div>
       <div style={{ fontFamily: L.font, fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>your cart</div>
       <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 5, color: L.fg, opacity: 0.6 }}>{itemCount} item{itemCount === 1 ? "" : "s"} · free shipping applied</div>
@@ -602,17 +637,75 @@ export function LayoutStorefrontView({
         ))}
       </div>
 
-      <div style={{ marginTop: 16, border: `1px dashed ${L.line}`, padding: 14, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>coupon</span>
-        <span style={{ border: `1px solid ${L.line}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.fg }}>{L.cart.coupon}</span>
-        <span style={{ color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {money.discount} off</span>
+      <div className="ssr-anim-in" style={{ animationDelay: "60ms", marginTop: 16, border: `1px dashed ${L.line}`, padding: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>coupon</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, border: `1px solid ${L.accent}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.accent, fontWeight: 700 }}>
+            <span aria-hidden>🎟️</span>{L.cart.coupon}
+          </span>
+          <span key={`cpn-${couponNonce}`} className="ssr-pop" style={{ display: "inline-block", color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {money.discount} off</span>
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+          <input
+            value={couponCode}
+            onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponMsg(null); }}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.currentTarget.nextSibling as HTMLButtonElement)?.click(); } }}
+            placeholder="try another code"
+            style={{ flex: 1, minWidth: 140, border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "9px 11px", fontFamily: MONO, fontSize: 12, textTransform: "uppercase" }}
+          />
+          <button
+            type="button"
+            className="ssr-h-btn"
+            onClick={() => {
+              const code = couponCode.trim().toUpperCase();
+              setCouponNonce((n) => n + 1);
+              if (!code) { setCouponMsg("enter a code to check it"); return; }
+              setCouponMsg(
+                code === L.cart.coupon.toUpperCase()
+                  ? `✓ ${code} applied — ${money.discount} off`
+                  : `“${code}” isn’t valid — ${L.cart.coupon} is already the best price`
+              );
+            }}
+            style={{ border: `1px solid ${L.accent}`, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "9px 16px", ...pointer }}
+          >apply</button>
+        </div>
+        {couponMsg && (
+          <div key={`cpnmsg-${couponNonce}`} className="ssr-anim-in" style={{ fontSize: 12, marginTop: 8, color: couponMsg.startsWith("✓") ? L.accent : L.fg, opacity: couponMsg.startsWith("✓") ? 1 : 0.75, fontWeight: couponMsg.startsWith("✓") ? 700 : 400 }}>{couponMsg}</div>
+        )}
       </div>
 
-      <div style={{ marginTop: 16, border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
+      <div className="ssr-anim-in" style={{ animationDelay: "120ms", marginTop: 16, border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>delivering to</div>
         <div style={{ fontSize: 14, fontWeight: 700, marginTop: 7, color: L.fg }}>{L.cart.name}</div>
         <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.78 }}>{L.cart.address}</div>
-        <div style={{ fontFamily: MONO, fontSize: 11, marginTop: 8, color: L.accent }}>change address</div>
+        <button
+          type="button"
+          onClick={() => setAddrOpen((o) => !o)}
+          style={{ fontFamily: MONO, fontSize: 11, marginTop: 8, color: L.accent, background: "transparent", border: 0, padding: 0, ...pointer }}
+        >{addrOpen ? "close ▲" : "change address ▾"}</button>
+        {addrOpen && (
+          <div className="ssr-anim-in" style={{ display: "grid", gap: 8, marginTop: 12 }}>
+            {[
+              { k: "name", ph: "full name", def: L.cart.name },
+              { k: "phone", ph: "10-digit mobile", def: "" },
+              { k: "line", ph: "house no, street, area", def: L.cart.address },
+              { k: "pin", ph: "6-digit pincode", def: "" },
+            ].map((f) => (
+              <input
+                key={f.k}
+                defaultValue={f.def}
+                placeholder={f.ph}
+                style={{ border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "9px 11px", fontFamily: MONO, fontSize: 12 }}
+              />
+            ))}
+            <button
+              type="button"
+              className="ssr-h-btn"
+              onClick={() => setAddrOpen(false)}
+              style={{ border: `1px solid ${L.accent}`, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "10px 14px", ...pointer }}
+            >save address</button>
+          </div>
+        )}
       </div>
     </div>
 
@@ -629,28 +722,75 @@ export function LayoutStorefrontView({
 
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 20, color: L.fg, opacity: 0.7 }}>payment method</div>
         <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
-          {L.cart.methods.map((m) => {
+          {L.cart.methods.map((m, mi) => {
             const on = shop ? (shop.method || L.cart.methods[0].name) === m.name : m.on;
             return (
-              <div key={m.name} className="ssr-h-lift" onClick={() => shop?.setMethod(m.name)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, ...pointer }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{m.name}</div>
+              <div
+                key={m.name}
+                className="ssr-pay-row ssr-anim-in"
+                onClick={() => shop?.setMethod(m.name)}
+                style={{ animationDelay: `${mi * 70}ms`, border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", gap: 11, ...pointer }}
+              >
+                <span aria-hidden style={{ fontSize: 18, lineHeight: 1, width: 24, textAlign: "center", flexShrink: 0 }}>{payIcon(m.name)}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{payLabel(m.name)}</div>
                   <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
+                  {on && payTags(m.name) && (
+                    <div style={{ display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" }}>
+                      {payTags(m.name)!.map((tg) => (
+                        <span key={tg} style={{ fontFamily: MONO, fontSize: 8, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${L.line}`, color: L.fg, opacity: 0.75, padding: "3px 6px" }}>{tg}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <span style={{ fontFamily: MONO, fontSize: 10, color: L.accent }}>{on ? "selected" : ""}</span>
+                <span style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? L.accent : L.line}`, display: "grid", placeItems: "center", flexShrink: 0, transition: "border-color .18s ease" }}>
+                  {on && <span key={`dot-${m.name}`} className="ssr-pop" style={{ width: 8, height: 8, borderRadius: "50%", background: L.accent, display: "block" }} />}
+                </span>
               </div>
             );
           })}
         </div>
 
         <button type="button" className="ssr-h-btn" onClick={shop?.placeOrder} style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}>place order · {money.total}</button>
-        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>paying by {payLabel(shop?.method || L.cart.methods[0].name)} · GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
       </div>
     </div>
   </div>
 )}
             </div>
   );
+}
+
+/** emoji glyph for a payment method, matched loosely on its name */
+function payIcon(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("upi")) return "⚡";
+  if (n.includes("emi")) return "🗓️";
+  if (n.includes("card")) return "💳";
+  if (n.includes("cash") || n.includes("cod") || n.includes("rider")) return "💵";
+  if (n.includes("bank") || n.includes("transfer") || n.includes("neft")) return "🏦";
+  if (n.includes("subscribe") || n.includes("refill")) return "🔁";
+  if (n.includes("part-payment") || n.includes("part payment") || n.includes("part ")) return "◐";
+  return "•";
+}
+
+/** a slightly friendlier label for the common rails */
+function payLabel(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("upi")) return "UPI — GPay, PhonePe, Paytm";
+  if (n.includes("card")) return "Credit / Debit card";
+  if ((n.includes("cash") || n.includes("cod")) && !n.includes("card")) return "Cash on delivery";
+  return name;
+}
+
+/** tiny reassurance chips shown under the selected rail */
+function payTags(name: string): string[] | null {
+  const n = name.toLowerCase();
+  if (n.includes("upi")) return ["instant", "no fee", "100% secure"];
+  if (n.includes("card")) return ["visa", "mastercard", "rupay", "3-D secure"];
+  if (n.includes("cash") || n.includes("cod")) return ["pay at door", "check before you pay"];
+  if (n.includes("emi")) return ["no-cost", "hdfc · icici · axis"];
+  return null;
 }
 
 function arrow(side: "left" | "right"): React.CSSProperties {

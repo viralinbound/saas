@@ -73,6 +73,7 @@ export function ShoppableLayout({
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [galleryPick, setGalleryPick] = useState("");
+  const [cartPulse, setCartPulse] = useState(0); // bumps the nav cart pill on add
   const [pin, setPin] = useState("");
   const [pinStatus, setPinStatus] = useState<"idle" | "ok" | "no" | "bad">("idle");
 
@@ -104,6 +105,7 @@ export function ShoppableLayout({
   const v = useMemo(() => buildLayoutView(L, slide), [L, slide]);
 
   const addToCart = (p: P, q = 1, vr = p.variants[0]) => {
+    setCartPulse((n) => n + 1);
     setCart((prev) => {
       const at = prev.findIndex((c) => c.p.name === p.name && c.variant === vr);
       if (at >= 0) {
@@ -139,7 +141,7 @@ export function ShoppableLayout({
 
   const shop: ShopApi = {
     cartCount: cart.reduce((a, c) => a + c.qty, 0),
-    cart, active, qty, variant, method, placed, cat, query, galleryPick, pin, pinStatus, searchOpen,
+    cart, active, qty, variant, method, placed, cat, query, galleryPick, pin, pinStatus, searchOpen, cartPulse,
     openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setGalleryPick(p.img); setPinStatus("idle"); setScreen("product"); scrollTop(); },
     addToCart,
     buyNow: (p) => { addToCart(p, qty, variant); setScreen("cart"); scrollTop(); },
