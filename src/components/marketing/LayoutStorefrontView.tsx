@@ -6,7 +6,7 @@
  * mock) and /preview/template/[key] (full-bleed, the "live preview").
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MONO, avatarFor, inr, numOf, type Layout } from "@/lib/layoutPreviews";
 import { DEFAULT_LAYOUT_BLOCKS, type LayoutBlocks } from "@/lib/layoutCommerce";
 import { Img } from "@/components/storefront/Img";
@@ -31,6 +31,7 @@ export type LayoutView = {
 export type ShopApi = {
   cartCount: number;
   cartPulse: number;      // increments each add-to-cart — drives the nav pill bump
+  lastAdded: string;      // name of the most recently added product (for the toast)
   cart: { p: P; qty: number; variant: string }[];
   active: P;
   qty: number;
@@ -61,7 +62,7 @@ export type ShopApi = {
   account: { name: string | null } | null;
   goCart: () => void;
   goHome: () => void;
-  placeOrder: () => void;
+  placeOrder: (details?: { name?: string; city?: string }) => void;
   toGrid: () => void;
   toLookbook: () => void;
   whatsapp: () => void;
@@ -95,11 +96,37 @@ export function LayoutStorefrontView({
 }) {
   const b: LayoutBlocks = { ...DEFAULT_LAYOUT_BLOCKS, ...blocks };
 
-  // checkout micro-interactions (coupon + address are demo-only, animated)
+  // ── checkout state (nothing pre-filled — the shopper types everything) ──
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const [couponNonce, setCouponNonce] = useState(0);
-  const [addrOpen, setAddrOpen] = useState(false);
+  const [addr, setAddr] = useState({ name: "", phone: "", line: "", city: "", pin: "" });
+  const [upiId, setUpiId] = useState("");
+  const [card, setCard] = useState({ no: "", name: "", exp: "", cvv: "" });
+  const [checkoutMsg, setCheckoutMsg] = useState<string | null>(null);
+
+  // "added to cart" toast — re-shows on every add, auto-hides
+  const [toast, setToast] = useState(false);
+  const pulse = shop?.cartPulse ?? 0;
+  useEffect(() => {
+    if (!pulse) return;
+    setToast(true);
+    const t = setTimeout(() => setToast(false), 2800);
+    return () => clearTimeout(t);
+  }, [pulse]);
+
+  const activeMethod = shop?.method || L.cart.methods[0]?.name || "";
+  const kind = payFields(activeMethod);
+  function checkoutError(): string | null {
+    if (!addr.name.trim() || addr.phone.length !== 10 || !addr.line.trim() || !addr.city.trim() || addr.pin.length !== 6)
+      return "add a complete delivery address (name, 10-digit mobile, address, city, 6-digit pincode)";
+    if (kind === "upi" && !/^[\w.\-]{2,}@[a-z]{2,}$/i.test(upiId.trim()))
+      return "enter a valid UPI ID, e.g. yourname@okhdfcbank";
+    if (kind === "card" && (card.no.replace(/\s/g, "").length < 15 || !card.name.trim() || card.exp.length < 5 || card.cvv.length < 3))
+      return "enter your full card details (number, name, expiry, CVV)";
+    return null;
+  }
+  const coStyle: React.CSSProperties = { border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "10px 11px", fontFamily: MONO, fontSize: 12, width: "100%" };
 
   const slideData = v.slides[v.si];
   const setSlide = onSlide;
@@ -189,13 +216,37 @@ export function LayoutStorefrontView({
   .ssr-pay-row { transition: border-color .18s ease, background-color .18s ease, transform .12s ease; }
   .ssr-pay-row:active { transform: scale(.99); }
 
+  /* "added to cart" toast */
+  @keyframes ssrToastIn { from { opacity: 0; transform: translateY(-18px) scale(.96); } to { opacity: 1; transform: none; } }
+  .ssr-toast-card { animation: ssrToastIn .3s cubic-bezier(.2,.85,.25,1) both; }
+
   @media (prefers-reduced-motion: reduce) {
     .ssr-h-card, .ssr-h-tile, .ssr-h-lift, .ssr-h-btn, .ssr-h-thumb img, .ssr-h-link, .ssr-pay-row { transition: none; }
     .ssr-h-card:hover, .ssr-h-tile:hover, .ssr-h-lift:hover, .ssr-h-btn:hover { transform: none; }
     .ssr-h-card:hover .ssr-h-thumb img { transform: none; }
-    .ssr-screen-in, .ssr-anim-in, .ssr-cart-bump, .ssr-pop { animation: none; }
+    .ssr-screen-in, .ssr-anim-in, .ssr-cart-bump, .ssr-pop, .ssr-toast-card { animation: none; }
   }
 ` }} />
+{shop && toast && (
+  <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 90, display: "flex", justifyContent: "center", padding: "0 12px", pointerEvents: "none" }}>
+    <div
+      key={`toast-${pulse}`}
+      className="ssr-toast-card"
+      style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, background: L.fg, color: L.bg, border: `1px solid ${L.accent}`, padding: "10px 12px 10px 10px", boxShadow: "0 14px 34px rgba(0,0,0,0.28)", maxWidth: 440, width: "100%" }}
+    >
+      <span className="ssr-pop" style={{ width: 24, height: 24, borderRadius: "50%", background: L.accent, color: btnFg, display: "grid", placeItems: "center", fontSize: 13, flexShrink: 0 }}>✓</span>
+      <span style={{ fontSize: 13, fontWeight: 700, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {shop.lastAdded ? `added — ${shop.lastAdded}` : "added to cart"}
+      </span>
+      <button
+        type="button"
+        className="ssr-h-btn"
+        onClick={() => { setToast(false); shop.goCart(); }}
+        style={{ marginLeft: "auto", background: L.accent, color: btnFg, border: 0, padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
+      >view cart →</button>
+    </div>
+  </div>
+)}
 {editable && (
   <style dangerouslySetInnerHTML={{ __html: `
     .ssr-edit-part { outline: 1px dashed rgba(36,69,122,0.35); outline-offset: -1px; transition: outline-color .12s; }
@@ -675,37 +726,16 @@ export function LayoutStorefrontView({
       </div>
 
       <div className="ssr-anim-in" style={{ animationDelay: "120ms", marginTop: 16, border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>delivering to</div>
-        <div style={{ fontSize: 14, fontWeight: 700, marginTop: 7, color: L.fg }}>{L.cart.name}</div>
-        <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.78 }}>{L.cart.address}</div>
-        <button
-          type="button"
-          onClick={() => setAddrOpen((o) => !o)}
-          style={{ fontFamily: MONO, fontSize: 11, marginTop: 8, color: L.accent, background: "transparent", border: 0, padding: 0, ...pointer }}
-        >{addrOpen ? "close ▲" : "change address ▾"}</button>
-        {addrOpen && (
-          <div className="ssr-anim-in" style={{ display: "grid", gap: 8, marginTop: 12 }}>
-            {[
-              { k: "name", ph: "full name", def: L.cart.name },
-              { k: "phone", ph: "10-digit mobile", def: "" },
-              { k: "line", ph: "house no, street, area", def: L.cart.address },
-              { k: "pin", ph: "6-digit pincode", def: "" },
-            ].map((f) => (
-              <input
-                key={f.k}
-                defaultValue={f.def}
-                placeholder={f.ph}
-                style={{ border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "9px 11px", fontFamily: MONO, fontSize: 12 }}
-              />
-            ))}
-            <button
-              type="button"
-              className="ssr-h-btn"
-              onClick={() => setAddrOpen(false)}
-              style={{ border: `1px solid ${L.accent}`, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "10px 14px", ...pointer }}
-            >save address</button>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>delivery address</div>
+        <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+          <input value={addr.name} onChange={(e) => { setAddr({ ...addr, name: e.target.value }); setCheckoutMsg(null); }} placeholder="full name" style={coStyle} />
+          <input value={addr.phone} onChange={(e) => { setAddr({ ...addr, phone: e.target.value.replace(/\D/g, "").slice(0, 10) }); setCheckoutMsg(null); }} inputMode="numeric" placeholder="10-digit mobile" style={coStyle} />
+          <input value={addr.line} onChange={(e) => { setAddr({ ...addr, line: e.target.value }); setCheckoutMsg(null); }} placeholder="flat / house no, building, street, area" style={coStyle} />
+          <div style={{ display: "flex", gap: 6 }}>
+            <input value={addr.city} onChange={(e) => { setAddr({ ...addr, city: e.target.value }); setCheckoutMsg(null); }} placeholder="city" style={{ ...coStyle, flex: 1 }} />
+            <input value={addr.pin} onChange={(e) => { setAddr({ ...addr, pin: e.target.value.replace(/\D/g, "").slice(0, 6) }); setCheckoutMsg(null); }} inputMode="numeric" placeholder="pincode" style={{ ...coStyle, width: 120 }} />
           </div>
-        )}
+        </div>
       </div>
     </div>
 
@@ -724,41 +754,96 @@ export function LayoutStorefrontView({
         <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
           {L.cart.methods.map((m, mi) => {
             const on = shop ? (shop.method || L.cart.methods[0].name) === m.name : m.on;
+            const k = payFields(m.name);
             return (
-              <div
-                key={m.name}
-                className="ssr-pay-row ssr-anim-in"
-                onClick={() => shop?.setMethod(m.name)}
-                style={{ animationDelay: `${mi * 70}ms`, border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", gap: 11, ...pointer }}
-              >
-                <span aria-hidden style={{ fontSize: 18, lineHeight: 1, width: 24, textAlign: "center", flexShrink: 0 }}>{payIcon(m.name)}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{payLabel(m.name)}</div>
-                  <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
-                  {on && payTags(m.name) && (
-                    <div style={{ display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" }}>
-                      {payTags(m.name)!.map((tg) => (
-                        <span key={tg} style={{ fontFamily: MONO, fontSize: 8, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${L.line}`, color: L.fg, opacity: 0.75, padding: "3px 6px" }}>{tg}</span>
-                      ))}
-                    </div>
-                  )}
+              <div key={m.name}>
+                <div
+                  className="ssr-pay-row ssr-anim-in"
+                  onClick={() => { shop?.setMethod(m.name); setCheckoutMsg(null); }}
+                  style={{ animationDelay: `${mi * 70}ms`, border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", gap: 11, ...pointer }}
+                >
+                  <span aria-hidden style={{ fontSize: 18, lineHeight: 1, width: 24, textAlign: "center", flexShrink: 0 }}>{payIcon(m.name)}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{payLabel(m.name)}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
+                    {on && payTags(m.name) && (
+                      <div style={{ display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" }}>
+                        {payTags(m.name)!.map((tg) => (
+                          <span key={tg} style={{ fontFamily: MONO, fontSize: 8, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${L.line}`, color: L.fg, opacity: 0.75, padding: "3px 6px" }}>{tg}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? L.accent : L.line}`, display: "grid", placeItems: "center", flexShrink: 0, transition: "border-color .18s ease" }}>
+                    {on && <span key={`dot-${m.name}`} className="ssr-pop" style={{ width: 8, height: 8, borderRadius: "50%", background: L.accent, display: "block" }} />}
+                  </span>
                 </div>
-                <span style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? L.accent : L.line}`, display: "grid", placeItems: "center", flexShrink: 0, transition: "border-color .18s ease" }}>
-                  {on && <span key={`dot-${m.name}`} className="ssr-pop" style={{ width: 8, height: 8, borderRadius: "50%", background: L.accent, display: "block" }} />}
-                </span>
+
+                {on && k === "upi" && (
+                  <div className="ssr-anim-in" style={{ display: "grid", gap: 6, padding: "10px 12px", border: `1px solid ${L.accent}`, borderTop: 0 }}>
+                    <input value={upiId} onChange={(e) => { setUpiId(e.target.value.replace(/\s/g, "")); setCheckoutMsg(null); }} placeholder="enter your UPI ID  ·  e.g. name@okhdfcbank" autoComplete="off" style={coStyle} />
+                    <div style={{ fontFamily: MONO, fontSize: 9, color: L.fg, opacity: 0.6 }}>a collect request opens in your UPI app — approve it to pay</div>
+                  </div>
+                )}
+                {on && k === "card" && (
+                  <div className="ssr-anim-in" style={{ display: "grid", gap: 6, padding: "10px 12px", border: `1px solid ${L.accent}`, borderTop: 0 }}>
+                    <input value={card.no} onChange={(e) => { setCard({ ...card, no: formatCard(e.target.value) }); setCheckoutMsg(null); }} inputMode="numeric" autoComplete="off" placeholder="card number" maxLength={19} style={coStyle} />
+                    <input value={card.name} onChange={(e) => { setCard({ ...card, name: e.target.value }); setCheckoutMsg(null); }} autoComplete="off" placeholder="name on card" style={coStyle} />
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <input value={card.exp} onChange={(e) => { setCard({ ...card, exp: formatExp(e.target.value) }); setCheckoutMsg(null); }} inputMode="numeric" autoComplete="off" placeholder="MM / YY" maxLength={7} style={{ ...coStyle, flex: 1 }} />
+                      <input value={card.cvv} onChange={(e) => { setCard({ ...card, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) }); setCheckoutMsg(null); }} inputMode="numeric" autoComplete="off" placeholder="CVV" maxLength={4} style={{ ...coStyle, width: 92 }} />
+                    </div>
+                    <div style={{ fontFamily: MONO, fontSize: 9, color: L.fg, opacity: 0.6 }}>🔒 processed by razorpay over 3-D secure · card details are never stored</div>
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
 
-        <button type="button" className="ssr-h-btn" onClick={shop?.placeOrder} style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}>place order · {money.total}</button>
-        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>paying by {payLabel(shop?.method || L.cart.methods[0].name)} · GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
+        <button
+          type="button"
+          className="ssr-h-btn"
+          onClick={() => {
+            if (!shop) return;
+            const err = checkoutError();
+            if (err) { setCheckoutMsg(err); return; }
+            setCheckoutMsg(null);
+            shop.placeOrder({ name: addr.name, city: addr.city });
+          }}
+          style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}
+        >place order · {money.total}</button>
+        {checkoutMsg && (
+          <div key={checkoutMsg} className="ssr-anim-in" style={{ fontSize: 12, fontWeight: 700, marginTop: 8, color: "#B91C1C" }}>{checkoutMsg}</div>
+        )}
+        <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>paying by {payLabel(activeMethod)} · GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
       </div>
     </div>
   </div>
 )}
             </div>
   );
+}
+
+/** which detail fields a payment method needs the shopper to fill in */
+function payFields(name: string): "upi" | "card" | null {
+  const n = name.toLowerCase();
+  if (n.includes("upi")) return "upi";
+  if (n.includes("card")) return "card";
+  return null;
+}
+
+/** "4111 1111 1111 1111" grouping as the shopper types */
+function formatCard(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 16);
+  return digits.replace(/(.{4})/g, "$1 ").trim();
+}
+
+/** "MM / YY" as the shopper types */
+function formatExp(raw: string): string {
+  const d = raw.replace(/\D/g, "").slice(0, 4);
+  if (d.length <= 2) return d;
+  return `${d.slice(0, 2)} / ${d.slice(2)}`;
 }
 
 /** emoji glyph for a payment method, matched loosely on its name */
