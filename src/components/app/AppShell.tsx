@@ -1,14 +1,21 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import type { Store, User, Product, Order } from "@/lib/types";
 import { UserMenu } from "./UserMenu";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { ConsoleMenuToggle } from "./ConsoleMenuToggle";
 
-type StoreWithRelations = Store & {
-  owner: User;
-  products: Product[];
-  orders: (Order & { items: unknown[] })[];
+/** Only what the console chrome actually needs. Every page can satisfy this —
+ *  full-store callers pass their `products`/`orders` arrays, the streamed
+ *  dashboard shell passes `productCount`/`orderCount` instead. */
+type ShellStore = {
+  name: string;
+  slug: string;
+  plan: string;
+  owner: { name: string; email: string };
+  products?: unknown[];
+  orders?: unknown[];
+  productCount?: number;
+  orderCount?: number;
 };
 
 const navItems = [
@@ -36,7 +43,7 @@ export function AppShell({
   activePath = "/app",
   flush = false,
 }: {
-  store: StoreWithRelations;
+  store: ShellStore;
   crumb: string;
   title: string;
   children: React.ReactNode;
@@ -45,11 +52,14 @@ export function AppShell({
 }) {
   if (!store) redirect("/login");
 
+  const productCount = store.productCount ?? store.products?.length ?? 0;
+  const orderCount = store.orderCount ?? store.orders?.length ?? 0;
+
   const productLimit =
     store.plan === "free" ? 10 : store.plan === "essential" ? 100 : null;
   const usagePct = productLimit
-    ? Math.min(100, Math.round((store.products.length / productLimit) * 100))
-    : Math.min(100, store.products.length * 3);
+    ? Math.min(100, Math.round((productCount / productLimit) * 100))
+    : Math.min(100, productCount * 3);
 
   return (
     <div className="console-grid" style={{ display: "grid", gridTemplateColumns: "252px minmax(0, 1fr)", minHeight: "100vh", background: "#F1EFE9", fontFamily: "'Instrument Sans', system-ui, sans-serif", color: "#14161A" }}>
@@ -65,7 +75,7 @@ export function AppShell({
           {navItems.map((item) => {
             const active = activePath === item.href;
             const metaVal =
-              item.meta === "products" ? store.products.length : item.meta === "orders" ? store.orders.length : item.meta;
+              item.meta === "products" ? productCount : item.meta === "orders" ? orderCount : item.meta;
             return (
               <Link
                 key={item.href}
@@ -95,7 +105,7 @@ export function AppShell({
               plan · {store.plan || "free"}
             </div>
             <div style={{ fontSize: 13, fontWeight: 700, marginTop: 6 }}>
-              {store.products.length} / {productLimit ?? "unlimited"} products
+              {productCount} / {productLimit ?? "unlimited"} products
             </div>
             <div style={{ height: 6, background: "rgba(250,249,246,0.18)", marginTop: 8 }}>
               <div style={{ width: `${usagePct}%`, height: "100%", background: "#24457A" }} />

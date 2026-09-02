@@ -55,6 +55,52 @@ export const getCurrentStore = cache(async (): Promise<StoreWithRelations | null
   return mapStoreWithRelations(storeRow, profile, email, products || [], orders || []);
 });
 
+/**
+ * Lightweight active-store header for the dashboard shell — just the fields
+ * `<AppShell>` needs (name, plan, owner, product/order counts), fetched with
+ * `head:true` COUNT queries instead of pulling every row. Lets `/app` paint the
+ * shell + skeletons immediately while `getCurrentStore()` (orders + products +
+ * panels) streams in behind a <Suspense>.
+ */
+export const getDashboardShell = cache(async () => {
+  const user = await getSessionUser();
+  if (!user) return null;
+  const supabase = await createClient();
+
+  const storeRow = await resolveActiveStore<{
+    id: string;
+    name: string;
+    slug: string;
+    plan: string | null;
+    currency: string | null;
+    status: string | null;
+    subdomain: string | null;
+  }>("id, name, slug, plan, currency, status, subdomain");
+  if (!storeRow) return null;
+
+  const [{ data: profile }, { count: productCount }, { count: orderCount }] = await Promise.all([
+    supabase.from("profiles").select("name, phone").eq("id", user.id).maybeSingle(),
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("store_id", storeRow.id),
+    supabase.from("orders").select("id", { count: "exact", head: true }).eq("store_id", storeRow.id),
+  ]);
+
+  return {
+    id: storeRow.id,
+    name: storeRow.name,
+    slug: storeRow.slug,
+    plan: storeRow.plan || "free",
+    currency: storeRow.currency || "INR",
+    status: storeRow.status || "draft",
+    subdomain: storeRow.subdomain,
+    owner: {
+      name: profile?.name || user.email?.split("@")[0] || "there",
+      email: user.email || profile?.phone || user.phone || "",
+    },
+    productCount: productCount ?? 0,
+    orderCount: orderCount ?? 0,
+  };
+});
+
 export async function requireUser() {
   const user = await getCurrentUser();
   if (!user) throw new Error("UNAUTHORIZED");

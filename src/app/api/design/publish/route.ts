@@ -1,8 +1,24 @@
 import { NextResponse } from "next/server";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/constants";
 import { resolveActiveStore } from "@/lib/activeStore";
+import { storefrontTag } from "@/lib/stores";
+
+/** Drop every cached copy of a store's public storefront so a publish /
+ *  unpublish shows up on the live site within a second, across all the
+ *  addresses a visitor can arrive on (slug, subdomain, clean host path). */
+function revalidateStorefront(keys: (string | null | undefined)[], hostPath?: string | null) {
+  for (const k of new Set(keys.filter(Boolean) as string[])) revalidateTag(storefrontTag(k));
+  const slug = keys.find(Boolean);
+  if (slug) revalidatePath(`/s/${slug}`);
+  if (hostPath) {
+    revalidateTag(storefrontTag(hostPath));
+    revalidatePath(`/h/${hostPath}`);
+    revalidatePath(`/${hostPath}`);
+  }
+}
 
 async function currentStore(_supabase: Awaited<ReturnType<typeof createClient>>) {
   return resolveActiveStore<{ id: string; slug: string; subdomain: string | null; status: string }>(
@@ -42,6 +58,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: key ? map[key] : error.message }, { status: key === "FORBIDDEN" ? 403 : 409 });
   }
 
+  revalidateStorefront([store.slug, store.subdomain, sub], (data as { hostPath?: string })?.hostPath);
+
   return NextResponse.json({ ok: true, ...data });
 }
 
@@ -55,5 +73,8 @@ export async function DELETE() {
     const msg = error.message.includes("FORBIDDEN") ? "You don't have access to this store." : error.message;
     return NextResponse.json({ error: msg }, { status: 403 });
   }
+
+  revalidateStorefront([store.slug, store.subdomain], (data as { hostPath?: string })?.hostPath);
+
   return NextResponse.json({ ok: true, ...data });
 }

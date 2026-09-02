@@ -3,6 +3,9 @@ import { getStorefront } from "@/lib/stores";
 import { V2Storefront } from "@/components/builder/V2Storefront";
 import { coerceSite, isV2 } from "@/lib/builder";
 
+// ISR — same policy as the storefront home. Busted on publish.
+export const revalidate = 60;
+
 // Secondary pages of a v2 drag-and-drop site: /s/<slug>/<pagePath>
 export default async function StoreSubPage({
   params,

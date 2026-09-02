@@ -6,6 +6,10 @@ import { coerceSite, isV2 } from "@/lib/builder";
 import { isStarterLayoutConfig, isStarterTemplate, seedStarterConfig } from "@/lib/layoutCommerce";
 import { MerchantLayoutStorefront } from "@/components/storefront/MerchantLayoutStorefront";
 
+// ISR — same as /s/[slug]: served from cache, revalidated once a minute or
+// on publish (revalidateTag / revalidatePath in /api/design/publish).
+export const revalidate = 60;
+
 /**
  * Hosted URL. Accepts both shapes:
  *   /h/<company>/<project>   (current)

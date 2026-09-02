@@ -1,7 +1,33 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "./supabase/server";
+import { publicClient } from "./supabase/public";
 import { mapProduct, mapStore } from "./db-mapper";
 import type { Product, Store } from "./types";
 import { coerceConfig, coerceTokens, type StoreConfig, type ThemeTokens } from "./customization";
+
+/** Storefront read cache window (seconds). A publish busts it immediately via
+ *  `revalidateTag("store:<key>")`; otherwise it refreshes at most once per window
+ *  no matter how many visitors hit the page. */
+export const STOREFRONT_TTL = 60;
+
+/** Cache tag for one store's public storefront data — keyed on the slug / host
+ *  the visitor arrived on. `publish`/`unpublish` revalidate every variant. */
+export const storefrontTag = (key: string) => `store:${key.toLowerCase()}`;
+
+/** Raw `get_storefront` RPC payload, cached and de-duped across visitors.
+ *  Cookie-less (uses the anon client) so the calling route can be ISR'd. */
+async function getStorefrontRaw(hostOrSlug: string): Promise<unknown | null> {
+  const key = hostOrSlug.toLowerCase();
+  return unstable_cache(
+    async () => {
+      const supabase = publicClient();
+      const { data, error } = await supabase.rpc("get_storefront", { p_host: key });
+      return error || !data ? null : data;
+    },
+    ["get_storefront", key],
+    { revalidate: STOREFRONT_TTL, tags: [storefrontTag(key), "storefronts"] }
+  )();
+}
 
 export type StorefrontData = {
   store: Store & { products: Product[] };
@@ -18,9 +44,10 @@ export type StorefrontData = {
  * live store — never draft content or any other company's data.
  */
 export async function getStorefront(hostOrSlug: string): Promise<StorefrontData | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_storefront", { p_host: hostOrSlug });
-  if (error || !data) return null;
+  const data = (await getStorefrontRaw(hostOrSlug)) as
+    | { store: Record<string, unknown>; products?: Record<string, unknown>[]; config?: unknown; themeTokens?: unknown; demo?: unknown }
+    | null;
+  if (!data) return null;
 
   const s = data.store as Record<string, unknown>;
   const rows = (data.products as Record<string, unknown>[]) || [];

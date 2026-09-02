@@ -7,6 +7,12 @@ import { coerceSite, isV2 } from "@/lib/builder";
 import { isStarterLayoutConfig, isStarterTemplate, seedStarterConfig } from "@/lib/layoutCommerce";
 import { MerchantLayoutStorefront } from "@/components/storefront/MerchantLayoutStorefront";
 
+// ISR: a live store's page is served from the edge cache and only re-rendered
+// once per minute (or immediately when the merchant publishes — see
+// /api/design/publish, which calls revalidateTag("store:<slug>")). Visitor
+// traffic no longer hits the database on every request.
+export const revalidate = 60;
+
 export default async function StorePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 

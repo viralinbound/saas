@@ -100,7 +100,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(rw);
   }
 
-  const { supabaseResponse, user, hasStore } = await updateSession(request);
+  // `hasStore` is only consulted by the login/signup, onboarding and /app
+  // redirects below — tell updateSession to skip its 3 queries otherwise.
+  const wantStore =
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/app");
+
+  const { supabaseResponse, user, hasStore } = await updateSession(request, { wantStore });
   const isLoggedIn = !!user;
 
   // A redirect from middleware must carry the (possibly refreshed) auth
