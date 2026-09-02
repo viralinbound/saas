@@ -62,7 +62,7 @@ export type ShopApi = {
   account: { name: string | null } | null;
   goCart: () => void;
   goHome: () => void;
-  placeOrder: (details?: { name?: string; city?: string }) => void;
+  placeOrder: (details?: { name?: string; city?: string; discountApplied?: boolean }) => void;
   toGrid: () => void;
   toLookbook: () => void;
   whatsapp: () => void;
@@ -100,6 +100,7 @@ export function LayoutStorefrontView({
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const [couponNonce, setCouponNonce] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false); // nothing is pre-applied — the shopper types a code
   const [addr, setAddr] = useState({ name: "", phone: "", line: "", city: "", pin: "" });
   const [upiId, setUpiId] = useState("");
   const [card, setCard] = useState({ no: "", name: "", exp: "", cvv: "" });
@@ -159,7 +160,7 @@ export function LayoutStorefrontView({
     : v.lines;
   const itemCount = shop ? shop.cart.reduce((a, c) => a + c.qty, 0) : 3;
   const subtotalN = shop ? shop.cart.reduce((a, c) => a + numOf(c.p.price) * c.qty, 0) : numOf(v.subtotal);
-  const discountN = shop ? Math.min(numOf(L.cart.discount), subtotalN) : numOf(L.cart.discount);
+  const discountN = shop ? (couponApplied ? Math.min(numOf(L.cart.discount), subtotalN) : 0) : numOf(L.cart.discount);
   const gstN = Math.round((subtotalN - discountN) * 0.05);
   const money = {
     subtotal: shop ? inr(subtotalN) : v.subtotal,
@@ -691,37 +692,51 @@ export function LayoutStorefrontView({
       <div className="ssr-anim-in" style={{ animationDelay: "60ms", marginTop: 16, border: `1px dashed ${L.line}`, padding: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>coupon</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, border: `1px solid ${L.accent}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.accent, fontWeight: 700 }}>
-            <span aria-hidden>🎟️</span>{L.cart.coupon}
-          </span>
-          <span key={`cpn-${couponNonce}`} className="ssr-pop" style={{ display: "inline-block", color: L.accent, fontSize: 13, fontWeight: 700 }}>applied — {money.discount} off</span>
+          {couponApplied ? (
+            <>
+              <span key={`cpn-${couponNonce}`} className="ssr-pop" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: `1px solid ${L.accent}`, padding: "8px 12px", fontFamily: MONO, fontSize: 12, color: L.accent, fontWeight: 700 }}>
+                <span aria-hidden>🎟️</span>{couponCode.trim().toUpperCase()}
+              </span>
+              <span style={{ color: L.accent, fontSize: 13, fontWeight: 700 }}>− {money.discount} applied</span>
+              <button
+                type="button"
+                onClick={() => { setCouponApplied(false); setCouponCode(""); setCouponMsg(null); setCouponNonce((n) => n + 1); }}
+                style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: L.fg, opacity: 0.6, background: "transparent", border: 0, ...pointer }}
+              >remove</button>
+            </>
+          ) : (
+            <span style={{ fontSize: 12, color: L.fg, opacity: 0.6 }}>have a code? enter it below</span>
+          )}
         </div>
-        <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-          <input
-            value={couponCode}
-            onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponMsg(null); }}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.currentTarget.nextSibling as HTMLButtonElement)?.click(); } }}
-            placeholder="try another code"
-            style={{ flex: 1, minWidth: 140, border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "9px 11px", fontFamily: MONO, fontSize: 12, textTransform: "uppercase" }}
-          />
-          <button
-            type="button"
-            className="ssr-h-btn"
-            onClick={() => {
-              const code = couponCode.trim().toUpperCase();
-              setCouponNonce((n) => n + 1);
-              if (!code) { setCouponMsg("enter a code to check it"); return; }
-              setCouponMsg(
-                code === L.cart.coupon.toUpperCase()
-                  ? `✓ ${code} applied — ${money.discount} off`
-                  : `“${code}” isn’t valid — ${L.cart.coupon} is already the best price`
-              );
-            }}
-            style={{ border: `1px solid ${L.accent}`, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "9px 16px", ...pointer }}
-          >apply</button>
-        </div>
-        {couponMsg && (
-          <div key={`cpnmsg-${couponNonce}`} className="ssr-anim-in" style={{ fontSize: 12, marginTop: 8, color: couponMsg.startsWith("✓") ? L.accent : L.fg, opacity: couponMsg.startsWith("✓") ? 1 : 0.75, fontWeight: couponMsg.startsWith("✓") ? 700 : 400 }}>{couponMsg}</div>
+        {!couponApplied && (
+          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+            <input
+              value={couponCode}
+              onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponMsg(null); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.currentTarget.nextSibling as HTMLButtonElement)?.click(); } }}
+              placeholder="enter coupon code"
+              style={{ flex: 1, minWidth: 140, border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "9px 11px", fontFamily: MONO, fontSize: 12, textTransform: "uppercase" }}
+            />
+            <button
+              type="button"
+              className="ssr-h-btn"
+              onClick={() => {
+                const code = couponCode.trim().toUpperCase();
+                setCouponNonce((n) => n + 1);
+                if (!code) { setCouponMsg("enter a code to apply"); return; }
+                if (code === L.cart.coupon.toUpperCase()) {
+                  setCouponApplied(true);
+                  setCouponMsg(null);
+                } else {
+                  setCouponMsg(`“${code}” isn’t a valid code`);
+                }
+              }}
+              style={{ border: `1px solid ${L.accent}`, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "9px 16px", ...pointer }}
+            >apply</button>
+          </div>
+        )}
+        {couponMsg && !couponApplied && (
+          <div key={`cpnmsg-${couponNonce}`} className="ssr-anim-in" style={{ fontSize: 12, marginTop: 8, color: L.fg, opacity: 0.75 }}>{couponMsg}</div>
         )}
       </div>
 
@@ -744,7 +759,9 @@ export function LayoutStorefrontView({
         <div style={{ fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>order summary</div>
         <div style={{ display: "grid", gap: 9, marginTop: 15, fontFamily: MONO, fontSize: 13, color: L.fg }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>subtotal</span><span>{money.subtotal}</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>discount</span><span style={{ color: L.accent }}>− {money.discount}</span></div>
+          {couponApplied && (
+            <div className="ssr-anim-in" style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>discount ({couponCode.trim().toUpperCase()})</span><span style={{ color: L.accent }}>− {money.discount}</span></div>
+          )}
           <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>GST</span><span>{money.gst}</span></div>
           <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ opacity: 0.7 }}>shipping</span><span>free</span></div>
           <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${L.line}`, paddingTop: 10, marginTop: 4, fontSize: 17, fontWeight: 700 }}><span>to pay</span><span>{money.total}</span></div>
@@ -809,7 +826,7 @@ export function LayoutStorefrontView({
             const err = checkoutError();
             if (err) { setCheckoutMsg(err); return; }
             setCheckoutMsg(null);
-            shop.placeOrder({ name: addr.name, city: addr.city });
+            shop.placeOrder({ name: addr.name, city: addr.city, discountApplied: couponApplied });
           }}
           style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}
         >place order · {money.total}</button>

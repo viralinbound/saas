@@ -119,10 +119,10 @@ export function ShoppableLayout({
     });
   };
 
-  const placeOrder = (details?: { name?: string; city?: string }) => {
+  const placeOrder = (details?: { name?: string; city?: string; discountApplied?: boolean }) => {
     if (!cart.length) return;
     const subtotalN = cart.reduce((a, c) => a + numOf(c.p.price) * c.qty, 0);
-    const discountN = Math.min(numOf(L.cart.discount), subtotalN);
+    const discountN = details?.discountApplied ? Math.min(numOf(L.cart.discount), subtotalN) : 0;
     const gstN = Math.round((subtotalN - discountN) * 0.05);
     const r = ref6();
     saveOrder(orderSlug, {
