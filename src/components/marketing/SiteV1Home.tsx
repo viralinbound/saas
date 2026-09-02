@@ -820,10 +820,10 @@ function CursorCatalogCTA() {
         ))}
       </div>
       <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto", padding: "150px 28px", textAlign: "center", pointerEvents: "none" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,246,0.45)", marginBottom: 34 }}>move your cursor ✦ the catalog follows</div>
-        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9FBBE0" }}>ready when you are</div>
-        <h2 style={{ fontSize: "clamp(44px, 6.4vw, 100px)", lineHeight: 0.86, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 18, color: "#FAF9F6" }}>
-          ₹15,000 a year.<br /><span style={{ fontWeight: 600, color: "#9FBBE0" }}>2% when it sells.</span>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#FFFFFF", opacity: 0.95, marginBottom: 34 }}>move your cursor ✦ the catalog follows</div>
+        <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "#38BDF8", fontWeight: 700 }}>ready when you are</div>
+        <h2 style={{ fontSize: "clamp(44px, 6.4vw, 100px)", lineHeight: 0.86, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 18, color: "#FFFFFF" }}>
+          ₹15,000 a year.<br /><span style={{ fontWeight: 700, color: "#38BDF8" }}>2% when it sells.</span>
         </h2>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 36 }}>
           <a href="/signup" style={{ pointerEvents: "auto", background: "#EEF2F8", color: "#14161A", border: "2px solid #EEF2F8", padding: "18px 30px", fontSize: 18, fontWeight: 700, textDecoration: "none", boxShadow: "0 12px 28px rgba(20,22,26,0.10)" }}>start essential →</a>

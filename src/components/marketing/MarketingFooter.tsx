@@ -10,7 +10,6 @@ const COLUMNS = [
       { name: "layout previews", href: "/#themes" },
       { name: "what's included", href: "/#included" },
       { name: "plans & pricing", href: "/pricing" },
-      { name: "domain search", href: "/domains" },
       { name: "merchant console", href: "/app" },
     ],
   },

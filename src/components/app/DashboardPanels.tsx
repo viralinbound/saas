@@ -42,7 +42,7 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
     <div style={{ display: "grid", gap: 20 }}>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.5fr) minmax(0, 1fr)", gap: 20, alignItems: "start" }} className="ssr-dash-split">
         {/* revenue & orders chart */}
-        <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 24 }}>
+        <div className="ssr-dash-panel" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div>
               <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#24457A" }}>last 14 days</div>
@@ -67,7 +67,7 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
         </div>
 
         {/* needs you today */}
-        <div style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", padding: 24 }}>
+        <div className="ssr-dash-panel" style={{ border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", padding: 24 }}>
           <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9FBBE0" }}>needs you today</div>
           <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
             <NeedCard
@@ -94,7 +94,7 @@ export function DashboardPanels({ store }: { store: StoreWith }) {
       </div>
 
       {/* live order feed */}
-      <div style={{ border: "1px solid #E4E1DA", background: "#FAF9F6" }}>
+      <div className="ssr-dash-panel" style={{ border: "1px solid #E4E1DA", background: "#FAF9F6" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "18px 22px", borderBottom: "1px solid #E4E1DA" }}>
           <h3 style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.035em" }}>live order feed</h3>
           <a href="/app/orders" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#24457A", textDecoration: "none" }}>all orders →</a>

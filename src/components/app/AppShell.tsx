@@ -128,10 +128,6 @@ export function AppShell({
             <h1 className="console-title" style={{ fontSize: 25, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h1>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-            <div className="console-search" style={{ border: "1px solid #E4E1DA", background: "#fff", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
-              <span style={{ fontFamily: MONO, fontSize: 10, opacity: 0.6 }}>⌘K</span>
-              <input type="text" placeholder="search orders, products, customers" style={{ border: 0, outline: "none", background: "transparent", fontSize: 13, width: 220 }} />
-            </div>
             <span className="console-datepill" style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "9px 12px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
               {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
             </span>

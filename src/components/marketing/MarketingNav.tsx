@@ -11,7 +11,6 @@ const LINKS = [
   { href: "/#themes", label: "layouts" },
   { href: "/#included", label: "what's included" },
   { href: "/pricing", label: "pricing" },
-  { href: "/domains", label: "domain search" },
   { href: "/about", label: "studio" },
 ];
 

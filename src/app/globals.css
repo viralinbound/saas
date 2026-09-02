@@ -146,7 +146,6 @@ aside a, aside a:hover { text-decoration: none; }
   .console-header { padding: 12px 16px !important; gap: 12px !important; }
   .console-title { font-size: 21px !important; }
   .console-body { padding: 18px 16px 56px !important; overflow-x: clip; }
-  .console-search { display: none !important; }
   /* any console table scrolls inside its own box, never the page */
   .console-body table { display: block; overflow-x: auto; white-space: nowrap; }
 }
@@ -194,6 +193,15 @@ aside a, aside a:hover { text-decoration: none; }
   .rtable td.rt-wide { display: block; text-align: left; }
   .rtable td.rt-wide::before { display: block; margin-bottom: 4px; }
   .rtable td:empty { display: none; }
+}
+
+/* dashboard cards and panels keep breathable spacing on tablets/phones */
+@media (max-width: 900px) {
+  .ssr-dash-panel { padding: 18px !important; }
+}
+@media (max-width: 560px) {
+  .ssr-dash-stat { padding: 16px !important; }
+  .ssr-dash-stats { gap: 10px !important; }
 }
 
 /* project-card stat tiles: 2×2 on the narrowest screens */
@@ -282,6 +290,9 @@ aside a, aside a:hover { text-decoration: none; }
     line-height: 1.5;
     color: #24457A;
     margin-bottom: 12px;
+  }
+  .ssr-editor-canvas {
+    padding: 18px 14px 28px !important;
   }
 }
 /* pricing / plans ROI card + more breathing room on phones */

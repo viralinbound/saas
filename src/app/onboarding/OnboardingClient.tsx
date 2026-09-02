@@ -740,7 +740,6 @@ function OnboardingShell({
         @media (max-width: 920px) {
           .onboarding-layout { grid-template-columns: 1fr !important; }
           .onboarding-preview { position: static !important; }
-          .onboarding-header-search { display: none !important; }
           .onboarding-theme-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
@@ -756,10 +755,6 @@ function OnboardingShell({
           </Link>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-          <div className="onboarding-header-search" style={{ border: "1px solid #E4E1DA", background: "#FFFFFF", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px" }}>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, opacity: 0.72 }}>⌘K</span>
-            <span style={{ fontSize: 13, color: "#94A3B8" }}>search orders, products, customers</span>
-          </div>
           <div style={{ border: "1px solid #E4E1DA", background: "#EEF2F8", padding: "9px 12px", fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700 }}>
             {todayLabel}
           </div>

@@ -56,7 +56,7 @@ export async function DashboardBody() {
         />
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
+      <div className="ssr-dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
         <Stat label="today's revenue" value={formatMoney(todayRevenue, currency)} sub={revDelta} tone={yestRevenue > 0 && todayRevenue < yestRevenue ? "muted" : "accent"} lead />
         <Stat label="orders today" value={String(todayOrders.length)} sub={`${awaitingDispatch} awaiting dispatch`} />
         <Stat label="products live" value={String(published)} sub={`${store.products.length} in catalog`} tone="accent" />
@@ -79,14 +79,14 @@ function Stat({
   tone?: "accent" | "muted";
 }) {
   return (
-    <div style={{
+    <div className="ssr-dash-stat" style={{
       border: "1px solid #E4E1DA",
       background: highlight ? "#EEF2F8" : "#FAF9F6",
       padding: 20,
       boxShadow: lead ? "0 12px 28px rgba(20,22,26,0.10)" : "none",
     }}>
       <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.7 }}>{label}</div>
-      <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, fontFamily: MONO }}>{value}</div>
+      <div style={{ fontSize: "clamp(1.7rem, 4.6vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, fontFamily: MONO }}>{value}</div>
       {sub && (
         <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: tone === "accent" ? "#24457A" : undefined, opacity: tone === "accent" ? 1 : 0.7 }}>{sub}</div>
       )}
@@ -100,7 +100,7 @@ export function DashboardSkeleton() {
   return (
     <>
       <style>{`@keyframes ssrPulse { 0%,100% { opacity: 1 } 50% { opacity: .5 } }`}</style>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
+      <div className="ssr-dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} style={{ border: "1px solid #E4E1DA", background: "#FAF9F6", padding: 20 }}>
             <div style={{ ...cell, width: "45%", height: 9 }} />

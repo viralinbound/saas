@@ -8,14 +8,6 @@ export const SOCIAL_PROOF_BRANDS = [
   "✦ HERBAL ESSENCE",
 ];
 
-export const DOMAIN_EXTENSIONS = [
-  { ext: ".com", price: "₹899/yr", badge: "POPULAR" },
-  { ext: ".in", price: "₹499/yr", badge: "TOP PICK" },
-  { ext: ".co.in", price: "₹399/yr", badge: "INDIA" },
-  { ext: ".store", price: "₹299/yr", badge: "ECOMMERCE" },
-  { ext: ".shop", price: "₹199/yr", badge: "BEST VALUE" },
-  { ext: ".online", price: "₹149/yr", badge: "DEAL" },
-];
 
 export const PILLARS = [
   {
@@ -65,10 +57,3 @@ export const CONSULTATION_SLOTS = ["9:00am", "10:00am", "11:00am", "12:00pm", "2
 
 export const FEATURED_TEMPLATES = THEMES.slice(0, 3);
 
-export function cleanDomainQuery(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/https?:\/\/|www\.|\.com|\.in|\.store|\.shop|\.online/g, "")
-    .replace(/[^a-z0-9]/g, "");
-}

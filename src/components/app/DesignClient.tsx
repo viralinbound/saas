@@ -104,7 +104,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
   const [publishing, setPublishing] = useState(false);
   const [msg, setMsg] = useState("");
   const [previewNonce, setPreviewNonce] = useState(0);
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("mobile");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("mobile");
   const [showCopy, setShowCopy] = useState(false);
 
   useEffect(() => {
@@ -419,6 +419,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
 
   const hostedFull = `https://www.${ROOT_DOMAIN}${hostedPath || `/${storeSlug}`}`;
   const mobile = previewDevice === "mobile";
+  const tablet = previewDevice === "tablet";
   const changeLabel = dirty ? "1 unpublished change" : status === "draft" ? "draft · not published" : "theme saved";
 
   return (
@@ -853,7 +854,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 8 }}>
-            {(["mobile", "desktop"] as const).map((d) => (
+            {(["mobile", "tablet", "desktop"] as const).map((d) => (
               <button
                 key={d}
                 type="button"
@@ -931,7 +932,7 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               padding: 9,
               borderRadius: mobile ? 34 : 0,
               boxShadow: "0 12px 28px rgba(20,22,26,0.10)",
-              width: mobile ? 380 : "100%",
+              width: mobile ? 380 : tablet ? 820 : "100%",
               maxWidth: "100%",
             }}
           >
@@ -942,10 +943,10 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               style={{
                 display: "block",
                 width: "100%",
-                height: mobile ? 640 : 720,
+                height: mobile ? 640 : tablet ? 920 : 720,
                 border: 0,
                 background: "#fff",
-                borderRadius: mobile ? 26 : 0,
+                borderRadius: mobile ? 26 : tablet ? 16 : 0,
               }}
             />
           </div>

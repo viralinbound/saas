@@ -215,7 +215,7 @@ export const LAYOUTS: Layout[] = [
       { name: "ingredient and dosage callouts", detail: "percentages, ph and patch-test notes on every product" },
       { name: "routine bundles", detail: "am/pm sets priced below the sum of the parts" },
       { name: "subscription refills", detail: "45-day cadence, discounted, with a whatsapp reminder" },
-      { name: "verified reviews with photos", detail: "filtered by skin type on the review wall" },
+      { name: "verified reviews with photos", detail: "filtered by skin type in the reviews section" },
       { name: "trial and full sizes", detail: "both sizes on one page, priced separately" },
       { name: "batch and expiry display", detail: "manufactured and use-by on every listing" },
     ],
