@@ -15,7 +15,7 @@ import { LayoutStorefrontView, type ShopApi } from "@/components/marketing/Layou
 import type { LayoutBlocks } from "@/lib/layoutCommerce";
 import { saveOrder } from "@/lib/orderHistory";
 import { StorefrontAccountPanel } from "@/components/storefront/StorefrontAccountPanel";
-import { loadCustomer, saveCustomer, clearCustomer, type CustomerSession } from "@/lib/customerSession";
+import { clearCustomer, type CustomerSession } from "@/lib/customerSession";
 
 type P = Layout["products"][number];
 type Line = { p: P; qty: number; variant: string };
@@ -94,7 +94,10 @@ export function ShoppableLayout({
   const [customer, setCustomer] = useState<CustomerSession | null>(null);
   const [acctOpen, setAcctOpen] = useState(false);
   useEffect(() => {
-    if (accountSlug) setCustomer(loadCustomer(accountSlug));
+    if (!accountSlug) return;
+    // Remove persisted sessions from older builds and disable auto-login.
+    clearCustomer(accountSlug);
+    setCustomer(null);
   }, [accountSlug]);
 
   // real orders (persisted to the store's Supabase, shown on the merchant
@@ -162,38 +165,44 @@ export function ShoppableLayout({
 
     setOrderBusy(true);
     try {
-      const slugToUse = accountSlug || orderSlug || layout.store.toLowerCase().replace(/\s+/g, "-");
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          storeSlug: slugToUse,
-          customerName: details?.name || customer.customer.name || customer.customer.email.split("@")[0],
-          customerPhone: details?.phone || customer.customer.phone || "9999999999",
-          customerEmail: customer.customer.email || undefined,
-          address: details?.line || "Standard Delivery",
-          city: details?.city || "Bengaluru",
-          pincode: details?.pincode || "560001",
-          paymentMethod: (method || L.cart.methods[0]?.name || "cod").toLowerCase(),
-          items: cart.map((c) => ({
-            productId: (c.p.id as string) || "demo-item",
-            name: c.p.name,
-            price: Math.round(numOf(c.p.price)),
-            quantity: c.qty,
-            variant: c.variant || null,
-          })),
-        }),
-      });
-      const d = (await res.json().catch(() => ({}))) as { order?: { orderNumber?: string }; orderNumber?: string; error?: string };
-      const num = d?.order?.orderNumber || d?.orderNumber || ref6();
-      saveOrder(orderSlug, localReceipt(false, num));
-      setPlaced(num);
-      setCart([]);
-    } catch {
-      const num = ref6();
-      saveOrder(orderSlug, localReceipt(true, num));
-      setPlaced(num);
-      setCart([]);
+      if (liveOrders && accountSlug) {
+        const res = await fetch("/api/storefront/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: accountSlug,
+            token: customer.token,
+            paymentMethod: (method || L.cart.methods[0]?.name || "cod").toLowerCase(),
+            address: {
+              name: details?.name || customer.customer.name || customer.customer.email.split("@")[0],
+              phone: details?.phone || customer.customer.phone || undefined,
+              email: customer.customer.email || undefined,
+              line: details?.line || "Standard Delivery",
+              city: details?.city || "Bengaluru",
+              pincode: details?.pincode || "560001",
+            },
+            items: cart.map((c) => ({
+              productId: c.p.id,
+              name: c.p.name,
+              price: Math.round(numOf(c.p.price)),
+              quantity: c.qty,
+              variant: c.variant || null,
+            })),
+          }),
+        });
+        const d = (await res.json().catch(() => ({}))) as { order?: { orderNumber?: string }; orderNumber?: string; error?: string };
+        if (!res.ok) throw new Error(d?.error || "Could not place order.");
+        const num = d?.order?.orderNumber || d?.orderNumber || ref6();
+        setPlaced(num);
+        setCart([]);
+      } else {
+        const num = ref6();
+        saveOrder(orderSlug, localReceipt(false, num));
+        setPlaced(num);
+        setCart([]);
+      }
+    } catch (e) {
+      setOrderError(e instanceof Error ? e.message : "Could not place order.");
     } finally {
       setOrderBusy(false);
     }
@@ -251,7 +260,7 @@ export function ShoppableLayout({
           line={L.line}
           btnFg={btnFg}
           session={customer}
-          onAuthed={(s) => { saveCustomer(accountSlug, s); setCustomer(s); setAcctOpen(false); }}
+          onAuthed={(s) => { setCustomer(s); setAcctOpen(false); }}
           onLogout={() => { clearCustomer(accountSlug); setCustomer(null); setAcctOpen(false); }}
           onClose={() => setAcctOpen(false)}
         />

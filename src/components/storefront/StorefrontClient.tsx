@@ -8,11 +8,20 @@ import { coerceConfig, coerceTokens, type StoreConfig, type ThemeTokens, type Se
 import { track } from "@/lib/track";
 import { readableTextOn, luminance } from "@/lib/color";
 import { mediaCover, mediaSlides } from "@/lib/media";
-import { loadOrders, saveOrder, type LocalOrder } from "@/lib/orderHistory";
 import { StorefrontAccountPanel } from "@/components/storefront/StorefrontAccountPanel";
-import { loadCustomer, saveCustomer, clearCustomer, type CustomerSession } from "@/lib/customerSession";
+import { clearCustomer, type CustomerSession } from "@/lib/customerSession";
 
 type CartItem = { product: Product; quantity: number; variant?: string; engraving?: string };
+type PastOrder = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  paymentMethod: string;
+  total: number;
+  city: string | null;
+  createdAt: string;
+  items: { name: string; quantity: number; variant: string | null }[];
+};
 
 export function StorefrontClient({
   store,
@@ -94,11 +103,39 @@ export function StorefrontClient({
   const [customer, setCustomer] = useState<CustomerSession | null>(null);
   const [acctOpen, setAcctOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
-  const [orderHistory, setOrderHistory] = useState<LocalOrder[]>([]);
+  const [orderHistory, setOrderHistory] = useState<PastOrder[]>([]);
+  const [lastOrderNumber, setLastOrderNumber] = useState<string>("");
+  const [ordersLoading, setOrdersLoading] = useState(false);
   useEffect(() => {
-    setCustomer(loadCustomer(store.slug));
-    setOrderHistory(loadOrders(store.slug));
+    // Remove persisted sessions from older builds and disable auto-login.
+    clearCustomer(store.slug);
+    setCustomer(null);
+    setOrderHistory([]);
   }, [store.slug]);
+
+  useEffect(() => {
+    if (!customer?.token) {
+      setOrderHistory([]);
+      return;
+    }
+    let live = true;
+    setOrdersLoading(true);
+    fetch(`/api/storefront/order?slug=${encodeURIComponent(store.slug)}&token=${encodeURIComponent(customer.token)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!live) return;
+        setOrderHistory(Array.isArray(d.orders) ? d.orders : []);
+      })
+      .catch(() => {
+        if (live) setOrderHistory([]);
+      })
+      .finally(() => {
+        if (live) setOrdersLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, [customer?.token, store.slug]);
 
   async function useMyLocation() {
     if (!("geolocation" in navigator)) {
@@ -145,22 +182,6 @@ export function StorefrontClient({
     if (!form.city.trim()) return "Enter your city.";
     if (!/^\d{6}$/.test(form.pincode.trim())) return "Enter a valid 6-digit pincode.";
     return "";
-  }
-
-  function recordOrder(orderNumber: string, preview: boolean) {
-    const rec: LocalOrder = {
-      orderNumber,
-      placedAt: new Date().toISOString(),
-      storeName: store.name,
-      customerName: form.customerName.trim(),
-      city: form.city.trim() || undefined,
-      paymentMethod: form.paymentMethod,
-      total: subtotal,
-      currency: store.currency || "INR",
-      items: cart.map((i) => ({ name: i.product.name, quantity: i.quantity, price: i.product.price, variant: i.variant })),
-      preview,
-    };
-    setOrderHistory(saveOrder(store.slug, rec));
   }
 
   const categories = useMemo(() => {
@@ -237,22 +258,21 @@ export function StorefrontClient({
     }
     setFormErr("");
 
-    const res = await fetch("/api/orders", {
+    const res = await fetch("/api/storefront/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        storeSlug: store.slug,
-        customerName: form.customerName.trim() || customer.customer.name || customer.customer.email.split("@")[0],
-        customerPhone: form.customerPhone.trim() || customer.customer.phone || "9999999999",
-        customerEmail: form.customerEmail.trim() || customer.customer.email || undefined,
-        address: form.address.trim(),
-        city: form.city.trim() || undefined,
-        pincode: form.pincode.trim() || undefined,
+        slug: store.slug,
+        token: customer.token,
         paymentMethod: form.paymentMethod,
-        deliverySlot: themeKey === "bakery" ? selectedSlot : undefined,
-        customEngraving: customEngraving || undefined,
-        giftWrapped,
-        discountAmount,
+        address: {
+          name: form.customerName.trim() || customer.customer.name || customer.customer.email.split("@")[0],
+          phone: form.customerPhone.trim() || customer.customer.phone || undefined,
+          email: form.customerEmail.trim() || customer.customer.email || undefined,
+          line: form.address.trim(),
+          city: form.city.trim() || undefined,
+          pincode: form.pincode.trim() || undefined,
+        },
         items: cart.map((i) => ({
           productId: i.product.id,
           name: i.product.name,
@@ -265,11 +285,19 @@ export function StorefrontClient({
     });
     const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      recordOrder(data?.order?.orderNumber || `ORD-${Date.now().toString().slice(-6)}`, false);
+      const orderNum = data?.order?.orderNumber || data?.orderNumber || `ORD-${Date.now().toString().slice(-6)}`;
+      setLastOrderNumber(orderNum);
       setOrderDone(true);
       setCart([]);
       setCheckoutOpen(false);
       setCartOpen(false);
+      setOrdersOpen(true);
+      setOrdersLoading(true);
+      fetch(`/api/storefront/order?slug=${encodeURIComponent(store.slug)}&token=${encodeURIComponent(customer.token)}`)
+        .then((r) => r.json())
+        .then((d) => setOrderHistory(Array.isArray(d.orders) ? d.orders : []))
+        .catch(() => {})
+        .finally(() => setOrdersLoading(false));
     } else {
       setFormErr(data?.error || "Could not place the order. Please try again.");
     }
@@ -395,31 +423,39 @@ export function StorefrontClient({
               <h3 style={{ fontWeight: 900, fontSize: "1.2rem", color: "#0F172A" }}>Your orders from {store.name}</h3>
               <button onClick={() => setOrdersOpen(false)} style={{ border: 0, background: "#F1F5F9", width: 30, height: 30, borderRadius: "50%", cursor: "pointer", fontWeight: 800 }}>✕</button>
             </div>
-            {orderHistory.length === 0 ? (
+            {!customer ? (
+              <div style={{ color: "#64748B", fontSize: "0.9rem", lineHeight: 1.6 }}>
+                Sign in to view your order history on this store.
+                <button type="button" onClick={() => { setOrdersOpen(false); setAcctOpen(true); }} style={{ marginTop: 10, display: "block", background: accent, color: onAccent, border: 0, padding: "8px 14px", borderRadius: 8, fontWeight: 800, cursor: "pointer" }}>
+                  Sign in / Sign up
+                </button>
+              </div>
+            ) : ordersLoading ? (
+              <p style={{ color: "#64748B", fontSize: "0.9rem" }}>Loading orders…</p>
+            ) : orderHistory.length === 0 ? (
               <p style={{ color: "#64748B", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                No orders yet. Add something to the cart and check out — your orders will show up here on this device.
+                No orders yet. Place your first order and it will appear here.
               </p>
             ) : (
               <div style={{ display: "grid", gap: 12 }}>
                 {orderHistory.map((o) => (
-                  <div key={o.orderNumber + o.placedAt} style={{ border: "1px solid #E2E8F0", borderRadius: 12, padding: 14 }}>
+                  <div key={o.id} style={{ border: "1px solid #E2E8F0", borderRadius: 12, padding: 14 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
                       <strong style={{ fontFamily: "ui-monospace, monospace", fontSize: "0.9rem" }}>{o.orderNumber}</strong>
-                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{new Date(o.placedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{new Date(o.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
                     <div style={{ marginTop: 8, display: "grid", gap: 4 }}>
                       {o.items.map((it, k) => (
                         <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "#334155" }}>
                           <span>{it.name}{it.variant ? ` · ${it.variant}` : ""} × {it.quantity}</span>
-                          <span style={{ fontFamily: "ui-monospace, monospace" }}>{money(it.price * it.quantity)}</span>
+                          <span style={{ fontFamily: "ui-monospace, monospace" }}>—</span>
                         </div>
                       ))}
                     </div>
                     <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: "0.9rem" }}>
-                      <span>{o.paymentMethod.toUpperCase()} · {o.city || "—"}</span>
+                      <span>{o.paymentMethod.toUpperCase()} · {o.status} · {o.city || "—"}</span>
                       <span style={{ fontFamily: "ui-monospace, monospace" }}>{money(o.total)}</span>
                     </div>
-                    {o.preview && <div style={{ marginTop: 6, fontSize: "0.7rem", color: "#B45309", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>demo preview order</div>}
                   </div>
                 ))}
               </div>
@@ -481,7 +517,7 @@ export function StorefrontClient({
         <div style={{ maxWidth: 1200, margin: "20px auto", padding: "0 24px" }}>
           <div style={{ background: "#ECFDF5", border: "2px solid #10B981", padding: 20, borderRadius: 14, color: "#065F46", textAlign: "center" }}>
             <div style={{ fontWeight: 800, fontSize: "1.1rem" }}>
-              🎉 Order placed{orderHistory[0] ? ` — ${orderHistory[0].orderNumber}` : ""}!
+                🎉 Order placed{lastOrderNumber ? ` — ${lastOrderNumber}` : ""}!
             </div>
             <div style={{ fontSize: "0.92rem", marginTop: 4 }}>
               Your items are confirmed. We&apos;ll reach out on WhatsApp/Phone shortly.
@@ -940,7 +976,7 @@ export function StorefrontClient({
           line="#E2E8F0"
           btnFg={onAccent}
           session={customer}
-          onAuthed={(s) => { saveCustomer(store.slug, s); setCustomer(s); setAcctOpen(false); }}
+          onAuthed={(s) => { setCustomer(s); setAcctOpen(false); }}
           onLogout={() => { clearCustomer(store.slug); setCustomer(null); setAcctOpen(false); }}
           onClose={() => setAcctOpen(false)}
         />
