@@ -108,67 +108,7 @@ export function PricingBlock({
         </>
       )}
 
-      {showRoi && (
-        <div style={{ marginTop: showHeader ? 44 : 0, border: "1px solid #E4E1DA", background: "#14161A", color: "#FAF9F6", boxShadow: "0 12px 28px rgba(20,22,26,0.10)", padding: 34 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9FBBE0" }}>your real cost · pro plan</div>
-              <h3 style={{ fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 6, marginBottom: 0, color: "#FAF9F6" }}>
-                what {FEE_PCT}% works out to at your volume
-              </h3>
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 12, color: "#9FBBE0", opacity: 0.9 }}>drag ⟶</div>
-          </div>
-
-          <div style={{ marginTop: 30 }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.75 }}>estimated monthly store sales</div>
-              <div style={{ fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 700, letterSpacing: "-0.025em", color: "#9FBBE0", fontFamily: MONO }}>{inr(sales)}</div>
-            </div>
-            <div
-              ref={trackRef}
-              onPointerDown={onTrack}
-              role="slider"
-              aria-valuemin={MIN}
-              aria-valuemax={MAX}
-              aria-valuenow={sales}
-              aria-label="estimated monthly store sales"
-              style={{ position: "relative", height: 46, marginTop: 14, display: "flex", alignItems: "center", touchAction: "none", cursor: "ew-resize" }}
-            >
-              <div style={{ position: "absolute", left: 0, right: 0, height: 8, background: "rgba(250,249,246,0.2)", border: "1px solid rgba(250,249,246,0.35)" }} />
-              <div style={{ position: "absolute", left: 0, height: 8, background: "#24457A", width: `${pct}%` }} />
-              <div style={{ position: "absolute", left: `${pct}%`, width: 30, height: 30, marginLeft: -15, background: "#EEF2F8", border: "2px solid #FAF9F6", transform: "rotate(45deg)" }} />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 10, opacity: 0.6, letterSpacing: "0.1em" }}>
-              <span>₹25,000</span>
-              <span>₹5,00,000 / mo</span>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 210px), 1fr))", gap: 16, marginTop: 30 }}>
-            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>monthly sales</div>
-              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO }}>{inr(sales)}</div>
-            </div>
-            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>{FEE_PCT}% platform fee</div>
-              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO, color: "#9FBBE0" }}>{inr(fee)} / mo</div>
-            </div>
-            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20, background: "rgba(159,187,224,0.14)" }}>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>total year one</div>
-              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO, color: "#9FBBE0" }}>{inr(total)}</div>
-              <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, opacity: 0.7 }}>
-                (₹{Math.round(PRO_YEAR / 1000)}k plan + {inr(fee * 12)} sales fee)
-              </div>
-            </div>
-            <div style={{ border: "1px solid rgba(250,249,246,0.24)", padding: 20 }}>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>effective per month</div>
-              <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 8, fontFamily: MONO }}>{inr(total / 12)}</div>
-              <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, opacity: 0.7 }}>{((total / (sales * 12)) * 100).toFixed(1)}% of revenue</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {showRoi && null}
 
       {showTiers && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 258px), 1fr))", gap: 18, marginTop: 40 }}>
