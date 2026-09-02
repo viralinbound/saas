@@ -7,6 +7,7 @@ import { formatMoney, getTheme } from "@/lib/constants";
 import { coerceConfig, coerceTokens, type StoreConfig, type ThemeTokens, type Section } from "@/lib/customization";
 import { track } from "@/lib/track";
 import { readableTextOn, luminance } from "@/lib/color";
+import { mediaCover, mediaSlides } from "@/lib/media";
 import { loadOrders, saveOrder, type LocalOrder } from "@/lib/orderHistory";
 import { StorefrontAccountPanel } from "@/components/storefront/StorefrontAccountPanel";
 import { loadCustomer, saveCustomer, clearCustomer, type CustomerSession } from "@/lib/customerSession";
