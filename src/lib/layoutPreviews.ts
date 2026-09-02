@@ -9,6 +9,9 @@ const U = (id: string, w = 600) =>
 
 export type KV = { label: string; value: string };
 export type Product = {
+  /** real catalogue id — present only for a merchant store's products, so
+   *  checkout can place a real order. Absent on the demo template layouts. */
+  id?: string;
   name: string; price: string; mrp: string; rating: string; badge: string;
   variants: string[]; img: string;
 };

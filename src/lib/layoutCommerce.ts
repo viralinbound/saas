@@ -272,6 +272,7 @@ export function catalogToLayoutProducts(products: Product[], fallback: Layout["p
       .map((s) => s.trim())
       .filter(Boolean);
     return {
+      id: p.id,
       name: p.name,
       price: inr(Math.round((p.price || 0) / 100)),
       mrp: p.mrp ? inr(Math.round(p.mrp / 100)) : fb.mrp,

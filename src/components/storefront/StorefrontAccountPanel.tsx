@@ -7,8 +7,19 @@
  * sessions are opaque tokens in public.storefront_sessions.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CustomerSession, StoreCustomer } from "@/lib/customerSession";
+
+type PastOrder = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  paymentMethod: string;
+  total: number; // paise
+  city: string | null;
+  createdAt: string;
+  items: { name: string; quantity: number; variant: string | null }[];
+};
 
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 
@@ -42,6 +53,18 @@ export function StorefrontAccountPanel({
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+
+  const [orders, setOrders] = useState<PastOrder[] | null>(null);
+  useEffect(() => {
+    if (!session?.token) { setOrders(null); return; }
+    let live = true;
+    fetch(`/api/storefront/order?slug=${encodeURIComponent(storeSlug)}&token=${encodeURIComponent(session.token)}`)
+      .then((r) => r.json())
+      .then((d) => { if (live) setOrders(Array.isArray(d.orders) ? d.orders : []); })
+      .catch(() => { if (live) setOrders([]); });
+    return () => { live = false; };
+  }, [session?.token, storeSlug]);
+  const inr = (paise: number) => "₹" + Math.round(paise / 100).toLocaleString("en-IN");
 
   const field: React.CSSProperties = {
     width: "100%", border: `1px solid ${line}`, background: card, color: fg,
@@ -105,9 +128,25 @@ export function StorefrontAccountPanel({
             <div style={{ fontSize: 18, fontWeight: 700 }}>{session.customer.name || session.customer.email}</div>
             <div style={{ fontFamily: MONO, fontSize: 12, opacity: 0.7, marginTop: 4 }}>{session.customer.email}</div>
             {session.customer.phone && <div style={{ fontFamily: MONO, fontSize: 12, opacity: 0.7, marginTop: 2 }}>{session.customer.phone}</div>}
-            <p style={{ fontSize: 13, opacity: 0.75, marginTop: 12, lineHeight: 1.5 }}>
-              You&apos;re signed in to this store. Your orders are saved to your account.
-            </p>
+            <div style={{ ...label, marginTop: 18 }}>your orders</div>
+            <div style={{ marginTop: 8, maxHeight: 260, overflowY: "auto", display: "grid", gap: 8 }}>
+              {orders === null && <div style={{ fontSize: 13, opacity: 0.6 }}>loading…</div>}
+              {orders?.length === 0 && <div style={{ fontSize: 13, opacity: 0.65 }}>No orders yet — your first order will show here.</div>}
+              {orders?.map((o) => (
+                <div key={o.id} style={{ border: `1px solid ${line}`, padding: "10px 12px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+                    <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700 }}>{o.orderNumber}</span>
+                    <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700 }}>{inr(o.total)}</span>
+                  </div>
+                  <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>
+                    {o.items.map((it) => `${it.name}${it.quantity > 1 ? ` ×${it.quantity}` : ""}`).join(", ")}
+                  </div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.6, marginTop: 6 }}>
+                    {new Date(o.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} · {o.status} · {o.paymentMethod}
+                  </div>
+                </div>
+              ))}
+            </div>
             <button type="button" onClick={logout} style={{ marginTop: 16, width: "100%", border: `1px solid ${line}`, background: "transparent", color: fg, padding: 12, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               log out
             </button>

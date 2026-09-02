@@ -60,9 +60,17 @@ export type ShopApi = {
   toggleSearch: () => void;
   openAccount: () => void;
   account: { name: string | null } | null;
+  /** true on a real store — checkout requires a signed-in customer and the
+   *  order is saved to the merchant's dashboard */
+  requireLogin: boolean;
+  orderBusy: boolean;
+  orderError: string | null;
   goCart: () => void;
   goHome: () => void;
-  placeOrder: (details?: { name?: string; city?: string; discountApplied?: boolean }) => void;
+  placeOrder: (details?: {
+    name?: string; phone?: string; line?: string; city?: string; pincode?: string;
+    discountApplied?: boolean;
+  }) => void;
   toGrid: () => void;
   toLookbook: () => void;
   whatsapp: () => void;
@@ -119,6 +127,8 @@ export function LayoutStorefrontView({
   const activeMethod = shop?.method || L.cart.methods[0]?.name || "";
   const kind = payFields(activeMethod);
   function checkoutError(): string | null {
+    if (shop?.requireLogin && !shop.account)
+      return "__LOGIN__"; // handled specially — opens the account panel
     if (!addr.name.trim() || addr.phone.length !== 10 || !addr.line.trim() || !addr.city.trim() || addr.pin.length !== 6)
       return "add a complete delivery address (name, 10-digit mobile, address, city, 6-digit pincode)";
     if (kind === "upi" && !/^[\w.\-]{2,}@[a-z]{2,}$/i.test(upiId.trim()))
@@ -818,20 +828,32 @@ export function LayoutStorefrontView({
           })}
         </div>
 
+        {shop?.requireLogin && !shop.account && (
+          <div style={{ marginTop: 14, border: `1px solid ${L.accent}`, background: L.card, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, color: L.fg }}>sign in to place your order &amp; track it</span>
+            <button type="button" className="ssr-h-btn" onClick={() => shop.openAccount()} style={{ border: 0, background: L.accent, color: btnFg, fontSize: 12, fontWeight: 700, padding: "8px 14px", ...pointer }}>sign in / sign up</button>
+          </div>
+        )}
+
         <button
           type="button"
           className="ssr-h-btn"
+          disabled={shop?.orderBusy}
           onClick={() => {
             if (!shop) return;
             const err = checkoutError();
+            if (err === "__LOGIN__") { setCheckoutMsg("please sign in to place your order"); shop.openAccount(); return; }
             if (err) { setCheckoutMsg(err); return; }
             setCheckoutMsg(null);
-            shop.placeOrder({ name: addr.name, city: addr.city, discountApplied: couponApplied });
+            shop.placeOrder({
+              name: addr.name, phone: addr.phone, line: addr.line, city: addr.city, pincode: addr.pin,
+              discountApplied: couponApplied,
+            });
           }}
-          style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}
-        >place order · {money.total}</button>
-        {checkoutMsg && (
-          <div key={checkoutMsg} className="ssr-anim-in" style={{ fontSize: 12, fontWeight: 700, marginTop: 8, color: "#B91C1C" }}>{checkoutMsg}</div>
+          style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, opacity: shop?.orderBusy ? 0.6 : 1, ...pointer }}
+        >{shop?.orderBusy ? "placing order…" : `place order · ${money.total}`}</button>
+        {(checkoutMsg || shop?.orderError) && (
+          <div key={checkoutMsg || shop?.orderError} className="ssr-anim-in" style={{ fontSize: 12, fontWeight: 700, marginTop: 8, color: "#B91C1C" }}>{checkoutMsg || shop?.orderError}</div>
         )}
         <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>paying by {payLabel(activeMethod)} · GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
       </div>

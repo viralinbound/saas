@@ -113,11 +113,11 @@ export function PricingBlock({
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
             <div>
               <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9FBBE0" }}>your real cost · pro plan</div>
-              <h3 style={{ fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 6, marginBottom: 0 }}>
+              <h3 style={{ fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 700, letterSpacing: "-0.025em", marginTop: 6, marginBottom: 0, color: "#FAF9F6" }}>
                 what {FEE_PCT}% works out to at your volume
               </h3>
             </div>
-            <div style={{ fontFamily: MONO, fontSize: 12, opacity: 0.7 }}>drag ⟶</div>
+            <div style={{ fontFamily: MONO, fontSize: 12, color: "#9FBBE0", opacity: 0.9 }}>drag ⟶</div>
           </div>
 
           <div style={{ marginTop: 30 }}>

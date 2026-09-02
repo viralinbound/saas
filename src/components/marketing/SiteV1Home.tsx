@@ -243,6 +243,15 @@ export function SiteV1Home() {
   const live = THEMES[themeIx];
   const how = HOW[hstep];
   const bundle = BUNDLE[tab];
+  const indCarouselRef = useRef<HTMLDivElement>(null);
+
+  function scrollIndCarousel(dir: "left" | "right") {
+    const el = indCarouselRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>(".ssr-ind-card");
+    const step = card ? card.offsetWidth + 14 : 280;
+    el.scrollBy({ left: dir === "left" ? -step : step, behavior: "smooth" });
+  }
 
   useEffect(() => {
     const id = window.location.hash.replace("#", "");
@@ -465,11 +474,58 @@ export function SiteV1Home() {
               <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#24457A" }}>industries we build for</div>
               <h2 style={{ fontSize: "clamp(28px, 3.4vw, 46px)", lineHeight: 0.95, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 12 }}>one console, <span style={{ fontWeight: 600, color: "#24457A" }}>every kind of catalog.</span></h2>
             </div>
-            <a href="/templates" style={{ fontSize: 15, fontWeight: 700, borderBottom: "1px solid #24457A", alignSelf: "flex-end", color: "#24457A", textDecoration: "none" }}>walk all six, full size →</a>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, alignSelf: "flex-end" }}>
+              <a href="/templates" style={{ fontSize: 15, fontWeight: 700, borderBottom: "1px solid #24457A", color: "#24457A", textDecoration: "none" }}>walk all six, full size →</a>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => scrollIndCarousel("left")}
+                  aria-label="Scroll left"
+                  style={{ width: 36, height: 36, border: "1px solid #24457A", background: "#FFFFFF", color: "#24457A", fontSize: 16, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollIndCarousel("right")}
+                  aria-label="Scroll right"
+                  style={{ width: 36, height: 36, border: "1px solid #24457A", background: "#24457A", color: "#FFFFFF", fontSize: 16, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}
+                >
+                  →
+                </button>
+              </div>
+            </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 14 }}>
+          <div
+            ref={indCarouselRef}
+            style={{
+              display: "flex",
+              gap: 14,
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              scrollBehavior: "smooth",
+              paddingBottom: 12,
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
             {INDUSTRIES.map((c) => (
-              <a key={c.name} href="/templates" style={{ border: "1px solid #E4E1DA", background: "#FFFFFF", overflow: "hidden", color: "#14161A", display: "block", textDecoration: "none" }}>
+              <a
+                key={c.name}
+                href="/templates"
+                className="ssr-ind-card"
+                style={{
+                  flex: "0 0 calc((100% - 42px) / 4)",
+                  minWidth: 230,
+                  scrollSnapAlign: "start",
+                  border: "1px solid #E4E1DA",
+                  background: "#FFFFFF",
+                  overflow: "hidden",
+                  color: "#14161A",
+                  display: "block",
+                  textDecoration: "none",
+                  transition: "transform 0.18s ease, box-shadow 0.18s ease",
+                }}
+              >
                 <div style={{ aspectRatio: "4 / 5", overflow: "hidden" }}>
                   <img src={c.img} alt={`${c.name} layout`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
@@ -480,7 +536,7 @@ export function SiteV1Home() {
               </a>
             ))}
           </div>
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 22, opacity: 0.6 }}>layouts, photographed with stock imagery · client stores go up here once we have permission to name them</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 18, opacity: 0.6 }}>layouts, photographed with stock imagery · scroll one by one or click arrows</div>
         </div>
       </section>
 
@@ -766,7 +822,7 @@ function CursorCatalogCTA() {
       <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto", padding: "150px 28px", textAlign: "center", pointerEvents: "none" }}>
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(250,249,246,0.45)", marginBottom: 34 }}>move your cursor ✦ the catalog follows</div>
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9FBBE0" }}>ready when you are</div>
-        <h2 style={{ fontSize: "clamp(44px, 6.4vw, 100px)", lineHeight: 0.86, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 18 }}>
+        <h2 style={{ fontSize: "clamp(44px, 6.4vw, 100px)", lineHeight: 0.86, fontWeight: 700, letterSpacing: "-0.03em", marginTop: 18, color: "#FAF9F6" }}>
           ₹15,000 a year.<br /><span style={{ fontWeight: 600, color: "#9FBBE0" }}>2% when it sells.</span>
         </h2>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 36 }}>

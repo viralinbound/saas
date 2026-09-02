@@ -7,8 +7,9 @@ import { formatMoney, getTheme } from "@/lib/constants";
 import { coerceConfig, coerceTokens, type StoreConfig, type ThemeTokens, type Section } from "@/lib/customization";
 import { track } from "@/lib/track";
 import { readableTextOn, luminance } from "@/lib/color";
-import { mediaCover, mediaSlides } from "@/lib/media";
 import { loadOrders, saveOrder, type LocalOrder } from "@/lib/orderHistory";
+import { StorefrontAccountPanel } from "@/components/storefront/StorefrontAccountPanel";
+import { loadCustomer, saveCustomer, clearCustomer, type CustomerSession } from "@/lib/customerSession";
 
 type CartItem = { product: Product; quantity: number; variant?: string; engraving?: string };
 
@@ -88,10 +89,13 @@ export function StorefrontClient({
   const [formErr, setFormErr] = useState("");
   const [locating, setLocating] = useState(false);
 
-  // Buyer order history (localStorage — works for previews too)
+  // Customer Session (requires sign in to order)
+  const [customer, setCustomer] = useState<CustomerSession | null>(null);
+  const [acctOpen, setAcctOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
   const [orderHistory, setOrderHistory] = useState<LocalOrder[]>([]);
   useEffect(() => {
+    setCustomer(loadCustomer(store.slug));
     setOrderHistory(loadOrders(store.slug));
   }, [store.slug]);
 
@@ -217,6 +221,14 @@ export function StorefrontClient({
 
   async function placeOrder(e: React.FormEvent) {
     e.preventDefault();
+
+    // ── REQUIRE CUSTOMER SIGN-IN BEFORE PLACING ORDER ──
+    if (!customer) {
+      setFormErr("Please sign in or create an account to place your order.");
+      setAcctOpen(true);
+      return;
+    }
+
     const err = validateForm();
     if (err) {
       setFormErr(err);
@@ -224,22 +236,14 @@ export function StorefrontClient({
     }
     setFormErr("");
 
-    if (previewOnly) {
-      recordOrder(`PRV-${Date.now().toString().slice(-6)}`, true);
-      setOrderDone(true);
-      setCart([]);
-      setCheckoutOpen(false);
-      setCartOpen(false);
-      return;
-    }
     const res = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         storeSlug: store.slug,
-        customerName: form.customerName.trim(),
-        customerPhone: form.customerPhone.trim(),
-        customerEmail: form.customerEmail.trim() || undefined,
+        customerName: form.customerName.trim() || customer.customer.name || customer.customer.email.split("@")[0],
+        customerPhone: form.customerPhone.trim() || customer.customer.phone || "9999999999",
+        customerEmail: form.customerEmail.trim() || customer.customer.email || undefined,
         address: form.address.trim(),
         city: form.city.trim() || undefined,
         pincode: form.pincode.trim() || undefined,
@@ -358,6 +362,13 @@ export function StorefrontClient({
               style={{ border: "1px solid #CBD5E1", borderRadius: 8, padding: "8px 12px", fontSize: "0.85rem", width: 170, outline: "none" }}
             />
           )}
+          <button
+            type="button"
+            onClick={() => setAcctOpen(true)}
+            style={{ background: "#FFF", color: "#334155", border: "1px solid #CBD5E1", padding: "10px 14px", borderRadius: 8, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+          >
+            👤 {customer ? customer.customer.name || "Account" : "Sign In"}
+          </button>
           <button
             type="button"
             onClick={() => setOrdersOpen(true)}
@@ -918,6 +929,20 @@ export function StorefrontClient({
             </form>
           </div>
         </div>
+      )}
+      {acctOpen && (
+        <StorefrontAccountPanel
+          storeSlug={store.slug}
+          accent={accent}
+          fg="#0F172A"
+          card="#FFFFFF"
+          line="#E2E8F0"
+          btnFg={onAccent}
+          session={customer}
+          onAuthed={(s) => { saveCustomer(store.slug, s); setCustomer(s); setAcctOpen(false); }}
+          onLogout={() => { clearCustomer(store.slug); setCustomer(null); setAcctOpen(false); }}
+          onClose={() => setAcctOpen(false)}
+        />
       )}
     </div>
   );

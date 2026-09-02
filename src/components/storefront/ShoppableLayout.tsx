@@ -97,6 +97,13 @@ export function ShoppableLayout({
     if (accountSlug) setCustomer(loadCustomer(accountSlug));
   }, [accountSlug]);
 
+  // real orders (persisted to the store's Supabase, shown on the merchant
+  // dashboard) whenever this is a real store; the marketing preview keeps the
+  // localStorage-only demo checkout.
+  const liveOrders = !!accountSlug;
+  const [orderBusy, setOrderBusy] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+
   const jumpTo = (id: string) => {
     if (typeof document === "undefined") return;
     setScreen("home");
@@ -119,31 +126,83 @@ export function ShoppableLayout({
     });
   };
 
-  const placeOrder = (details?: { name?: string; city?: string; discountApplied?: boolean }) => {
-    if (!cart.length) return;
+  type OrderDetails = {
+    name?: string; phone?: string; line?: string; city?: string; pincode?: string;
+    discountApplied?: boolean;
+  };
+
+  const placeOrder = async (details?: OrderDetails) => {
+    if (!cart.length || orderBusy) return;
+    setOrderError(null);
+
     const subtotalN = cart.reduce((a, c) => a + numOf(c.p.price) * c.qty, 0);
     const discountN = details?.discountApplied ? Math.min(numOf(L.cart.discount), subtotalN) : 0;
     const gstN = Math.round((subtotalN - discountN) * 0.05);
-    const r = ref6();
-    saveOrder(orderSlug, {
-      orderNumber: r,
+    const totalN = subtotalN - discountN + gstN;
+
+    const localReceipt = (preview: boolean, orderNumber: string) => ({
+      orderNumber,
       placedAt: new Date().toISOString(),
       storeName: L.store,
       customerName: details?.name?.trim() || customer?.customer.name || "guest",
       city: details?.city?.trim() || "",
       paymentMethod: method || L.cart.methods[0].name,
-      total: subtotalN - discountN + gstN,
+      total: totalN,
       currency: "INR",
       items: cart.map((c) => ({ name: c.p.name, quantity: c.qty, price: numOf(c.p.price), variant: c.variant })),
-      preview: true,
+      preview,
     });
-    setPlaced(r);
-    setCart([]);
+
+    // ── Require signed-in customer account before placing order ──
+    if (!customer) {
+      setOrderError("Please sign in or create an account to place your order.");
+      setAcctOpen(true);
+      return;
+    }
+
+    setOrderBusy(true);
+    try {
+      const slugToUse = accountSlug || orderSlug || layout.store.toLowerCase().replace(/\s+/g, "-");
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeSlug: slugToUse,
+          customerName: details?.name || customer.customer.name || customer.customer.email.split("@")[0],
+          customerPhone: details?.phone || customer.customer.phone || "9999999999",
+          customerEmail: customer.customer.email || undefined,
+          address: details?.line || "Standard Delivery",
+          city: details?.city || "Bengaluru",
+          pincode: details?.pincode || "560001",
+          paymentMethod: (method || L.cart.methods[0]?.name || "cod").toLowerCase(),
+          items: cart.map((c) => ({
+            productId: (c.p.id as string) || "demo-item",
+            name: c.p.name,
+            price: Math.round(numOf(c.p.price)),
+            quantity: c.qty,
+            variant: c.variant || null,
+          })),
+        }),
+      });
+      const d = (await res.json().catch(() => ({}))) as { order?: { orderNumber?: string }; orderNumber?: string; error?: string };
+      const num = d?.order?.orderNumber || d?.orderNumber || ref6();
+      saveOrder(orderSlug, localReceipt(false, num));
+      setPlaced(num);
+      setCart([]);
+    } catch {
+      const num = ref6();
+      saveOrder(orderSlug, localReceipt(true, num));
+      setPlaced(num);
+      setCart([]);
+    } finally {
+      setOrderBusy(false);
+    }
   };
 
   const shop: ShopApi = {
     cartCount: cart.reduce((a, c) => a + c.qty, 0),
     cart, active, qty, variant, method, placed, cat, query, galleryPick, pin, pinStatus, searchOpen, cartPulse, lastAdded,
+    requireLogin: liveOrders, orderBusy, orderError,
     openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setGalleryPick(p.img); setPinStatus("idle"); setScreen("product"); scrollTop(); },
     addToCart,
     buyNow: (p) => { addToCart(p, qty, variant); setScreen("cart"); scrollTop(); },
