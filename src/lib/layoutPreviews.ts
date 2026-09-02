@@ -24,6 +24,11 @@ export type Layout = {
   tiles: { name: string; count: string; img: string }[];
   banner: { kicker: string; headline: string; sub: string; cta: string; img: string };
   checkout: string; delivery: string;
+  /** shopper-facing label for where the store ships, e.g. "Bengaluru + 18,240 pincodes". */
+  serviceArea?: string;
+  /** serviceable pincodes: full 6-digit codes or 2–5 digit prefixes, comma/space
+   *  separated. Empty ⇒ the store ships everywhere. */
+  servicePins?: string;
   products: Product[];
   signature: { title: string; rows: KV[] };
   reviews: { name: string; city: string; text: string }[];

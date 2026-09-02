@@ -56,6 +56,10 @@ export type LayoutPatch = {
   reviews?: Layout["reviews"];
   trust?: Layout["trust"];
   whatsapp?: string;
+  /** shopper-facing label for where the store delivers */
+  serviceArea?: string;
+  /** serviceable pincodes / prefixes, comma or space separated (blank = ships everywhere) */
+  servicePins?: string;
   bg?: string;
   card?: string;
   fg?: string;
@@ -113,6 +117,8 @@ export function seedLayoutPatch(L: Layout, storeName: string): LayoutPatch {
     reviews: L.reviews.map((r) => ({ ...r })),
     trust: L.trust.map((t) => ({ ...t })),
     whatsapp: "918431101466",
+    serviceArea: L.serviceArea || "delivers across India",
+    servicePins: L.servicePins || "",
     bg: L.bg,
     card: L.card,
     fg: L.fg,
@@ -235,6 +241,8 @@ export function mergeMerchantLayout(
     chips: csv(p.chips, base.chips),
     gridTitle: p.gridTitle ?? fromSections.gridTitle ?? base.gridTitle,
     gridMeta: p.gridMeta || base.gridMeta,
+    serviceArea: p.serviceArea ?? base.serviceArea ?? "",
+    servicePins: p.servicePins ?? base.servicePins ?? "",
     banner,
     tiles: p.tiles?.length ? p.tiles : base.tiles,
     signature: p.signature?.rows?.length ? p.signature : base.signature,

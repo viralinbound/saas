@@ -702,6 +702,33 @@ export function DesignClient({ storeSlug }: { storeSlug: string }) {
               <input style={inp} value={patch.whatsapp ?? ""} placeholder="9199…" onChange={(e) => patchLayout({ whatsapp: e.target.value })} />
             </div>
 
+            <div data-edit-group="delivery">
+              <div style={label}>delivery area</div>
+              <div style={{ display: "grid", gap: 10 }}>
+                <label style={{ display: "block" }}>
+                  <span style={{ ...label, marginBottom: 6 }}>serviceable area — shown to shoppers</span>
+                  <input
+                    style={inp}
+                    value={patch.serviceArea ?? ""}
+                    placeholder="e.g. Bengaluru + 18,240 pincodes"
+                    onChange={(e) => patchLayout({ serviceArea: e.target.value })}
+                  />
+                </label>
+                <label style={{ display: "block" }}>
+                  <span style={{ ...label, marginBottom: 6 }}>serviceable pincodes — full codes or prefixes, comma separated (blank = ships everywhere)</span>
+                  <input
+                    style={inp}
+                    value={patch.servicePins ?? ""}
+                    placeholder="560, 110001, 4000"
+                    onChange={(e) => patchLayout({ servicePins: e.target.value })}
+                  />
+                </label>
+                <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.5 }}>
+                  On each product page a shopper types their pincode and sees whether you deliver there. A prefix like <code>560</code> matches every 560xxx code.
+                </div>
+              </div>
+            </div>
+
             <div>
               <div style={label}>sections {gate.addSections === false ? "· plan-gated" : ""}</div>
               <div style={{ display: "grid", gap: 6, opacity: gate.addSections === false ? 0.55 : 1 }}>

@@ -38,7 +38,8 @@ export type ShopApi = {
   cat: string;            // active category filter ("" = all)
   query: string;          // search text
   galleryPick: string;    // product-page main image
-  pinOK: boolean;
+  pin: string;            // pincode typed on the product page
+  pinStatus: "idle" | "ok" | "no" | "bad";
   searchOpen: boolean;
   openProduct: (p: P) => void;
   addToCart: (p: P, qty?: number, variant?: string) => void;
@@ -51,6 +52,7 @@ export type ShopApi = {
   setCat: (c: string) => void;
   setQuery: (q: string) => void;
   setGalleryPick: (src: string) => void;
+  setPin: (v: string) => void;
   checkPin: () => void;
   toggleSearch: () => void;
   openAccount: () => void;
@@ -143,6 +145,27 @@ export function LayoutStorefrontView({
 
   return (
             <div style={{ background: L.bg }}>
+<style dangerouslySetInnerHTML={{ __html: `
+  .ssr-h-card, .ssr-h-tile, .ssr-h-lift, .ssr-h-btn, .ssr-h-thumb img, .ssr-h-link {
+    transition: transform .18s ease, box-shadow .18s ease, filter .16s ease, opacity .16s ease;
+  }
+  .ssr-h-card { will-change: transform; }
+  .ssr-h-card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(20,22,26,0.14); }
+  .ssr-h-card:hover .ssr-h-thumb img,
+  .ssr-h-thumb:hover img { transform: scale(1.06); }
+  .ssr-h-thumb { overflow: hidden; }
+  .ssr-h-tile:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(20,22,26,0.12); }
+  .ssr-h-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(20,22,26,0.10); }
+  .ssr-h-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .ssr-h-btn:active { transform: translateY(0); filter: brightness(0.94); }
+  .ssr-h-link { text-underline-offset: 3px; }
+  .ssr-h-link:hover { opacity: 1; text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) {
+    .ssr-h-card, .ssr-h-tile, .ssr-h-lift, .ssr-h-btn, .ssr-h-thumb img, .ssr-h-link { transition: none; }
+    .ssr-h-card:hover, .ssr-h-tile:hover, .ssr-h-lift:hover, .ssr-h-btn:hover { transform: none; }
+    .ssr-h-card:hover .ssr-h-thumb img { transform: none; }
+  }
+` }} />
 {editable && (
   <style dangerouslySetInnerHTML={{ __html: `
     .ssr-edit-part { outline: 1px dashed rgba(36,69,122,0.35); outline-offset: -1px; transition: outline-color .12s; }
@@ -163,15 +186,15 @@ export function LayoutStorefrontView({
   <div style={{ display: "flex", gap: 15, marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
     {L.cats.map((c, k) => {
       const on = shop ? norm(shop.cat || L.cats[0]) === norm(c) : k === 0;
-      return <span key={c} onClick={() => shop?.setCat(c)} style={{ color: on ? L.accent : L.fg, ...pointer }}>{c}</span>;
+      return <span key={c} className="ssr-h-link" onClick={() => shop?.setCat(c)} style={{ color: on ? L.accent : L.fg, ...pointer }}>{c}</span>;
     })}
   </div>
   <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 13, fontSize: 13, color: L.fg }}>
-    <span onClick={shop?.toggleSearch} style={{ opacity: 0.75, ...pointer }}>search</span>
-    <span onClick={shop?.openAccount} style={{ opacity: 0.75, fontWeight: shop?.account ? 700 : 400, color: shop?.account ? L.accent : undefined, ...pointer }}>
+    <span className="ssr-h-link" onClick={shop?.toggleSearch} style={{ opacity: 0.75, ...pointer }}>search</span>
+    <span className="ssr-h-link" onClick={shop?.openAccount} style={{ opacity: 0.75, fontWeight: shop?.account ? 700 : 400, color: shop?.account ? L.accent : undefined, ...pointer }}>
       {shop?.account ? (shop.account.name ? shop.account.name.split(" ")[0].toLowerCase() : "account") : "account"}
     </span>
-    <span onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
+    <span className="ssr-h-btn" onClick={shop?.goCart} style={{ background: L.accent, color: btnFg, padding: "7px 13px", fontWeight: 700, ...pointer }}>cart · {shop ? shop.cartCount : 3}</span>
   </div>
   {shop?.searchOpen && (
     <div style={{ flexBasis: "100%", display: "flex", gap: 8, marginTop: 4 }}>
@@ -197,8 +220,8 @@ export function LayoutStorefrontView({
         <div style={{ fontFamily: L.font, fontSize: "clamp(30px, 3.4vw, 48px)", fontWeight: 700, letterSpacing: "-0.03em", color: "#FFFFFF", lineHeight: 1, marginTop: 10, maxWidth: 720 }}>{slideData.headline}</div>
         <div style={{ fontSize: 15, color: "#FFFFFF", marginTop: 10, maxWidth: 520, lineHeight: 1.5 }}>{slideData.sub}</div>
         <div style={{ display: "flex", gap: 9, marginTop: 16, flexWrap: "wrap", alignItems: "center" }}>
-          <span onClick={shop?.toGrid} style={{ background: L.accent, color: btnFg, padding: "12px 22px", fontSize: 14, fontWeight: 700, ...pointer }}>{slideData.cta}</span>
-          <span onClick={shop?.toLookbook} style={{ border: "1px solid #FFFFFF", color: "#FFFFFF", padding: "12px 18px", fontSize: 14, fontWeight: 700, ...pointer }}>{L.cta2}</span>
+          <span className="ssr-h-btn" onClick={shop?.toGrid} style={{ background: L.accent, color: btnFg, padding: "12px 22px", fontSize: 14, fontWeight: 700, ...pointer }}>{slideData.cta}</span>
+          <span className="ssr-h-btn" onClick={shop?.toLookbook} style={{ border: "1px solid #FFFFFF", color: "#FFFFFF", padding: "12px 18px", fontSize: 14, fontWeight: 700, ...pointer }}>{L.cta2}</span>
           <div style={{ display: "flex", gap: 7, marginLeft: 12 }}>
             {v.slides.map((_, k) => (
               <div key={k} onClick={() => setSlide(k)} style={{ width: k === v.si ? 28 : 10, height: 8, background: k === v.si ? "#FFFFFF" : "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.7)", cursor: "pointer" }} />
@@ -214,7 +237,7 @@ export function LayoutStorefrontView({
       {L.chips.map((c, k) => {
         const on = shop ? norm(shop.cat || L.chips[0]) === norm(c) : k === 0;
         return (
-          <span key={c} onClick={() => shop?.setCat(c)} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "7px 12px", ...pointer }}>{c}</span>
+          <span key={c} className="ssr-h-btn" onClick={() => shop?.setCat(c)} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "7px 12px", ...pointer }}>{c}</span>
         );
       })}
     </div></Edit>
@@ -224,11 +247,11 @@ export function LayoutStorefrontView({
     <Edit part="tiles">
     <div style={{ padding: "18px 24px 6px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
       <span style={{ fontFamily: L.font, fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", color: L.fg }}>shop by category</span>
-      <span onClick={() => { shop?.setCat(L.chips[0]); shop?.toGrid(); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>all categories →</span>
+      <span className="ssr-h-link" onClick={() => { shop?.setCat(L.chips[0]); shop?.toGrid(); }} style={{ fontFamily: MONO, fontSize: 11, color: L.accent, ...pointer }}>all categories →</span>
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 150px), 1fr))", gap: 12, padding: "10px 24px 18px" }}>
       {L.tiles.map((t) => (
-        <div key={t.name} onClick={() => { shop?.setCat(t.name); shop?.toGrid(); }} style={{ border: `1px solid ${shop && norm(shop.cat) === norm(t.name) ? L.accent : L.line}`, background: L.card, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 118, ...pointer }}>
+        <div key={t.name} className="ssr-h-tile" onClick={() => { shop?.setCat(t.name); shop?.toGrid(); }} style={{ border: `1px solid ${shop && norm(shop.cat) === norm(t.name) ? L.accent : L.line}`, background: L.card, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 118, ...pointer }}>
           <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{t.count}</div>
           <div>
             <div style={{ fontFamily: L.font, fontSize: 21, fontWeight: 700, letterSpacing: "-0.02em", color: L.fg, lineHeight: 1.05 }}>{t.name}</div>
@@ -257,9 +280,9 @@ export function LayoutStorefrontView({
     ) : (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 178px), 1fr))", gap: 13, padding: "12px 24px 20px" }}>
       {visible.map((p) => (
-        <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, ...pointer }}>
+        <div key={p.name} className="ssr-h-card" onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, ...pointer }}>
           <div style={{ position: "relative" }}>
-            <div style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
+            <div className="ssr-h-thumb" style={{ aspectRatio: "3 / 4", overflow: "hidden" }}>
               <Img fallback={L.hero} src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div style={{ position: "absolute", top: 8, left: 8, background: L.accent, color: btnFg, fontFamily: MONO, fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 7px" }}>{p.badge}</div>
@@ -277,7 +300,7 @@ export function LayoutStorefrontView({
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
               <span style={{ fontFamily: MONO, fontSize: 9, color: L.fg, opacity: 0.6 }}>★ {p.rating}</span>
-              <button type="button" onClick={(e) => { e.stopPropagation(); shop?.addToCart(p); }} style={{ border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", fontSize: 11, fontWeight: 700, padding: "6px 10px", ...pointer }}>add to cart</button>
+              <button type="button" className="ssr-h-btn" onClick={(e) => { e.stopPropagation(); shop?.addToCart(p); }} style={{ border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", fontSize: 11, fontWeight: 700, padding: "6px 10px", ...pointer }}>add to cart</button>
             </div>
           </div>
         </div>
@@ -296,7 +319,7 @@ export function LayoutStorefrontView({
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: L.accent }}>{L.banner.kicker}</div>
         <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, letterSpacing: "-0.025em", marginTop: 8, color: L.fg, lineHeight: 1.05 }}>{L.banner.headline}</div>
         <p style={{ fontSize: 14, lineHeight: 1.5, marginTop: 9, color: L.fg, opacity: 0.8 }}>{L.banner.sub}</p>
-        <div onClick={shop?.toGrid} style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700, ...pointer }}>{L.banner.cta}</div>
+        <div className="ssr-h-btn" onClick={shop?.toGrid} style={{ alignSelf: "flex-start", marginTop: 15, background: L.accent, color: btnFg, padding: "10px 17px", fontSize: 13, fontWeight: 700, ...pointer }}>{L.banner.cta}</div>
       </div>
     </div></Edit>
     )}
@@ -322,7 +345,7 @@ export function LayoutStorefrontView({
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(33%, 118px), 1fr))", gap: 8, padding: "10px 24px 24px" }}>
       {v.gallery.map((g) => (
-        <div key={g.img} style={{ aspectRatio: "1 / 1", border: `1px solid ${L.line}`, overflow: "hidden" }}>
+        <div key={g.img} className="ssr-h-lift ssr-h-thumb" style={{ aspectRatio: "1 / 1", border: `1px solid ${L.line}`, overflow: "hidden" }}>
           <Img fallback={L.hero} src={g.img} alt={g.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
       ))}
@@ -334,7 +357,7 @@ export function LayoutStorefrontView({
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))", gap: 13, padding: "12px 24px 22px" }}>
       {L.reviews.map((r) => (
-        <div key={r.name} style={{ border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
+        <div key={r.name} className="ssr-h-lift" style={{ border: `1px solid ${L.line}`, background: L.card, padding: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", border: `1px solid ${L.line}` }}>
               <Img fallback={L.hero} src={avatarFor(r.name)} alt={r.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -367,7 +390,7 @@ export function LayoutStorefrontView({
         <div style={{ fontSize: 15, fontWeight: 700, color: L.fg }}>order on whatsapp instead</div>
         <div style={{ fontSize: 13, marginTop: 3, color: L.fg, opacity: 0.75 }}>send a photo of what you want — we reply with a payment link.</div>
       </div>
-      <div onClick={shop?.whatsapp} style={{ background: L.accent, color: btnFg, padding: "10px 16px", fontSize: 13, fontWeight: 700, ...pointer }}>message us</div>
+      <div className="ssr-h-btn" onClick={shop?.whatsapp} style={{ background: L.accent, color: btnFg, padding: "10px 16px", fontSize: 13, fontWeight: 700, ...pointer }}>message us</div>
     </div>
 
     <div style={{ background: L.footBg, color: L.footFg, padding: "26px 24px" }}>
@@ -387,6 +410,7 @@ export function LayoutStorefrontView({
               {col.links.map((l) => (
                 <span
                   key={l}
+                  className="ssr-h-link"
                   onClick={() => {
                     if (!shop) return;
                     if (col.kind === "cat") { shop.setCat(l); shop.toGrid(); }
@@ -417,7 +441,7 @@ export function LayoutStorefrontView({
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginTop: 8 }}>
           {[pd.img, ...L.extra.slice(0, 3)].map((src, k) => (
-            <div key={k} onClick={() => shop?.setGalleryPick(src)} style={{ aspectRatio: "1 / 1", border: `1px solid ${galleryMain === src ? L.accent : L.line}`, overflow: "hidden", ...pointer }}>
+            <div key={k} className="ssr-h-lift" onClick={() => shop?.setGalleryPick(src)} style={{ aspectRatio: "1 / 1", border: `1px solid ${galleryMain === src ? L.accent : L.line}`, overflow: "hidden", ...pointer }}>
               <Img fallback={L.hero} src={src} alt="gallery" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
           ))}
@@ -443,7 +467,7 @@ export function LayoutStorefrontView({
             {pd.variants.map((vv, k) => {
               const on = shop ? vv === shop.variant : k === 0;
               return (
-                <button key={vv} type="button" onClick={() => shop?.setVariant(vv)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "9px 14px", fontSize: 13, fontWeight: 700, ...pointer }}>{vv}</button>
+                <button key={vv} type="button" className="ssr-h-btn" onClick={() => shop?.setVariant(vv)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? L.accent : "transparent", color: on ? btnFg : L.fg, padding: "9px 14px", fontSize: 13, fontWeight: 700, ...pointer }}>{vv}</button>
               );
             })}
           </div>
@@ -455,18 +479,40 @@ export function LayoutStorefrontView({
             <span style={{ padding: "12px 6px", fontFamily: MONO, color: L.fg }}>{shop ? shop.qty : 1}</span>
             <button type="button" onClick={() => shop?.setQty(shop.qty + 1)} style={{ padding: "12px 14px", color: L.fg, fontWeight: 700, background: "transparent", border: 0, ...pointer }}>+</button>
           </div>
-          <button type="button" onClick={() => shop?.addToCart(pd, shop.qty, shop.variant)} style={{ flex: 1, minWidth: 150, background: L.accent, color: btnFg, textAlign: "center", padding: 13, fontSize: 15, fontWeight: 700, border: 0, ...pointer }}>add to cart</button>
-          <button type="button" onClick={() => shop?.buyNow(pd)} style={{ border: `1px solid ${L.fg}`, color: L.fg, background: "transparent", padding: "13px 18px", fontSize: 15, fontWeight: 700, ...pointer }}>buy now</button>
+          <button type="button" className="ssr-h-btn" onClick={() => shop?.addToCart(pd, shop.qty, shop.variant)} style={{ flex: 1, minWidth: 150, background: L.accent, color: btnFg, textAlign: "center", padding: 13, fontSize: 15, fontWeight: 700, border: 0, ...pointer }}>add to cart</button>
+          <button type="button" className="ssr-h-btn" onClick={() => shop?.buyNow(pd)} style={{ border: `1px solid ${L.fg}`, color: L.fg, background: "transparent", padding: "13px 18px", fontSize: 15, fontWeight: 700, ...pointer }}>buy now</button>
         </div>
 
         <div style={{ marginTop: 18, border: `1px solid ${L.line}`, background: L.card, padding: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: L.fg, opacity: 0.7 }}>deliver to</span>
-            <span style={{ border: `1px solid ${L.line}`, padding: "7px 10px", fontFamily: MONO, fontSize: 12, color: L.fg }}>560038</span>
-            <span onClick={shop?.checkPin} style={{ color: L.accent, fontSize: 12, fontWeight: 700, ...pointer }}>{shop?.pinOK ? "✓ serviceable" : "check"}</span>
+            <input
+              value={shop?.pin ?? ""}
+              onChange={(e) => shop?.setPin(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+              onKeyDown={(e) => { if (e.key === "Enter") shop?.checkPin(); }}
+              inputMode="numeric"
+              placeholder="6-digit pincode"
+              disabled={!shop}
+              style={{ border: `1px solid ${L.line}`, background: L.bg, color: L.fg, padding: "7px 10px", fontFamily: MONO, fontSize: 12, width: 128 }}
+            />
+            <button type="button" className="ssr-h-btn" onClick={() => shop?.checkPin()} style={{ border: `1px solid ${L.accent}`, background: "transparent", color: L.accent, fontSize: 12, fontWeight: 700, padding: "7px 12px", ...pointer }}>check</button>
           </div>
-          <div style={{ fontSize: 13, marginTop: 9, color: L.fg }}>{shop?.pinOK ? `${L.pdp.delivery} · to 560038` : L.pdp.delivery}</div>
+          {shop?.pinStatus === "ok" && (
+            <div style={{ fontSize: 13, marginTop: 9, color: L.accent, fontWeight: 700 }}>✓ serviceable · {L.pdp.delivery} · to {shop.pin}</div>
+          )}
+          {shop?.pinStatus === "no" && (
+            <div style={{ fontSize: 13, marginTop: 9, color: "#B91C1C", fontWeight: 700 }}>we don’t deliver to {shop.pin} yet{L.serviceArea ? ` — ${L.serviceArea}` : ""}. message us on whatsapp to check.</div>
+          )}
+          {shop?.pinStatus === "bad" && (
+            <div style={{ fontSize: 13, marginTop: 9, color: "#B91C1C", fontWeight: 700 }}>enter a valid 6-digit pincode</div>
+          )}
+          {(!shop || shop.pinStatus === "idle") && (
+            <div style={{ fontSize: 13, marginTop: 9, color: L.fg }}>{L.pdp.delivery}</div>
+          )}
           <div style={{ fontSize: 13, marginTop: 4, color: L.fg, opacity: 0.75 }}>{L.pdp.returns}</div>
+          {L.serviceArea && (
+            <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 6, color: L.fg, opacity: 0.6, letterSpacing: "0.04em" }}>serviceable area · {L.serviceArea}</div>
+          )}
         </div>
 
         <div style={{ display: "grid", gap: 7, marginTop: 18 }}>
@@ -497,8 +543,8 @@ export function LayoutStorefrontView({
     <div style={{ padding: "0 24px 8px", fontFamily: L.font, fontSize: 19, fontWeight: 700, color: L.fg }}>goes well with</div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(50%, 170px), 1fr))", gap: 12, padding: "10px 24px 26px" }}>
       {L.products.slice(1, 4).map((p) => (
-        <div key={p.name} onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10, ...pointer }}>
-          <div style={{ width: 66, height: 66, border: `1px solid ${L.line}`, overflow: "hidden" }}>
+        <div key={p.name} className="ssr-h-lift" onClick={() => shop?.openProduct(p)} style={{ border: `1px solid ${L.line}`, background: L.card, display: "grid", gridTemplateColumns: "66px 1fr", gap: 11, alignItems: "center", padding: 10, ...pointer }}>
+          <div className="ssr-h-thumb" style={{ width: 66, height: 66, border: `1px solid ${L.line}`, overflow: "hidden" }}>
             <Img fallback={L.hero} src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div>
@@ -516,7 +562,7 @@ export function LayoutStorefrontView({
     <div style={{ width: 54, height: 54, borderRadius: "50%", background: L.accent, color: btnFg, display: "grid", placeItems: "center", fontSize: 26, margin: "0 auto" }}>✓</div>
     <div style={{ fontFamily: L.font, fontSize: 28, fontWeight: 700, color: L.fg, marginTop: 16 }}>order placed</div>
     <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.1em", color: L.fg, opacity: 0.7, marginTop: 8 }}>{shop.placed} · GST invoice emailed · updates on whatsapp</div>
-    <button type="button" onClick={shop.goHome} style={{ marginTop: 22, background: L.accent, color: btnFg, border: 0, padding: "12px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>continue shopping</button>
+    <button type="button" className="ssr-h-btn" onClick={shop.goHome} style={{ marginTop: 22, background: L.accent, color: btnFg, border: 0, padding: "12px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>continue shopping</button>
   </div>
 )}
 
@@ -524,7 +570,7 @@ export function LayoutStorefrontView({
   <div style={{ padding: "60px 24px", textAlign: "center" }}>
     <div style={{ fontFamily: L.font, fontSize: 26, fontWeight: 700, color: L.fg }}>your cart is empty</div>
     <div style={{ fontSize: 14, color: L.fg, opacity: 0.7, marginTop: 8 }}>add a few pieces from the storefront to see the checkout.</div>
-    <button type="button" onClick={shop.goHome} style={{ marginTop: 20, border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", padding: "11px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>browse the store</button>
+    <button type="button" className="ssr-h-btn" onClick={shop.goHome} style={{ marginTop: 20, border: `1px solid ${L.accent}`, color: L.accent, background: "transparent", padding: "11px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>browse the store</button>
   </div>
 )}
 
@@ -586,7 +632,7 @@ export function LayoutStorefrontView({
           {L.cart.methods.map((m) => {
             const on = shop ? (shop.method || L.cart.methods[0].name) === m.name : m.on;
             return (
-              <div key={m.name} onClick={() => shop?.setMethod(m.name)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, ...pointer }}>
+              <div key={m.name} className="ssr-h-lift" onClick={() => shop?.setMethod(m.name)} style={{ border: `1px solid ${on ? L.accent : L.line}`, background: on ? (onDark ? "#1E2530" : "#F7F4EC") : "transparent", padding: "12px 13px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, ...pointer }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: L.fg }}>{m.name}</div>
                   <div style={{ fontFamily: MONO, fontSize: 10, marginTop: 3, color: L.fg, opacity: 0.65 }}>{m.meta}</div>
@@ -597,7 +643,7 @@ export function LayoutStorefrontView({
           })}
         </div>
 
-        <button type="button" onClick={shop?.placeOrder} style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}>place order · {money.total}</button>
+        <button type="button" className="ssr-h-btn" onClick={shop?.placeOrder} style={{ width: "100%", background: L.accent, color: btnFg, textAlign: "center", padding: 14, fontSize: 15, fontWeight: 700, marginTop: 18, border: 0, ...pointer }}>place order · {money.total}</button>
         <div style={{ fontFamily: MONO, fontSize: 10, lineHeight: 1.7, marginTop: 12, color: L.fg, opacity: 0.65 }}>GST invoice emailed instantly · order updates on whatsapp · {L.pdp.returns}</div>
       </div>
     </div>

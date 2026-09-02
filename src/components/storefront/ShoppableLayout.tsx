@@ -73,7 +73,20 @@ export function ShoppableLayout({
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [galleryPick, setGalleryPick] = useState("");
-  const [pinOK, setPinOK] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinStatus, setPinStatus] = useState<"idle" | "ok" | "no" | "bad">("idle");
+
+  const checkPin = () => {
+    const p = pin.trim();
+    if (!/^\d{6}$/.test(p)) { setPinStatus("bad"); return; }
+    const tokens = (L.servicePins || "")
+      .split(/[,\s]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!tokens.length) { setPinStatus("ok"); return; } // ships everywhere
+    const ok = tokens.some((t) => (t.length >= 6 ? t === p : p.startsWith(t)));
+    setPinStatus(ok ? "ok" : "no");
+  };
 
   // storefront customer session (per store) — only when accountSlug is set
   const [customer, setCustomer] = useState<CustomerSession | null>(null);
@@ -126,8 +139,8 @@ export function ShoppableLayout({
 
   const shop: ShopApi = {
     cartCount: cart.reduce((a, c) => a + c.qty, 0),
-    cart, active, qty, variant, method, placed, cat, query, galleryPick, pinOK, searchOpen,
-    openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setGalleryPick(p.img); setPinOK(false); setScreen("product"); scrollTop(); },
+    cart, active, qty, variant, method, placed, cat, query, galleryPick, pin, pinStatus, searchOpen,
+    openProduct: (p) => { setActive(p); setQty(1); setVariant(p.variants[0]); setGalleryPick(p.img); setPinStatus("idle"); setScreen("product"); scrollTop(); },
     addToCart,
     buyNow: (p) => { addToCart(p, qty, variant); setScreen("cart"); scrollTop(); },
     setQty, setVariant,
@@ -137,7 +150,8 @@ export function ShoppableLayout({
     setCat: (c) => { setCat(c); setQuery(""); },
     setQuery: (q) => { setQuery(q); if (q) setCat(""); },
     setGalleryPick,
-    checkPin: () => setPinOK(true),
+    setPin: (v: string) => { setPin(v); setPinStatus("idle"); },
+    checkPin,
     toggleSearch: () => setSearchOpen((o) => !o),
     openAccount: () => { if (accountSlug) setAcctOpen(true); },
     account: customer ? { name: customer.customer.name } : null,
